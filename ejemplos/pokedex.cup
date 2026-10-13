@@ -1,0 +1,32 @@
+# Pokédex: busca un Pokémon y muestra su ficha
+
+pokedex = [
+    "pikachu":    (numero: 25, tipo: "eléctrico", altura: 0.4, peso: 6.0),
+    "bulbasaur":  (numero: 1,  tipo: "planta",    altura: 0.7, peso: 6.9),
+    "charmander": (numero: 4,  tipo: "fuego",     altura: 0.6, peso: 8.5),
+    "squirtle":   (numero: 7,  tipo: "agua",      altura: 0.5, peso: 9.0),
+    "eevee":      (numero: 133, tipo: "normal",   altura: 0.3, peso: 6.5),
+]
+
+fx consejo(tipo):
+    when tipo:
+        is "fuego":
+            return "Cuidado con los Pokémon de agua"
+        is "agua":
+            return "Cuidado con los Pokémon de planta y eléctricos"
+        is "planta":
+            return "Cuidado con los Pokémon de fuego"
+        is "eléctrico":
+            return "Cuidado con los Pokémon de tierra"
+        else:
+            return "No tiene debilidades especiales"
+
+repeat 3:
+    nombre = lower(strip(read("¿Qué Pokémon buscas? ")))
+    if nombre in pokedex:
+        p = pokedex[nombre]
+        show("  #{p.numero} {upper(nombre)}  ·  tipo {p.tipo}")
+        show("  Mide {p.altura} m y pesa {p.peso} kg")
+        show("  Consejo: {consejo(p.tipo)}")
+    else:
+        show("  «{nombre}» no está en la Pokédex. Conozco: {join(keys(pokedex), ", ")}")

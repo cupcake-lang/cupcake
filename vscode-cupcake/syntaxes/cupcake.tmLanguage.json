@@ -1,0 +1,198 @@
+{
+  "name": "Cupcake",
+  "scopeName": "source.cupcake",
+  "patterns": [
+    {
+      "include": "#comentario"
+    },
+    {
+      "include": "#texto-triple"
+    },
+    {
+      "include": "#texto"
+    },
+    {
+      "include": "#texto-simple"
+    },
+    {
+      "include": "#definicion"
+    },
+    {
+      "include": "#palabras"
+    },
+    {
+      "include": "#constantes"
+    },
+    {
+      "include": "#numeros"
+    },
+    {
+      "include": "#integradas"
+    },
+    {
+      "include": "#campo-de-registro"
+    },
+    {
+      "include": "#llamada"
+    },
+    {
+      "include": "#operadores"
+    }
+  ],
+  "repository": {
+    "comentario": {
+      "name": "comment.line.number-sign.cupcake",
+      "match": "#.*$"
+    },
+    "interpolacion": {
+      "name": "meta.interpolation.cupcake",
+      "begin": "(?<!\\\\)\\{",
+      "end": "\\}",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.section.interpolation.begin.cupcake"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.interpolation.end.cupcake"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#constantes"
+        },
+        {
+          "include": "#numeros"
+        },
+        {
+          "include": "#integradas"
+        },
+        {
+          "include": "#llamada"
+        },
+        {
+          "include": "#operadores"
+        }
+      ]
+    },
+    "escape": {
+      "name": "constant.character.escape.cupcake",
+      "match": "\\\\."
+    },
+    "texto-triple": {
+      "name": "string.quoted.triple.cupcake",
+      "begin": "\"\"\"",
+      "end": "\"\"\"",
+      "patterns": [
+        {
+          "include": "#escape"
+        },
+        {
+          "include": "#interpolacion"
+        }
+      ]
+    },
+    "texto": {
+      "name": "string.quoted.double.cupcake",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "include": "#escape"
+        },
+        {
+          "include": "#interpolacion"
+        }
+      ]
+    },
+    "texto-simple": {
+      "name": "string.quoted.single.cupcake",
+      "begin": "'",
+      "end": "'",
+      "patterns": [
+        {
+          "include": "#escape"
+        },
+        {
+          "include": "#interpolacion"
+        }
+      ]
+    },
+    "definicion": {
+      "match": "\\b(fx)\\s+([\\p{L}_][\\p{L}\\p{N}_]*)",
+      "captures": {
+        "1": {
+          "name": "storage.type.function.cupcake"
+        },
+        "2": {
+          "name": "entity.name.function.cupcake"
+        }
+      }
+    },
+    "palabras": {
+      "patterns": [
+        {
+          "name": "keyword.control.cupcake",
+          "match": "\\b(if|else|when|while|repeat|for|in|at|by|break|continue|return|stop|try|except|finally|raise|assert)\\b"
+        },
+        {
+          "name": "storage.type.function.cupcake",
+          "match": "\\b(fx)\\b|λ"
+        },
+        {
+          "name": "keyword.control.import.cupcake",
+          "match": "\\b(use|from|as)\\b"
+        },
+        {
+          "name": "keyword.operator.logical.cupcake",
+          "match": "\\b(and|or|not|has|is)\\b"
+        },
+        {
+          "name": "support.type.cupcake",
+          "match": "(?<=\\bis\\s|\\bis not\\s)(number|text|bool|list|dict|record|function|empty|none)\\b"
+        }
+      ]
+    },
+    "constantes": {
+      "name": "constant.language.cupcake",
+      "match": "\\b(true|false|none|it)\\b"
+    },
+    "numeros": {
+      "name": "constant.numeric.cupcake",
+      "match": "\\b\\d+(\\.\\d+)?\\b"
+    },
+    "integradas": {
+      "name": "support.function.builtin.cupcake",
+      "match": "\\b(show|read|read_num|len|add|drop|sorted|reversed|filter|map|reduce|count|first|last|min|max|sum|abs|round|int|float|str|bool|upper|lower|strip|split|join|replace|keys|values|load|save|roll|pick)(?=\\s*\\()"
+    },
+    "campo-de-registro": {
+      "match": "([\\p{L}_][\\p{L}\\p{N}_]*)\\s*(:)(?!\\s*\\])",
+      "captures": {
+        "1": {
+          "name": "variable.other.property.cupcake"
+        }
+      }
+    },
+    "llamada": {
+      "match": "\\b([\\p{L}_][\\p{L}\\p{N}_]*)(?=\\s*\\()",
+      "captures": {
+        "1": {
+          "name": "entity.name.function.call.cupcake"
+        }
+      }
+    },
+    "operadores": {
+      "patterns": [
+        {
+          "name": "keyword.operator.range.cupcake",
+          "match": "\\.\\."
+        },
+        {
+          "name": "keyword.operator.cupcake",
+          "match": "==|!=|<=|>=|\\*\\*|//|[+\\-*/%<>=]"
+        }
+      ]
+    }
+  }
+}

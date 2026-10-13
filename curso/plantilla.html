@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aprende con Cupi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Una vitrina de pastelería: el menú es una fila de cupcakes, cada lección uno que se decora al terminarla. */
+:root {
+  --fondo: #fbf6f8; --papel: #ffffff; --tinta: #2b1d24; --suave: #7a6670; --linea: #f0e2e8;
+  --cupi: #d6336c; --cupi-oscuro: #9e1f4f; --cupi-claro: #fde3ec; --mejilla: #ff8fb1; --betun: #ffc2d9; --capacillo: #f2b263; --capacillo-oscuro: #b8742c;
+  --dorado: #ffc21c; --sol: #ffc93c; --lentes: #1f1f1f; --lentes-borde: #000000; --sol-claro: #fff4cf; --cielo: #4aa3df; --cielo-claro: #e3f2fc;
+  --ok: #2f8a41; --ok-claro: #e2f5e5; --mal: #d64535; --mal-claro: #fde8e5;
+  --codigo-fondo: #fff8fb;
+  --c-kw: #d6336c; --c-bi: #0e7c86; --c-str: #2f8a57; --c-num: #c2571a; --c-com: #a08a95; --c-cons: #a3368f; --c-fn: #7c3aed; --c-campo: #b5476e;
+  --sombra: 0 2px 0 rgba(29, 43, 38, .06), 0 8px 24px rgba(29, 43, 38, .06);
+  --titulo: "Baloo 2", "Nunito", system-ui, sans-serif;
+  --cuerpo: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fondo: #171114; --papel: #211920; --tinta: #f6e9ef; --suave: #b9a3ae; --linea: #33252d;
+    --cupi: #ff6b9a; --cupi-oscuro: #d0457a; --cupi-claro: #3d1f2a; --mejilla: #ff8fb1; --betun: #ffc2d9; --capacillo: #f2b263; --capacillo-oscuro: #b8742c;
+    --dorado: #ffd04a; --sol: #ffd25c; --lentes: #141414; --lentes-borde: #8a8a8a; --sol-claro: #3a3218; --cielo: #6db8ec; --cielo-claro: #182c3a;
+    --ok: #6fd383; --ok-claro: #1c3324; --mal: #ff8f80; --mal-claro: #3b1f1b;
+    --codigo-fondo: #1e1418;
+    --c-kw: #ff6b9a; --c-bi: #6cd4e0; --c-str: #8fe0a8; --c-num: #ffb86b; --c-com: #8a7480; --c-cons: #f2a3e0; --c-fn: #c4a3ff; --c-campo: #ffb3cd;
+    --sombra: 0 2px 0 rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fondo: #171114; --papel: #211920; --tinta: #f6e9ef; --suave: #b9a3ae; --linea: #33252d;
+  --cupi: #ff6b9a; --cupi-oscuro: #d0457a; --cupi-claro: #3d1f2a; --mejilla: #ff8fb1; --betun: #ffc2d9; --capacillo: #f2b263; --capacillo-oscuro: #b8742c;
+  --dorado: #ffd04a; --sol: #ffd25c; --lentes: #141414; --lentes-borde: #8a8a8a; --sol-claro: #3a3218; --cielo: #6db8ec; --cielo-claro: #182c3a;
+  --ok: #6fd383; --ok-claro: #1c3324; --mal: #ff8f80; --mal-claro: #3b1f1b;
+  --codigo-fondo: #1e1418;
+  --c-kw: #ff6b9a; --c-bi: #6cd4e0; --c-str: #8fe0a8; --c-num: #ffb86b; --c-com: #8a7480; --c-cons: #f2a3e0; --c-fn: #c4a3ff; --c-campo: #ffb3cd;
+  --sombra: 0 2px 0 rgba(0, 0, 0, .25);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+code, pre, textarea { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--fondo); color: var(--tinta); font: 17px/1.65 var(--cuerpo); }
+h1, h2, h3 { font-family: var(--titulo); line-height: 1.15; text-wrap: balance; }
+code { font-family: var(--mono); font-size: .86em; background: var(--cupi-claro); padding: .08em .38em; border-radius: 6px; }
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--cielo); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- cabecera */
+.cabecera { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; display: flex; align-items: center; gap: 12px;
+  padding: 8px 20px; background: color-mix(in srgb, var(--fondo) 90%, transparent); backdrop-filter: blur(8px); border-bottom: 2px solid var(--linea); }
+.logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--tinta); font: 800 1.35rem/1 var(--titulo); }
+.logo svg { width: 32px; height: 32px; }
+.logo b { font-weight: 800; }
+.logo span { color: var(--cupi-oscuro); }
+.espacio { flex: 1; }
+.estrellas { font: 700 .95rem var(--titulo); color: var(--suave); white-space: nowrap; }
+.estrellas b { color: var(--tinta); }
+.motor { border: 2px solid var(--linea); background: var(--papel); color: var(--suave); border-radius: 999px; padding: 2px 12px; font-size: .82rem; white-space: nowrap; }
+.motor::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--linea); margin-right: 6px; vertical-align: 1px; }
+.motor[data-estado="cargando"]::before { background: var(--sol); animation: latido 1s infinite; }
+.motor[data-estado="listo"]::before { background: var(--cupi); }
+.motor[data-estado="error"]::before { background: var(--mal); }
+@keyframes latido { 50% { opacity: .3; } }
+.tema { border: 2px solid var(--linea); background: var(--papel); color: var(--tinta); border-radius: 10px; width: 36px; height: 32px; }
+
+/* ---- estructura */
+.marco { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 36px; max-width: 1150px; margin: 0 auto; padding: 26px 20px 90px; }
+nav.cuerpo { position: sticky; top: 76px; align-self: start; max-height: calc(100vh - 96px); overflow: auto; padding: 4px 4px 4px 0; }
+nav.cuerpo summary { display: none; }
+nav.cuerpo ol { list-style: none; margin: 0; padding: 0 0 0 6px; position: relative; }
+nav.cuerpo ol::before { content: ""; position: absolute; left: 25px; top: 18px; bottom: 18px; width: 4px; background: var(--linea); border-radius: 4px; }
+nav.cuerpo li a { position: relative; display: flex; gap: 12px; align-items: center; padding: 5px 8px 5px 0; color: var(--tinta); text-decoration: none; font-size: .93rem; line-height: 1.3; border-radius: 12px; }
+nav.cuerpo .seg { flex: 0 0 40px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--papel); border: 3px solid var(--linea);
+  font: 800 .9rem var(--titulo); color: var(--suave); z-index: 1; transition: background .3s, border-color .3s; }
+nav.cuerpo li a:hover .seg { border-color: var(--cupi); }
+nav.cuerpo li a.activa { font-weight: 800; }
+nav.cuerpo li a.activa .seg { border-color: var(--cupi-oscuro); color: var(--cupi-oscuro); }
+nav.cuerpo li.hecha .seg { background: var(--cupi); border-color: var(--cupi-oscuro); color: #fff; }
+main { min-width: 0; max-width: 790px; }
+
+@media (max-width: 900px) {
+  .marco { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 16px 16px 70px; }
+  nav.cuerpo { position: static; max-height: none; background: var(--papel); border: 2px solid var(--linea); border-radius: 16px; padding: 4px 8px; }
+  nav.cuerpo summary { display: block; padding: 8px 4px; font: 700 1rem var(--titulo); cursor: pointer; }
+  .estrellas { display: none; }
+  .cabecera { padding: 8px 16px; }
+}
+@media (max-width: 480px) { .logo { font-size: 1.15rem; } .motor { font-size: .72rem; } }
+
+/* ---- encabezado de la lección */
+.escena { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center; gap: 12px; margin-bottom: 26px; }
+.escena .num { font: 800 .85rem var(--titulo); letter-spacing: .08em; text-transform: uppercase; color: var(--cupi-oscuro); }
+.escena h1 { font-size: clamp(2rem, 5vw, 2.9rem); margin: 4px 0 0; }
+.dibujo { position: relative; }
+.dibujo svg { width: 100%; height: auto; display: block; overflow: visible; }
+.bocadillo { position: relative; background: var(--papel); border: 3px solid var(--tinta); border-radius: 22px; padding: 10px 16px; font: 700 1.05rem/1.35 var(--titulo); margin: 0 0 10px auto; max-width: 300px; box-shadow: 4px 4px 0 var(--sol); }
+.bocadillo::after { content: ""; position: absolute; bottom: -14px; right: 70px; border: 12px solid transparent; border-top-color: var(--tinta); border-bottom: 0; }
+@media (max-width: 640px) { .escena { grid-template-columns: minmax(0, 1fr); } .bocadillo { margin: 0 auto 8px 0; } }
+.cupi-baila { animation: baile .9s ease-in-out 2; transform-origin: 60% 80%; }
+@keyframes baile { 25% { transform: rotate(-4deg) translateY(-6px); } 75% { transform: rotate(4deg) translateY(-6px); } }
+
+/* ---- secciones */
+section.parte { margin: 0 0 38px; }
+h2 { display: flex; align-items: center; gap: 10px; font-size: 1.5rem; margin: 0 0 12px; }
+h2 .icono { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--cupi-claro); font-size: 1rem; flex: none; }
+.historia { background: var(--cielo-claro); border-radius: 20px; padding: 6px 22px; font-size: 1.08rem; }
+.idea p, .idea li { max-width: 68ch; }
+.idea ul { padding-left: 1.3em; }
+.idea li { margin: .25em 0; }
+pre.codigo-fijo { margin: 14px 0; padding: 14px 18px; background: var(--codigo-fondo); border: 2px solid var(--linea); border-radius: 14px; font: 14.5px/1.6 var(--mono); overflow-x: auto; }
+.explica { margin: 18px 0 8px; }
+
+/* ---- tarjeta de código */
+.tarjeta { background: var(--papel); border: 2px solid var(--linea); border-radius: 18px; box-shadow: var(--sombra); margin: 10px 0 24px; overflow: hidden; }
+.editor { position: relative; display: grid; background: var(--codigo-fondo); border-bottom: 2px solid var(--linea); }
+.editor > * { grid-area: 1 / 1; margin: 0; padding: 16px 18px; font: 15px/1.6 var(--mono); tab-size: 4; white-space: pre; border: 0; letter-spacing: 0; }
+.editor pre { overflow: hidden; pointer-events: none; color: var(--tinta); }
+.editor textarea { resize: none; background: transparent; color: transparent; caret-color: var(--tinta); outline: none; overflow-x: auto; overflow-y: hidden; min-height: 3.2em; }
+.editor textarea:focus-visible { box-shadow: inset 0 0 0 3px var(--cielo); }
+.editor textarea::selection { background: color-mix(in srgb, var(--cielo) 35%, transparent); }
+.t-kw { color: var(--c-kw); font-weight: 600; } .t-bi { color: var(--c-bi); } .t-str { color: var(--c-str); }
+.t-num { color: var(--c-num); } .t-com { color: var(--c-com); font-style: italic; } .t-cons { color: var(--c-cons); font-weight: 600; }
+.t-int { color: var(--c-kw); }
+.t-fn { color: var(--c-fn); font-weight: 600; } .t-campo { color: var(--c-campo); }
+.acciones { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; }
+.btn { border: 2px solid var(--linea); background: var(--papel); color: var(--tinta); border-radius: 12px; padding: 6px 14px; font-weight: 700; font-size: .92rem; }
+.btn:hover { border-color: var(--suave); }
+.btn.primario { background: var(--cupi); border-color: var(--cupi-oscuro); color: #fff; box-shadow: 0 3px 0 var(--cupi-oscuro); }
+.btn.primario:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--cupi-oscuro); }
+.btn.sol { background: var(--sol); border-color: #d9a419; color: #3b2d00; box-shadow: 0 3px 0 #d9a419; }
+.btn:disabled { opacity: .55; cursor: progress; }
+.acciones .derecha { margin-left: auto; color: var(--suave); font-size: .8rem; }
+.respuestas { display: flex; gap: 10px; align-items: flex-start; padding: 0 12px 10px; }
+.respuestas label { font: 700 .85rem var(--titulo); color: var(--suave); padding-top: 6px; white-space: nowrap; }
+.respuestas textarea { flex: 1; min-width: 0; font: 14px/1.5 var(--mono); border: 2px solid var(--linea); border-radius: 10px; background: var(--codigo-fondo); color: var(--tinta); padding: 6px 10px; resize: vertical; }
+.salida { margin: 0; padding: 12px 18px; border-top: 2px solid var(--linea); font: 14.5px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 420px; overflow: auto; background: var(--codigo-fondo); }
+.salida .nota { display: block; font: 600 .78rem var(--cuerpo); color: var(--suave); margin-bottom: 4px; }
+.problema { margin: 0; padding: 12px 18px; border-top: 2px solid var(--linea); background: var(--mal-claro); }
+.problema b { display: block; font: 800 1rem var(--titulo); color: var(--mal); }
+.problema pre { margin: 4px 0 0; font: 14px/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.archivo { border-top: 2px dashed var(--linea); }
+.archivo .nombre { padding: 8px 18px 0; font: 700 .82rem var(--titulo); color: var(--suave); }
+.archivo pre { margin: 0; padding: 6px 18px 12px; font: 13.5px/1.55 var(--mono); overflow-x: auto; }
+
+/* ---- ejercicios */
+.ejercicio .enunciado { padding: 14px 18px; border-bottom: 2px solid var(--linea); background: var(--sol-claro); }
+.ejercicio .enunciado b.et { display: inline-block; font: 800 .8rem var(--titulo); letter-spacing: .08em; text-transform: uppercase; color: #a16207; margin-right: 6px; }
+.ejercicio.resuelto .enunciado { background: var(--ok-claro); }
+.ejercicio.resuelto .enunciado b.et { color: var(--ok); }
+.ejercicio.resuelto .enunciado b.et::after { content: " · ¡resuelto!"; }
+.checks { list-style: none; margin: 0; padding: 10px 18px; border-top: 2px solid var(--linea); }
+.checks li { display: grid; grid-template-columns: 26px 1fr; gap: 2px; padding: 3px 0; }
+.checks li::before { font-weight: 800; }
+.checks li.si::before { content: "✓"; color: var(--ok); }
+.checks li.no::before { content: "✗"; color: var(--mal); }
+.checks li .pista-check { grid-column: 2; color: var(--suave); font-size: .92rem; }
+.fiesta { display: flex; align-items: center; gap: 12px; margin: 0; padding: 10px 18px; background: var(--ok-claro); border-top: 2px solid var(--linea); font: 800 1.1rem var(--titulo); color: var(--ok); }
+.fiesta svg { width: 70px; height: 46px; flex: none; }
+.pistas { padding: 0 18px; }
+.pistas p { margin: 10px 0; padding: 8px 12px; background: var(--sol-claro); border-radius: 10px; font-size: .95rem; }
+.solucion { border-top: 2px solid var(--linea); }
+.solucion pre { margin: 0; padding: 14px 18px; font: 14px/1.6 var(--mono); background: var(--codigo-fondo); overflow-x: auto; }
+
+/* ---- recuerda */
+.recuerda { background: var(--sol-claro); border-radius: 6px 22px 22px 22px; padding: 14px 22px; transform: rotate(-.4deg); box-shadow: 4px 5px 0 var(--sol); }
+.recuerda ul { margin: 6px 0; padding-left: 1.2em; }
+.recuerda li { margin: .3em 0; }
+
+.navegar { display: flex; justify-content: space-between; gap: 12px; margin-top: 40px; }
+.navegar a { text-decoration: none; padding: 10px 16px; border: 2px solid var(--linea); border-radius: 14px; background: var(--papel); color: var(--tinta); max-width: 48%; font-weight: 700; }
+.navegar a small { display: block; color: var(--suave); font-size: .78rem; font-weight: 600; }
+.navegar a.sig { margin-left: auto; text-align: right; border-color: var(--cupi); }
+/* el código se ve tal como se escribe: «==» son dos signos, no uno */
+code, pre, textarea, .editor > * { font-variant-ligatures: none !important; font-feature-settings: "liga" 0, "calt" 0 !important; }
+</style>
+</head>
+<body>
+<header class="cabecera">
+  <a class="logo" href="#hola" aria-label="Inicio"><svg id="logo" viewBox="0 0 320 200" aria-hidden="true"></svg><b>Cup<span>cake</span></b></a>
+  <div class="espacio"></div>
+  <div class="estrellas" id="estrellas"></div>
+  <button class="motor" id="motor" data-estado="nada" title="Cupcake funciona dentro de tu navegador">Cupi está en el horno</button>
+  <button class="tema" id="tema" title="Cambiar colores" aria-label="Cambiar colores">◐</button>
+</header>
+<div class="marco">
+  <nav class="cuerpo" aria-label="Lecciones"><details id="det" open><summary>Las lecciones</summary><ol id="indice"></ol></details></nav>
+  <main id="contenido"></main>
+</div>
+
+<script id="datos" type="application/json">/*DATOS*/null</script>
+<script id="fuentes" type="application/json">/*FUENTES*/null</script>
+<script>
+"use strict";
+const DATOS = JSON.parse(document.getElementById("datos").textContent);
+const FUENTES = JSON.parse(document.getElementById("fuentes").textContent);
+const LECCIONES = DATOS.lecciones;
+
+// ------------------------------------------------------------------ memoria del navegador
+const CLAVE = "Cupcake-curso-v1";
+let memoria = { hechos: {}, codigo: {}, tema: null };
+try { Object.assign(memoria, JSON.parse(localStorage.getItem(CLAVE) || "{}")); } catch (e) {}
+let pendiente = null;
+function guardar() {
+  clearTimeout(pendiente);
+  pendiente = setTimeout(() => { try { localStorage.setItem(CLAVE, JSON.stringify(memoria)); } catch (e) {} }, 250);
+}
+
+const $ = (s, r = document) => r.querySelector(s);
+function el(tag, attrs = {}, ...hijos) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "html") n.innerHTML = v;
+    else if (k === "class") n.className = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else if (v === true) n.setAttribute(k, "");
+    else if (v !== false && v != null) n.setAttribute(k, v);
+  }
+  for (const h of hijos) if (h != null) n.append(h);
+  return n;
+}
+const escapar = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+// ------------------------------------------------------------------ Cupi, el cupcake
+// Un capacillo con carita, betún en espiral, doce chispitas y una cereza. Sin brazos ni patas: solo cute.
+function cuerpoCupi({ cx = 200, cy = 96, opacidad = 1 } = {}) {
+  const [hx, hy] = [cx, cy];
+  let s = `<g opacity="${opacidad}" stroke-linejoin="round">`;
+  // el capacillo, con rayitas
+  s += `<path d="M${hx - 54} ${hy + 2} L${hx + 54} ${hy + 2} L${hx + 40} ${hy + 64} Q${hx} ${hy + 70} ${hx - 40} ${hy + 64} Z" fill="var(--capacillo)" stroke="var(--capacillo-oscuro)" stroke-width="3"/>`;
+  for (const k of [-36, -18, 0, 18, 36])
+    s += `<path d="M${hx + k} ${hy + 6} L${hx + k * 0.74} ${hy + 64}" stroke="var(--capacillo-oscuro)" stroke-width="2.5" opacity=".45" stroke-linecap="round"/>`;
+  // el betún en espiral: tres capas y una puntita
+  const capa = (y, rx, ry) => `<ellipse cx="${hx}" cy="${y}" rx="${rx}" ry="${ry}" fill="var(--betun)" stroke="var(--cupi-oscuro)" stroke-width="3"/>`;
+  s += capa(hy - 2, 62, 20) + capa(hy - 24, 48, 18) + capa(hy - 44, 32, 15);
+  s += `<path d="M${hx - 12} ${hy - 54} Q${hx} ${hy - 76} ${hx + 10} ${hy - 56}" fill="var(--betun)" stroke="var(--cupi-oscuro)" stroke-width="3"/>`;
+  s += `<path d="M${hx - 40} ${hy - 30} q 10 -8 22 -8" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/>`;
+  // doce chispitas de colores
+  const colores = ["#4aa3df", "#ffc93c", "#6fcf7f", "#9b7bea", "#ff8a3d", "#ffffff"];
+  const lugares = [[-44, -6, 30], [-24, 4, -40], [6, 6, 20], [30, -2, -25], [48, -10, 50], [-34, -26, -10],
+                   [-10, -20, 60], [16, -28, -50], [36, -30, 15], [-18, -44, 35], [4, -48, -20], [22, -44, 70]];
+  lugares.forEach(([dx, dy, g], i) =>
+    s += `<rect x="${hx + dx - 5}" y="${hy + dy - 2}" width="10" height="4" rx="2" fill="${colores[i % 6]}" stroke="var(--cupi-oscuro)" stroke-width=".8" transform="rotate(${g} ${hx + dx} ${hy + dy})"/>`);
+  // la cereza
+  s += `<path d="M${hx + 2} ${hy - 76} q 4 -14 16 -18" stroke="#6b3e1f" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  s += `<circle cx="${hx}" cy="${hy - 70}" r="11" fill="#e0233c" stroke="#9e1428" stroke-width="2.5"/><circle cx="${hx - 4}" cy="${hy - 74}" r="3" fill="#fff" opacity=".8"/>`;
+  // la carita, en el capacillo
+  for (const dx of [-17, 17]) {
+    s += `<ellipse cx="${hx + dx}" cy="${hy + 26}" rx="6" ry="7.5" fill="#2b1d24"/>`;
+    s += `<circle cx="${hx + dx + 2}" cy="${hy + 23}" r="2.3" fill="#fff"/><circle cx="${hx + dx - 2}" cy="${hy + 29}" r="1.1" fill="#fff"/>`;
+  }
+  s += `<ellipse cx="${hx - 31}" cy="${hy + 37}" rx="7" ry="4.5" fill="var(--mejilla)" opacity=".85"/><ellipse cx="${hx + 31}" cy="${hy + 37}" rx="7" ry="4.5" fill="var(--mejilla)" opacity=".85"/>`;
+  s += `<path d="M${hx - 7} ${hy + 36} q 3.5 5 7 0 q 3.5 5 7 0" stroke="#2b1d24" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+  // los cupcakes de la vitrina, en fila (para la lección de listas)
+  const pts = [0, 1, 2, 3, 4].map(i => [hx - 196 + i * 27, hy + 62 - Math.sin(i * 0.7) * 12]);
+  return { svg: s + "</g>", hx, hy, pts };
+}
+
+const T = (x, y, texto, extra = "") =>
+  `<text x="${x}" y="${y}" font-family="Baloo 2, sans-serif" font-weight="800" ${extra}>${texto}</text>`;
+
+const ACCESORIOS = {
+  saludo: ({ hx, hy }) => `<path d="M${hx + 84} ${hy - 70} q 12 8 10 22 M${hx + 96} ${hy - 80} q 16 12 12 34" stroke="var(--suave)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    ${T(hx + 66, hy - 84, "¡Hola!", 'font-size="20" fill="var(--cupi-oscuro)"')}
+    ${T(hx - 120, hy - 50, "✦", 'font-size="18" fill="var(--sol)"')}${T(hx - 96, hy - 80, "✦", 'font-size="12" fill="var(--cielo)"')}`,
+  cajas: ({ hx }) => `<g transform="translate(${hx - 196} 112)">
+    <rect x="0" y="0" width="62" height="46" rx="4" fill="#d9a066" stroke="#9a6a3a" stroke-width="3"/><path d="M0 14 h62" stroke="#9a6a3a" stroke-width="3"/>
+    <rect x="6" y="22" width="50" height="16" rx="3" fill="#fff"/>${T(9, 34, "chispitas", 'font-size="10" fill="#1d2b26"')}
+    <rect x="68" y="10" width="56" height="36" rx="4" fill="#e8b67d" stroke="#9a6a3a" stroke-width="3"/>
+    <rect x="76" y="20" width="40" height="16" rx="3" fill="#fff"/>${T(79, 33, "nombre", 'font-size="11" fill="#1d2b26"')}</g>`,
+  cartel: ({ hx, hy }) => `<rect x="${hx + 42}" y="${hy - 6}" width="6" height="90" fill="#9a6a3a"/>
+    <rect x="${hx + 6}" y="${hy - 70}" width="92" height="56" rx="8" fill="#fff" stroke="#9a6a3a" stroke-width="4" transform="rotate(4 ${hx + 52} ${hy - 42})"/>
+    ${T(hx + 16, hy - 46, "¡Hola,", 'font-size="16" fill="var(--cupi-oscuro)"')}${T(hx + 16, hy - 26, "{nombre}!", 'font-size="16" fill="var(--c-bi)"')}`,
+  calculadora: ({ hx, hy }) => `<g transform="translate(${hx + 30} ${hy - 6}) rotate(10)">
+    <rect width="56" height="74" rx="9" fill="#2d3b36" stroke="#1d2b26" stroke-width="3"/><rect x="8" y="8" width="40" height="18" rx="3" fill="#bfe8c4"/>
+    ${T(12, 22, "300", 'font-size="13" fill="#1d2b26"')}
+    ${[0, 1, 2].map(r => [0, 1, 2].map(c => `<rect x="${8 + c * 14}" y="${32 + r * 13}" width="11" height="10" rx="2" fill="${c === 2 ? "var(--sol)" : "#e9f2ec"}"/>`).join("")).join("")}</g>
+    ${T(hx - 70, hy - 50, "×", 'font-size="30" fill="var(--dorado)"')}${T(hx - 36, hy - 66, "+", 'font-size="26" fill="var(--cielo)"')}${T(hx - 100, hy - 30, "=", 'font-size="26" fill="var(--sol)"')}`,
+  pregunta: ({ hx, hy }) => `<circle cx="${hx + 64}" cy="${hy - 66}" r="28" fill="var(--cielo-claro)" stroke="var(--cielo)" stroke-width="4"/>
+    ${T(hx + 53, hy - 52, "?", 'font-size="40" fill="var(--cielo)"')}<circle cx="${hx + 40}" cy="${hy - 32}" r="6" fill="var(--cielo-claro)" stroke="var(--cielo)" stroke-width="3"/>`,
+  caminos: ({ hx, hy }) => `<rect x="${hx + 60}" y="${hy - 66}" width="7" height="150" fill="#9a6a3a"/>
+    <path d="M${hx + 67} ${hy - 62} h44 l12 12 -12 12 h-44 z" fill="var(--cupi-claro)" stroke="var(--cupi-oscuro)" stroke-width="3"/>${T(hx + 76, hy - 44, "if", 'font-size="17" fill="var(--c-kw)"')}
+    <path d="M${hx + 60} ${hy + 46} h-46 l-12 12 12 12 h46 z" fill="var(--sol-claro)" stroke="#d9a419" stroke-width="3"/>${T(hx + 18, hy + 64, "else", 'font-size="16" fill="var(--c-kw)"')}`,
+  vueltas: ({ hx, hy }) => `<path d="M${hx - 150} ${hy - 60} a 90 30 0 1 1 170 -4" stroke="var(--cielo)" stroke-width="4" fill="none" stroke-dasharray="10 8" stroke-linecap="round"/>
+    <path d="M${hx + 22} ${hy - 72} l -2 18 -14 -10 z" fill="var(--cielo)"/>
+    ${T(hx - 150, hy - 74, "1", 'font-size="22" fill="var(--dorado)"')}${T(hx - 90, hy - 98, "2", 'font-size="22" fill="var(--sol)"')}${T(hx - 30, hy - 96, "3", 'font-size="22" fill="var(--cupi-oscuro)"')}`,
+  tren: ({ pts, hx, hy }) => `<path d="M${pts[0][0] - 14} ${pts[0][1] + 8} Q ${hx - 120} ${hy + 120} ${hx - 30} ${hy + 64}" stroke="var(--linea)" stroke-width="3" fill="none" stroke-dasharray="6 7"/>`
+    + pts.map(([x, y], i) => { const c = ["#ffb8d2", "#8b5a3c", "#fff4cf", "#b9e3c6", "#c9b5f5"][i];
+      return `<path d="M${x - 9} ${y} h18 l-3 12 h-12 z" fill="var(--capacillo)" stroke="#1d2b26" stroke-width="1.6"/><ellipse cx="${x}" cy="${y - 1}" rx="11" ry="7" fill="${c}" stroke="#1d2b26" stroke-width="1.6"/>`
+        + `<rect x="${x - 11}" y="${y - 50}" width="22" height="22" rx="6" fill="var(--papel)" stroke="var(--cielo)" stroke-width="2.5"/>${T(x - 5, y - 33, i, 'font-size="16" fill="var(--cielo)"')}`; }).join(""),
+  libro: ({ hx, hy }) => `<g transform="translate(${hx + 36} ${hy + 4}) scale(.68)">
+    <path d="M0 10 q 40 -14 70 0 q 30 -14 70 0 v 60 q -40 -14 -70 0 q -30 -14 -70 0 z" fill="#fff" stroke="#2563a6" stroke-width="4"/>
+    <path d="M70 10 v60" stroke="#2563a6" stroke-width="3"/>${T(10, 38, "chica: 3", 'font-size="12" fill="#1d2b26"')}${T(10, 56, "grande: 8", 'font-size="12" fill="#1d2b26"')}
+    ${T(80, 38, "talla?", 'font-size="12" fill="var(--cupi-oscuro)"')}</g>`,
+  ficha: ({ hx, hy }) => `<g transform="translate(${hx + 26} ${hy - 4}) rotate(-6)">
+    <rect width="96" height="66" rx="8" fill="#fff" stroke="var(--cielo)" stroke-width="4"/><rect width="96" height="16" rx="6" fill="var(--cielo)"/>
+    ${T(8, 31, "nombre:", 'font-size="11" fill="#5b6b64"')}${T(56, 31, "Argos", 'font-size="11" fill="#1d2b26"')}
+    ${T(8, 46, "bocas:", 'font-size="11" fill="#5b6b64"')}${T(56, 46, "100", 'font-size="11" fill="#1d2b26"')}
+    ${T(8, 60, "color:", 'font-size="11" fill="#5b6b64"')}${T(56, 60, "verde", 'font-size="11" fill="#1d2b26"')}</g>`,
+  herramienta: ({ hx, hy }) => `<g transform="translate(${hx + 62} ${hy - 44}) rotate(35)">
+    <rect x="-6" y="0" width="12" height="80" rx="5" fill="#9aa8a2" stroke="#5b6b64" stroke-width="2"/>
+    <path d="M-20 -6 a 20 20 0 1 0 40 0 l -10 -2 v 10 h -20 v -10 z" fill="#9aa8a2" stroke="#5b6b64" stroke-width="2"/></g>
+    ${T(hx + 92, hy - 56, "fx", 'font-size="24" fill="var(--c-kw)"')}`,
+  fotocopia: ({ hx, hy }) => cuerpoCupi({ cx: hx - 128, cy: hy + 10, opacidad: .35 }).svg,
+  lupa: ({ hx, hy }) => `<circle cx="${hx + 18}" cy="${hy - 8}" r="30" fill="var(--cielo-claro)" fill-opacity=".45" stroke="#5b6b64" stroke-width="6"/>
+    <path d="M${hx + 40} ${hy + 14} l 34 34" stroke="#9a6a3a" stroke-width="11" stroke-linecap="round"/>
+    ${[[hx + 106, hy + 60, "#e0233c"], [hx + 80, hy + 80, "var(--cielo)"]].map(([x, y, c]) => `<path d="M${x - 10} ${y} h20 l-3 13 h-14 z" fill="var(--capacillo)" stroke="#1d2b26" stroke-width="1.8"/><ellipse cx="${x}" cy="${y - 1}" rx="12" ry="8" fill="${c}" stroke="#1d2b26" stroke-width="1.8"/>`).join("")}`,
+  curita: ({ hx, hy }) => `<g transform="translate(${hx + 8} ${hy - 30}) rotate(-25)"><rect x="-22" y="-7" width="44" height="14" rx="6" fill="#f4c99b" stroke="#c98f55" stroke-width="2"/></g>
+    <g transform="translate(${hx + 8} ${hy - 30}) rotate(25)"><rect x="-22" y="-7" width="44" height="14" rx="6" fill="#f4c99b" stroke="#c98f55" stroke-width="2"/></g>
+    ${T(hx + 46, hy - 46, "✦", 'font-size="18" fill="var(--sol)"')}${T(hx - 60, hy - 56, "✦", 'font-size="14" fill="var(--sol)"')}`,
+  mochila: ({ hx, hy }) => { const [x, y] = [hx - 92, hy + 50]; return `<rect x="${x - 26}" y="${y - 44}" width="52" height="48" rx="12" fill="var(--dorado)" stroke="#b23b2e" stroke-width="3"/>
+    <rect x="${x - 16}" y="${y - 30}" width="32" height="16" rx="5" fill="#fff" opacity=".85"/>${T(x - 13, y - 17, ".cup", 'font-size="11" fill="#b23b2e"')}`; },
+  dado: ({ hx, hy }) => {
+    const cara = (x, y, r, puntos) => `<g transform="translate(${x} ${y}) rotate(${r})"><rect x="-20" y="-20" width="40" height="40" rx="8" fill="#fff" stroke="#1d2b26" stroke-width="3"/>`
+      + puntos.map(([a, b]) => `<circle cx="${a}" cy="${b}" r="4" fill="${puntos.length === 1 ? "var(--cupi)" : "#1d2b26"}"/>`).join("") + "</g>";
+    return cara(hx + 70, hy - 50, -14, [[-9, -9], [0, 0], [9, 9]]) + cara(hx + 92, hy + 6, 12, [[-9, -9], [9, -9], [-9, 9], [9, 9], [0, 0]])
+      + T(hx - 80, hy - 60, "?", 'font-size="30" fill="var(--cielo)"');
+  },
+  trofeo: ({ hx, hy }) => `${T(hx - 96, hy - 50, "✦", 'font-size="22" fill="var(--sol)"')}${T(hx - 70, hy - 84, "✦", 'font-size="14" fill="var(--cielo)"')}${T(hx + 50, hy - 70, "✦", 'font-size="18" fill="var(--cupi)"')}
+    <g transform="translate(${hx + 48} ${hy + 20})"><path d="M0 0 h40 v14 a 20 20 0 0 1 -40 0 z" fill="var(--sol)" stroke="#d9a419" stroke-width="3"/>
+    <rect x="16" y="32" width="8" height="12" fill="#d9a419"/><rect x="6" y="44" width="28" height="8" rx="2" fill="#d9a419"/></g>`,
+};
+
+function dibujarCupi(pose, clase = "") {
+  const c = cuerpoCupi();
+  const extra = ACCESORIOS[pose] ? ACCESORIOS[pose](c) : "";
+  const detras = pose === "fotocopia" ? extra : "";
+  const delante = pose === "fotocopia" ? "" : extra;
+  return `<svg viewBox="-20 -60 400 260" role="img" aria-label="Cupi, el cupcake" class="${clase}">${detras}${c.svg}${delante}</svg>`;
+}
+
+// ------------------------------------------------------------------ colores del código
+const PALABRAS = new Set("if else when while repeat for in at by break continue return stop fx try except finally raise assert use from as and or not has is".split(" "));
+const CONSTANTES = new Set(["true", "false", "none", "it"]);
+const INTEGRADAS = new Set("show read read_num len add drop sorted reversed filter map reduce count first last min max sum abs round int float str bool upper lower strip split join replace keys values load save roll pick".split(" "));
+const TOKEN = /(#[^\n]*)|("""[\s\S]*?(?:"""|$)|"(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?)|(\b\d+(?:\.\d+)?)|(λ)|([^\W\d][\w]*)/gu;
+function colorear(codigo) {
+  let fuera = "", ultimo = 0, m;
+  TOKEN.lastIndex = 0;
+  while ((m = TOKEN.exec(codigo))) {
+    fuera += escapar(codigo.slice(ultimo, m.index));
+    const t = escapar(m[0]);
+    let clase = null;
+    if (m[1]) clase = "t-com";
+    else if (m[2]) {
+      fuera += `<span class="t-str">${t.replace(/(\{[^}]*\})/g, '<span class="t-int">$1</span>')}</span>`;
+      ultimo = TOKEN.lastIndex; continue;
+    }
+    else if (m[3]) clase = "t-num";
+    else if (m[4]) clase = "t-kw";
+    else if (/\.\s*$/.test(codigo.slice(Math.max(0, m.index - 2), m.index)) && !/\.\.$/.test(codigo.slice(Math.max(0, m.index - 2), m.index))) clase = "t-campo";
+    else if (/\b(fx|λ)\s+$/.test(codigo.slice(Math.max(0, m.index - 8), m.index)) && codigo[m.index + m[0].length] === "(") clase = "t-fn";
+    else if (PALABRAS.has(m[5])) clase = "t-kw";
+    else if (CONSTANTES.has(m[5])) clase = "t-cons";
+    else if (INTEGRADAS.has(m[5])) clase = "t-bi";
+    fuera += clase ? `<span class="${clase}">${t}</span>` : t;
+    ultimo = TOKEN.lastIndex;
+  }
+  return fuera + escapar(codigo.slice(ultimo)) + "\n";
+}
+
+// ------------------------------------------------------------------ el editor
+function crearEditor(codigo, alCambiar) {
+  const pre = el("pre", { "aria-hidden": "true" });
+  const area = el("textarea", { spellcheck: "false", autocapitalize: "off", autocomplete: "off", wrap: "off", "aria-label": "Código Cupcake" });
+  area.value = codigo;
+  const caja = el("div", { class: "editor" }, pre, area);
+  function refrescar() {
+    pre.innerHTML = colorear(area.value);
+    area.style.height = "auto";
+    area.style.height = area.scrollHeight + "px";
+  }
+  area.addEventListener("input", () => { refrescar(); alCambiar && alCambiar(area.value); });
+  area.addEventListener("scroll", () => { pre.scrollLeft = area.scrollLeft; });
+  area.addEventListener("focus", () => motor.cargar().catch(() => {}), { once: true });
+  area.addEventListener("keydown", ev => {
+    if (ev.key === "Tab" && !ev.shiftKey && !ev.ctrlKey && !ev.metaKey) {
+      ev.preventDefault();
+      document.execCommand("insertText", false, "    ") || area.setRangeText("    ", area.selectionStart, area.selectionEnd, "end");
+      refrescar();
+    } else if (ev.key === "Tab" && ev.shiftKey) {             // Shift+Tab: quita sangría
+      ev.preventDefault();
+      const ini = area.value.lastIndexOf("\n", area.selectionStart - 1) + 1;
+      const quitar = area.value.slice(ini, ini + 4).match(/^ */)[0].length;
+      if (quitar) {
+        const pos = area.selectionStart;
+        area.setRangeText("", ini, ini + quitar, "preserve");
+        area.selectionStart = area.selectionEnd = Math.max(ini, pos - quitar);
+        refrescar(); alCambiar && alCambiar(area.value);
+      }
+    } else if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)) {
+      ev.preventDefault();
+      caja.dispatchEvent(new CustomEvent("ejecutar", { bubbles: true }));
+    } else if (ev.key === "Enter" && !ev.shiftKey && !ev.altKey) {   // Enter: sigue la sangría, y suma 4 después de «:»
+      const ini = area.value.lastIndexOf("\n", area.selectionStart - 1) + 1;
+      const linea = area.value.slice(ini, area.selectionStart);
+      let sangria = linea.match(/^ */)[0];
+      if (/:\s*(#.*)?$/.test(linea.split("#")[0].trimEnd() + " ") || /:\s*$/.test(linea)) sangria += "    ";
+      ev.preventDefault();
+      document.execCommand("insertText", false, "\n" + sangria) || area.setRangeText("\n" + sangria, area.selectionStart, area.selectionEnd, "end");
+      refrescar();
+    }
+  });
+  const editor = { caja, area, get valor() { return area.value; }, set valor(v) { area.value = v; refrescar(); alCambiar && alCambiar(v); }, refrescar };
+  requestAnimationFrame(refrescar);
+  new ResizeObserver(() => refrescar()).observe(caja);
+  refrescar();
+  return editor;
+}
+
+// ------------------------------------------------------------------ Cupcake dentro del navegador (Pyodide)
+const PUENTE = `
+import sys, os, json, traceback
+sys.path.insert(0, "/home/pyodide")
+os.chdir("/home/pyodide")
+import puente
+
+def _proteger(fn):
+    try:
+        return json.dumps(fn())
+    except BaseException:
+        return json.dumps({"estado": "error", "salida": "", "linea": None, "resultados": [], "todo_bien": False,
+                           "error": "Algo falló dentro de Cupcake (no es culpa de tu programa):\\n" + traceback.format_exc()})
+
+def _ejecutar(fuente, entradas, archivos):
+    return _proteger(lambda: puente.ejecutar(fuente, entradas, json.loads(archivos)))
+
+def _comprobar(fuente, entradas, checks, archivos):
+    return _proteger(lambda: puente.comprobar(fuente, entradas, json.loads(checks), json.loads(archivos)))
+`;
+const motor = {
+  py: null, promesa: null, boton: $("#motor"),
+  estado(e, texto) { this.boton.dataset.estado = e; this.boton.textContent = texto; },
+  origenes() { return location.protocol === "file:" ? [DATOS.pyodide] : ["pyodide/", DATOS.pyodide]; },
+  async probar(base) {
+    if (typeof loadPyodide !== "function") {
+      await new Promise((ok, mal) => {
+        const s = el("script", { src: base + "pyodide.js" });
+        s.onload = ok; s.onerror = () => { s.remove(); mal(new Error("no se encontró " + base + "pyodide.js")); };
+        document.head.append(s);
+      });
+    }
+    let reloj;
+    const limite = new Promise((_, mal) => { reloj = setTimeout(() => mal(new Error("no respondió en 90 segundos")), 90000); });
+    const opciones = base === "pyodide/" ? { indexURL: base, stdLibURL: base + "python_stdlib.zip.wasm" } : { indexURL: base };
+    try { return await Promise.race([loadPyodide(opciones), limite]); } finally { clearTimeout(reloj); }
+  },
+  cargar() {
+    if (this.promesa) return this.promesa;
+    const inicio = Date.now();
+    this.estado("cargando", "Horneando a Cupi…");
+    const contador = setInterval(() => {
+      if (this.boton.dataset.estado === "cargando") this.boton.textContent = `Horneando a Cupi… ${Math.round((Date.now() - inicio) / 1000)} s`;
+    }, 1000);
+    this.promesa = (async () => {
+      const errores = [];
+      let py = null;
+      for (const base of this.origenes()) {
+        try { py = await this.probar(base); break; } catch (e) { errores.push(e.message); }
+      }
+      if (!py) throw new Error(errores.join("; "));
+      for (const [n, f] of Object.entries(FUENTES)) py.FS.writeFile("/home/pyodide/" + n, f);
+      py.runPython(PUENTE);
+      this.py = py;
+      this.estado("listo", "Cupi está listo");
+      return py;
+    })().catch(err => { this.estado("error", "Cupi no se horneó (pulsa para reintentar)"); this.promesa = null; throw err; })
+      .finally(() => clearInterval(contador));
+    return this.promesa;
+  },
+  async llamar(nombre, ...args) {
+    const py = await this.cargar();
+    await new Promise(r => setTimeout(r, 15));
+    const fn = py.globals.get(nombre);
+    try { return JSON.parse(fn(...args)); } finally { fn.destroy(); }
+  },
+  ejecutar(codigo, entradas, archivos) { return this.llamar("_ejecutar", codigo, entradas, JSON.stringify(archivos || {})); },
+  comprobar(codigo, entradas, checks, archivos) { return this.llamar("_comprobar", codigo, entradas, JSON.stringify(checks), JSON.stringify(archivos || {})); },
+};
+motor.boton.addEventListener("click", () => motor.cargar().catch(() => {}));
+
+function confirmarConBoton(boton, pregunta, accion) {
+  if (boton.dataset.confirmando) { delete boton.dataset.confirmando; boton.textContent = boton.dataset.texto; accion(); return; }
+  boton.dataset.texto = boton.textContent;
+  boton.dataset.confirmando = "1";
+  boton.textContent = pregunta;
+  setTimeout(() => { if (boton.dataset.confirmando) { delete boton.dataset.confirmando; boton.textContent = boton.dataset.texto; } }, 4000);
+}
+
+// ------------------------------------------------------------------ una tarjeta de código
+function tarjetaCodigo(op) {
+  const guardado = op.clave ? memoria.codigo[op.clave] : null;
+  const salida = el("pre", { class: "salida", hidden: true, "aria-live": "polite" });
+  const problema = el("div", { class: "problema", hidden: true, "aria-live": "polite" });
+  const editor = crearEditor(guardado ?? op.codigo, v => {
+    if (op.clave) { if (v === op.codigo) delete memoria.codigo[op.clave]; else memoria.codigo[op.clave] = v; guardar(); }
+    mostrarRespuestas();
+  });
+  const respuestas = el("textarea", { rows: "2", placeholder: "Una respuesta por línea" });
+  respuestas.value = op.entradas || "";
+  const filaResp = el("div", { class: "respuestas" }, el("label", {}, "Respuestas"), respuestas);
+  function mostrarRespuestas() { filaResp.hidden = !/\bask\s*\(/.test(editor.valor); }
+  mostrarRespuestas();
+
+  const bEjecutar = el("button", { class: "btn" + (op.principal === false ? "" : " primario") }, "▶ Ejecutar");
+  const bReset = el("button", { class: "btn", title: "Volver al código original" }, "Volver a empezar");
+  const acciones = el("div", { class: "acciones" }, bEjecutar, bReset, el("span", { class: "derecha" }, "Ctrl + Enter"));
+
+  const archivos = Object.entries(op.archivos || {}).map(([n, c]) =>
+    el("div", { class: "archivo" }, el("div", { class: "nombre" }, `archivo ${n}`), el("pre", { html: colorear(c) })));
+
+  function mostrar(r, nota) {
+    salida.hidden = !(r.salida || r.estado === "ok");
+    salida.innerHTML = (nota ? `<span class="nota">${nota}</span>` : "") + escapar(r.salida || (r.estado === "ok" ? "(el programa no mostró nada)" : ""));
+    if (r.estado === "error") {
+      problema.hidden = false;
+      problema.replaceChildren(el("b", {}, r.linea ? `Cupi encontró un problema en la línea ${r.linea}:` : "Cupi encontró un problema:"),
+        el("pre", {}, (r.error || "") + (/read\(\) esperaba una respuesta/.test(r.error || "") ? "\n→ Escribe la respuesta en «Respuestas», una por línea." : "")));
+    } else problema.hidden = true;
+  }
+  async function ejecutar() {
+    const codigo = editor.valor, ent = respuestas.value;
+    if (!motor.py && op.pre && codigo === op.codigo && ent === (op.entradas || "")) {
+      mostrar(op.pre, op.azar ? "Un resultado de ejemplo: con azar, cada vez sale distinto. Cupi se está horneando…"
+                               : "Resultado guardado. Cupi se está horneando para que puedas cambiar el código.");
+      motor.cargar().catch(() => {});
+      return;
+    }
+    bEjecutar.disabled = true;
+    salida.hidden = false; problema.hidden = true;
+    salida.textContent = motor.py ? "Ejecutando…" : "Horneando a Cupi (solo la primera vez, unos segundos)…";
+    try { mostrar(await motor.ejecutar(codigo, ent, op.archivos)); }
+    catch (e) { mostrar({ estado: "error", salida: "", error: "No se pudo despertar a Cupcake. ¿Hay conexión?\n(" + e.message + ")" }); }
+    finally { bEjecutar.disabled = false; }
+  }
+  bEjecutar.addEventListener("click", ejecutar);
+  editor.caja.addEventListener("ejecutar", () => (op.alCtrlEnter || ejecutar)());
+  bReset.addEventListener("click", () => {
+    const volver = () => { editor.valor = op.codigo; respuestas.value = op.entradas || ""; };
+    if (editor.valor === op.codigo) volver(); else confirmarConBoton(bReset, "¿Borrar tus cambios? Pulsa otra vez", volver);
+  });
+  const caja = el("div", { class: "tarjeta" }, ...(op.antes || []), editor.caja, ...archivos, filaResp, acciones, ...(op.despues || []), salida, problema);
+  return { caja, editor, respuestas, acciones, mostrar };
+}
+
+// ------------------------------------------------------------------ un ejercicio
+function tarjetaEjercicio(l, ej, i) {
+  const clave = `${l.id}:${i}`;
+  const lista = el("ul", { class: "checks", hidden: true });
+  const fiesta = el("p", { class: "fiesta", hidden: true, html: dibujarCupi("trofeo", "cupi-baila") + "<span>¡Lo lograste! Cupi está bailando.</span>" });
+  const pistas = el("div", { class: "pistas" });
+  const solucion = el("div", { class: "solucion", hidden: true });
+  const enunciado = el("div", { class: "enunciado" }, el("b", { class: "et" }, `Desafío ${i + 1}`), el("span", { html: ej.enunciado }));
+  const t = tarjetaCodigo({ codigo: ej.inicial, entradas: ej.entradas, archivos: ej.archivos, clave: "ej:" + clave, principal: false,
+    antes: [enunciado], despues: [pistas, lista, fiesta, solucion], alCtrlEnter: () => comprobar() });
+  const caja = t.caja;
+  caja.classList.add("ejercicio");
+  if (memoria.hechos[clave]) caja.classList.add("resuelto");
+  const bComprobar = el("button", { class: "btn primario" }, "✓ Comprobar");
+  const bPista = el("button", { class: "btn sol" }, "Pista");
+  const bSol = el("button", { class: "btn" }, "Ver solución");
+  t.acciones.prepend(bComprobar);
+  t.acciones.querySelector(".derecha").before(bPista, bSol);
+  let n = 0;
+  if (!ej.pistas.length) { bPista.disabled = true; bPista.textContent = "Sin pistas"; }
+
+  async function comprobar() {
+    bComprobar.disabled = true;
+    lista.hidden = false; fiesta.hidden = true;
+    lista.innerHTML = `<li>${motor.py ? "Revisando…" : "Horneando a Cupi (solo la primera vez)…"}</li>`;
+    try {
+      const r = await motor.comprobar(t.editor.valor, t.respuestas.value, ej.checks, ej.archivos);
+      t.mostrar(r);
+      lista.replaceChildren(...r.resultados.map(x => el("li", { class: x.ok ? "si" : "no" },
+        el("span", {}, x.texto), x.pista ? el("span", { class: "pista-check" }, "→ " + x.pista) : null)));
+      if (r.todo_bien) {
+        fiesta.hidden = false;
+        caja.classList.add("resuelto");
+        memoria.hechos[clave] = true; guardar(); actualizarProgreso();
+        const grande = $(".dibujo svg"); if (grande) { grande.classList.remove("cupi-baila"); void grande.offsetWidth; grande.classList.add("cupi-baila"); }
+      }
+    } catch (e) {
+      lista.replaceChildren(el("li", { class: "no" }, "No se pudo despertar a Cupcake (" + e.message + "). Pulsa el botón de arriba para reintentar."));
+    } finally { bComprobar.disabled = false; }
+  }
+  bComprobar.addEventListener("click", comprobar);
+  bPista.addEventListener("click", () => {
+    if (n >= ej.pistas.length) return;
+    pistas.append(el("p", { html: `<b>Pista ${n + 1}:</b> ` + ej.pistas[n] }));
+    n++;
+    bPista.textContent = n < ej.pistas.length ? "Otra pista" : "No hay más pistas";
+    bPista.disabled = n >= ej.pistas.length;
+  });
+  bSol.addEventListener("click", () => {
+    if (!solucion.hidden) { solucion.hidden = true; bSol.textContent = "Ver solución"; return; }
+    if (!memoria.hechos[clave] && !bSol.dataset.confirmando) {
+      confirmarConBoton(bSol, "¿Seguro? Intenta con una pista. Pulsa otra vez", () => bSol.click());
+      return;
+    }
+    delete bSol.dataset.confirmando;
+    solucion.replaceChildren(el("pre", { html: colorear(ej.solucion) }),
+      el("div", { class: "acciones" }, el("button", { class: "btn", onclick: () => { t.editor.valor = ej.solucion; } }, "Copiar al editor")));
+    solucion.hidden = false; bSol.textContent = "Ocultar solución";
+  });
+  return caja;
+}
+
+// ------------------------------------------------------------------ páginas
+const total = () => LECCIONES.reduce((s, l) => s + l.ejercicios.length, 0);
+const hecha = l => l.ejercicios.length > 0 && l.ejercicios.every((_, i) => memoria.hechos[`${l.id}:${i}`]);
+function actualizarProgreso() {
+  const h = LECCIONES.reduce((s, l) => s + l.ejercicios.filter((_, i) => memoria.hechos[`${l.id}:${i}`]).length, 0);
+  $("#estrellas").innerHTML = `★ <b>${h}</b> de ${total()} desafíos`;
+  for (const l of LECCIONES) {
+    const a = document.querySelector(`#indice a[data-id="${l.id}"]`);
+    if (a) a.parentElement.classList.toggle("hecha", hecha(l));
+  }
+}
+function construirIndice() {
+  $("#indice").replaceChildren(...LECCIONES.map(l => el("li", {},
+    el("a", { href: "#" + l.id, "data-id": l.id }, el("span", { class: "seg" }, String(l.n)), el("span", {}, l.titulo)))),
+    el("li", {}, el("a", { href: "#galeria", "data-id": "galeria" }, el("span", { class: "seg" }, "★"), el("span", {}, "Galería Pokémon"))));
+}
+
+function paginaGaleria() {
+  const partes = [el("div", { class: "escena" },
+    el("div", {}, el("div", { class: "num" }, "Programas completos"), el("h1", {}, "Galería Pokémon")),
+    el("div", { class: "dibujo" }, el("p", { class: "bocadillo" }, "¡Programas de verdad, para jugar y aprender!"),
+      el("div", { html: dibujarCupi("trofeo") })))];
+  partes.push(el("div", { class: "historia", html: "<p>Programas más largos que juntan todo lo que aprendiste. Ejecútalos, cámbialos y mira qué pasa. Los que usan azar dan algo distinto cada vez.</p>" }));
+  for (const [i, p] of DATOS.galeria.entries()) {
+    partes.push(el("h2", {}, p.titulo));
+    partes.push(el("p", { class: "explica", html: p.texto }));
+    partes.push(tarjetaCodigo({ codigo: p.codigo, entradas: p.entradas, archivos: p.archivos, pre: p.pre, azar: p.azar, clave: `gal:${i}` }).caja);
+  }
+  partes.push(el("div", { class: "navegar" }, el("a", { href: "#" + LECCIONES[LECCIONES.length - 1].id }, el("small", {}, "← Anterior"), LECCIONES[LECCIONES.length - 1].titulo)));
+  $("#contenido").replaceChildren(...partes);
+}
+const ICONOS = {
+  historia: '<path d="M4 6 q6-3 12 0 q6-3 12 0 v16 q-6-3-12 0 q-6-3-12 0z M16 6v16" />',
+  idea: '<path d="M16 4 a8 8 0 0 1 5 14 v3 h-10 v-3 a8 8 0 0 1 5-14z M12 25 h8" />',
+  prueba: '<path d="M11 7 l13 9 -13 9z" />',
+  turno: '<path d="M16 4 l3.5 7.5 8 1 -6 5.5 1.6 8 -7.1-4 -7.1 4 1.6-8 -6-5.5 8-1z" />',
+  recuerda: '<path d="M16 4 a5 5 0 0 1 5 5 c0 4 -5 6 -5 6 s-5-2-5-6 a5 5 0 0 1 5-5z M16 15 v13" />',
+  pokeball: '<circle cx="16" cy="16" r="12" /><path d="M4 16 h8 M20 16 h8" /><circle cx="16" cy="16" r="4" />',
+};
+function seccion(icono, titulo, ...hijos) {
+  const svg = `<svg viewBox="0 0 32 32" width="22" height="22" fill="none" stroke="var(--cupi-oscuro)" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">${ICONOS[icono]}</svg>`;
+  return el("section", { class: "parte" }, el("h2", {}, el("span", { class: "icono", "aria-hidden": "true", html: svg }), titulo), ...hijos);
+}
+function paginaLeccion(l) {
+  const partes = [];
+  partes.push(el("div", { class: "escena" },
+    el("div", {}, el("div", { class: "num" }, `Lección ${l.n} de ${LECCIONES.length}`), el("h1", {}, l.titulo)),
+    el("div", { class: "dibujo" }, el("p", { class: "bocadillo" }, l.bocadillo), el("div", { html: dibujarCupi(l.cupi) }))));
+  partes.push(seccion("historia", "La historia", el("div", { class: "historia", html: l.historia })));
+  partes.push(seccion("idea", "La idea", el("div", { class: "idea", html: l.explicacion })));
+  const prueba = seccion("prueba", "¡Pruébalo!");
+  l.ejemplos.forEach((e, i) => {
+    prueba.append(el("p", { class: "explica", html: e.texto }));
+    prueba.append(tarjetaCodigo({ codigo: e.codigo, entradas: e.entradas, archivos: e.archivos, pre: e.pre, azar: e.azar, clave: `ex:${l.id}:${i}` }).caja);
+  });
+  partes.push(prueba);
+  if (l.pokemon && l.pokemon.length) {
+    const poke = seccion("pokeball", "Con Pokémon");
+    l.pokemon.forEach((e, i) => {
+      poke.append(el("p", { class: "explica", html: e.texto }));
+      poke.append(tarjetaCodigo({ codigo: e.codigo, entradas: e.entradas, archivos: e.archivos, pre: e.pre, azar: e.azar, clave: `pk:${l.id}:${i}` }).caja);
+    });
+    partes.push(poke);
+  }
+  if (l.ejercicios.length) {
+    const turno = seccion("turno", "Tu turno");
+    l.ejercicios.forEach((ej, i) => turno.append(tarjetaEjercicio(l, ej, i)));
+    partes.push(turno);
+  }
+  partes.push(seccion("recuerda", "Recuerda", el("div", { class: "recuerda" }, el("ul", { html: l.recuerda.map(r => `<li>${r}</li>`).join("") }))));
+  const idx = LECCIONES.indexOf(l);
+  const nav = el("div", { class: "navegar" });
+  if (idx > 0) nav.append(el("a", { href: "#" + LECCIONES[idx - 1].id }, el("small", {}, "← Anterior"), LECCIONES[idx - 1].titulo));
+  if (idx < LECCIONES.length - 1) nav.append(el("a", { href: "#" + LECCIONES[idx + 1].id, class: "sig" }, el("small", {}, "Siguiente →"), LECCIONES[idx + 1].titulo));
+  else nav.append(el("a", { href: "#galeria", class: "sig" }, el("small", {}, "Siguiente →"), "Galería Pokémon"));
+  partes.push(nav);
+  $("#contenido").replaceChildren(...partes);
+  document.querySelectorAll("pre[data-cup]").forEach(p => { p.innerHTML = colorear(p.textContent).replace(/\n$/, ""); });
+}
+function irA() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (id === "galeria") {
+    paginaGaleria();
+    document.querySelectorAll("#indice a").forEach(a => a.classList.toggle("activa", a.dataset.id === "galeria"));
+    document.title = "Galería Pokémon · Aprende con Cupi";
+    if (matchMedia("(max-width: 900px)").matches) $("#det").open = false;
+    window.scrollTo(0, 0);
+    return;
+  }
+  const l = LECCIONES.find(x => x.id === id) || LECCIONES[0];
+  paginaLeccion(l);
+  document.querySelectorAll("#indice a").forEach(a => a.classList.toggle("activa", a.dataset.id === l.id));
+  document.title = `${l.titulo} · Aprende con Cupi`;
+  if (matchMedia("(max-width: 900px)").matches) $("#det").open = false;
+  window.scrollTo(0, 0);
+}
+
+function aplicarTema() { if (memoria.tema) document.documentElement.dataset.theme = memoria.tema; else delete document.documentElement.dataset.theme; }
+$("#tema").addEventListener("click", () => {
+  const oscuro = memoria.tema ? memoria.tema === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  memoria.tema = oscuro ? "light" : "dark"; aplicarTema(); guardar();
+});
+
+$("#logo").setAttribute("viewBox", "0 0 100 100");            // el logo de Cupcake: la Insignia
+$("#logo").innerHTML = '<rect x="6" y="6" width="88" height="88" rx="24" fill="#d6336c"/><path d="M28 54 Q28 30 50 30 Q72 30 72 54 Z" fill="#fff"/>'
+  + '<path d="M33 58 H67 L62 78 Q50 81 38 78 Z" fill="#fff" opacity=".85"/><circle cx="50" cy="23" r="6" fill="#ffc2d9"/>';
+aplicarTema();
+construirIndice();
+if (matchMedia("(max-width: 900px)").matches) $("#det").open = false;
+window.addEventListener("hashchange", irA);
+irA();
+actualizarProgreso();
+
+// ------------------------------------------------------------------ prueba automática (?prueba)
+if (new URLSearchParams(location.search).has("prueba")) (async () => {
+  const informe = [];
+  const anota = (ok, t) => informe.push((ok ? "OK   " : "FALLA") + " " + t);
+  try {
+    await motor.cargar();
+    anota(true, "Pyodide cargado");
+    let fallas = 0;
+    for (const l of LECCIONES) {
+      for (const [i, e] of l.ejemplos.entries()) {
+        const r = await motor.ejecutar(e.codigo, e.entradas, e.archivos);
+        const distinto = e.azar ? r.estado !== "ok" : (r.estado !== e.pre.estado || r.salida !== e.pre.salida);
+        if (distinto) { fallas++; anota(false, `${l.id} ejemplo ${i + 1}: ${r.estado} ${r.error}\n${r.salida}`); }
+      }
+      for (const [i, e] of (l.pokemon || []).entries()) {
+        const r = await motor.ejecutar(e.codigo, e.entradas, e.archivos);
+        const distinto = e.azar ? r.estado !== "ok" : (r.estado !== e.pre.estado || r.salida !== e.pre.salida);
+        if (distinto) { fallas++; anota(false, `${l.id} pokémon ${i + 1}: ${r.estado} ${r.error}\n${r.salida}`); }
+      }
+      for (const [i, ej] of l.ejercicios.entries()) {
+        const s = await motor.comprobar(ej.solucion, ej.entradas, ej.checks, ej.archivos);
+        const a = await motor.comprobar(ej.inicial, ej.entradas, ej.checks, ej.archivos);
+        if (!s.todo_bien || a.todo_bien) { fallas++; anota(false, `${l.id} desafío ${i + 1}: solución ${s.todo_bien}, inicial ${a.todo_bien} ${s.error}`); }
+      }
+    }
+    for (const p of DATOS.galeria) {
+      const r = await motor.ejecutar(p.codigo, p.entradas, p.archivos);
+      const distinto = p.azar ? r.estado !== "ok" : (r.estado !== p.pre.estado || r.salida !== p.pre.salida);
+      if (distinto) { fallas++; anota(false, `galería ${p.titulo}: ${r.estado} ${r.error}`); }
+    }
+    anota(fallas === 0, `todo el curso en el navegador (${fallas} diferencias)`);
+    location.hash = "#cuentas"; await new Promise(r => setTimeout(r, 60));
+    $(".tarjeta .btn.primario").click(); await new Promise(r => setTimeout(r, 1500));
+    anota(/300 monedas/.test($(".salida").textContent), "botón Ejecutar → " + $(".salida").textContent.split("\n")[0]);
+  } catch (e) { anota(false, "excepción: " + (e && e.stack || e)); }
+  document.body.append(el("pre", { id: "resultado-prueba" }, informe.join("\n")));
+})();
+</script>
+</body>
+</html>

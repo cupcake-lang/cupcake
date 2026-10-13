@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 100" role="img" aria-label="Cupcake">
+  <rect x="6" y="6" width="88" height="88" rx="24" fill="#d6336c"/>
+  <path d="M28 54 Q28 30 50 30 Q72 30 72 54 Z" fill="#fff"/>
+  <path d="M33 58 H67 L62 78 Q50 81 38 78 Z" fill="#fff" opacity=".85"/>
+  <circle cx="50" cy="23" r="6" fill="#ffc2d9"/>
+  <text x="112" y="68" font-family="'Baloo 2', 'Nunito', system-ui, sans-serif" font-weight="800" font-size="52" fill="#2b1d24">cup<tspan fill="#d6336c">cake</tspan></text>
+</svg>

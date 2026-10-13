@@ -1,0 +1,54 @@
+{
+  "name": "cupcake",
+  "displayName": "Cupcake",
+  "description": "Cupcake 1.0 «Frambuesa»: colores, sangría y atajos para los archivos .cup",
+  "version": "1.0.0",
+  "publisher": "jesus-local",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "cupcake",
+        "aliases": [
+          "Cupcake",
+          "cupcake"
+        ],
+        "extensions": [
+          ".cup"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icono-archivo.svg",
+          "dark": "./icono-archivo.svg"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "cupcake",
+        "scopeName": "source.cupcake",
+        "path": "./syntaxes/cupcake.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "cupcake",
+        "path": "./snippets/cupcake.json"
+      }
+    ],
+    "configurationDefaults": {
+      "[cupcake]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+        "editor.detectIndentation": false
+      }
+    }
+  },
+  "icon": "icono.png"
+}

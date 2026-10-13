@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+
+# Lo que se genera
+curso/curso.html
+curso/pyodide/
+vscode-cupcake/*.vsix
+
+# Bocetos de diseño
+logo/propuestas.html
+logo/colores.html
+
+# Archivos que crean los programas de ejemplo
+*.txt

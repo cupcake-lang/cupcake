@@ -1,0 +1,44 @@
+# Un combate Pokémon por turnos, con daño al azar
+
+fx pokemon(nombre, tipo, vida, poder):
+    return (nombre: nombre, tipo: tipo, vida: vida, poder: poder)
+
+fx multiplicador(ataque, defensor):
+    when ataque and defensor:
+        is "agua" and "fuego", "fuego" and "planta", "planta" and "agua", "eléctrico" and "agua":
+            return 2
+        is "fuego" and "agua", "planta" and "fuego", "agua" and "planta", "agua" and "eléctrico":
+            return 0.5
+        else:
+            return 1
+
+fx atacar(atacante, defensor):
+    efecto = multiplicador(atacante.tipo, defensor.tipo)
+    dano = round(atacante.poder * efecto * roll(80, 100) / 100)
+    defensor.vida = max(defensor.vida - dano, 0)
+    when efecto:
+        is 2:
+            mensaje = " ¡Es súper eficaz!"
+        is 0.5:
+            mensaje = " No es muy eficaz…"
+        else:
+            mensaje = ""
+    show("  {atacante.nombre} ataca: {dano} de daño.{mensaje} A {defensor.nombre} le quedan {defensor.vida}")
+    return defensor
+
+ash = pokemon("Pikachu", "eléctrico", 35, 12)
+gary = pokemon("Squirtle", "agua", 44, 10)
+
+turno = 1
+while not (ash.vida == 0 or gary.vida == 0):
+    show("Turno {turno}")
+    gary = atacar(ash, gary)
+    if gary.vida > 0:
+        ash = atacar(gary, ash)
+    turno += 1
+
+if ash.vida > 0:
+    ganador = ash.nombre
+else:
+    ganador = gary.nombre
+show("¡{ganador} ganó el combate!")
