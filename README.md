@@ -1,3 +1,5 @@
+<p align="center"><b>English</b> · <a href="README.es.md">Español</a></p>
+
 <p align="center">
   <img src="logo/cupcake.svg" width="120" alt="Cupcake logo">
 </p>
@@ -13,7 +15,7 @@
 ---
 
 ```
-# Cupi's Bakery
+# Raspberry's Bakery
 prices = ["small": 2, "medium": 3, "large": 5]
 
 fx bill(mouths, size):
@@ -36,7 +38,7 @@ fx main():
 ## Why Cupcake
 
 - **It reads the way you think.** `:` and indentation. `if`, `else if`, `else`, `when`, `for`, `while`.
-- **No classes or methods.** Data is lists `[1, 2]`, dictionaries `["a": 1]` and records `(name: "Cupi", hp: 3)`. Everything else is a function: `add(list, x)`, never `list.append(x)`.
+- **No classes or methods.** Data is lists `[1, 2]`, dictionaries `["a": 1]` and records `(name: "Mint", hp: 3)`. Everything else is a function: `add(list, x)`, never `list.append(x)`.
 - **Data is copied.** `b = a` makes a copy: nothing changes behind your back.
 - **One way to do each thing.** No shortcuts to memorize.
 - **Friendly errors.** They tell you the line, what happened and how to fix it. If you write something from another language (`def`, `print`, `elif`, `list.append(x)`), Cupcake tells you how to write it.
@@ -99,13 +101,17 @@ code --install-extension vscode-cupcake/cupcake-1.0.0.vsix
 
 ## The course
 
-[`course/`](course) has a course for learning to program from scratch with Cupcake, for kids and adults, with Cupi the cupcake and lots of Pokémon examples. Every example runs and every challenge checks itself, right in the browser. To build it:
+[`course/`](course) has a course for learning to program from scratch with Cupcake, for adults and kids alike: a journey through the Kingdom of Cupcake, with 17 places, lots of Pokémon examples and a gallery of complete programs. Every example runs and every challenge checks itself, right in the browser. It comes in English and in Spanish.
+
+**Take the course online:** [in English](https://cupcake-lang.github.io/cupcake/) · [en español](https://cupcake-lang.github.io/cupcake/es/)
+
+To build it yourself:
 
 ```
 python3 course/build.py
 ```
 
-Then open `course/course.html` in your browser.
+Then open `course/en/course.html` (English) or `course/es/course.html` (Spanish) in your browser.
 
 ## Tests
 

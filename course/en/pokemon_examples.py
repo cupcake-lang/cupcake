@@ -2,7 +2,7 @@
 More examples for each lesson, in the Pokémon world.
 
 POKEMON[lesson_id] = list of examples, in the same format as the ones in lessons.py.
-They appear on the page in a "With Pokémon" section, after Cupi's examples.
+They appear on the page in a "With Pokémon" section, after the main examples.
 The ones marked "random": True give a different result every time.
 """
 
@@ -384,7 +384,7 @@ else:
 ],
 
 "project": [
-{"text": "Cupi also sells to Pokémon trainers:",
+{"text": "The Great Bakery also sells to Pokémon trainers:",
  "code": """prices = ["pokeball": 200, "potion": 300]
 
 orders = [

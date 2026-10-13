@@ -2,9 +2,10 @@
 The content of the course "Learn to program with Cupcake".
 
 Each lesson has:
-  pose:        what Cupi is doing in the drawing
-  bubble:      what Cupi says (speech bubble)
-  story:       a little story to start
+  place:       the place of the Kingdom of Cupcake the lesson happens in
+  pose:        what the drawing shows
+  bubble:      what the lesson's protagonist says (speech bubble)
+  story:       a little story to start: arriving at the place
   explanation: the idea, with code examples between ```
   examples:    code that can be run
   exercises:   practice, with automatic checks
@@ -19,12 +20,13 @@ LESSONS = [
 
 # ───────────────────────────────────────────────────────────── 1
 {
-"id": "hello", "title": "Hi! I'm Cupi",
-"pose": "wave", "bubble": "Hi! Let's learn together.",
+"id": "hello", "title": "Welcome to the Kingdom of Cupcake",
+"place": "Cupcake Castle",
+"pose": "wave", "bubble": "Welcome, traveler! Shall we begin?",
 "story": """
-Meet **Cupi**. He's a strawberry cupcake who lives in the display case of a bakery. He has twelve colorful sprinkles, lots of curiosity, and a problem you'll soon discover.
+The castle gates open with a smell of fresh cake. **Raspberry**, with a cherry on top, greets you and introduces her friends: tidy **Vanilla**, curious **Cinnamon**, careful **Mint** and **Blueberry** the inventor. In this kingdom, **code is magic**: you write words, and things happen.
 
-Cupi is going to teach you a programming language that has the same name as him: **Cupcake**. Small, sweet and easy to understand. Programming means writing instructions so the computer does things. And you don't need to know anything beforehand: we start from zero.
+The language of the magic is called **Cupcake**. Programming means writing instructions so the computer does things. You don't need to know anything yet. A starry path with 17 places starts here, and we'll walk it together.
 """,
 "explanation": """
 The first instruction is `show`. Whatever you put between the parentheses appears on the screen:
@@ -47,7 +49,7 @@ show("This one does get shown")
 "examples": [
 {"text": "Press **Run** and see what happens:",
  "code": """show("Hello, world!")
-show("I'm Cupi, and I have twelve sprinkles")
+show("Welcome to the Kingdom of Cupcake")
 """},
 {"text": "A fun fact: they're called *cupcakes* because they used to be baked in cups. One of the first recipes appeared in a cookbook from **1796**.",
  "code": """# Fun facts about cupcakes
@@ -77,16 +79,17 @@ show("One of the first recipes is from 1796")
 # ───────────────────────────────────────────────────────────── 2
 {
 "id": "variables", "title": "Boxes with names: variables",
-"pose": "boxes", "bubble": "I keep everything in labeled boxes!",
+"place": "Vanilla's Storehouse",
+"pose": "boxes", "bubble": "A label on every box. Always!",
 "story": """
-Cupi is very tidy. Everything he wants to remember goes into **boxes**, and on each box he sticks a **label** with a name. That way, when he needs something, he looks for the label and that's it.
+Your first stop is a quiet storehouse with shelves up to the ceiling. **Vanilla** keeps everything here in **boxes**, and every box has a **label** with a name. When she needs something, she reads the labels, and there it is.
 """,
 "explanation": """
 In programming, those boxes are called **variables**. You create them like this:
 
 ```
 sprinkles = 12
-name = "Cupi"
+name = "Vanilla"
 ```
 
 You read it as: “put 12 in a box called `sprinkles`”. The `=` sign means **store**, not “is equal to”.
@@ -99,7 +102,7 @@ show(name, "has", sprinkles, "sprinkles")
 
 `show` can show several things at once, separated by commas. It puts them on the same line, with a space between them.
 
-A box can hold **numbers** (`12`, `3.5`) or **texts** (`"Cupi"`). And you can **change** what it holds:
+A box can hold **numbers** (`12`, `3.5`) or **texts** (`"Vanilla"`). And you can **change** what it holds:
 
 ```
 sprinkles = 12
@@ -109,15 +112,15 @@ sprinkles = sprinkles + 2      # now it holds 14
 Box names have **no spaces** and can't start with a number: `my_sprinkles`, not `my sprinkles`.
 """,
 "examples": [
-{"text": "Cupi stores his details:",
- "code": """name = "Cupi"
+{"text": "Vanilla stores her details:",
+ "code": """name = "Vanilla"
 sprinkles = 12
-color = "orange"
+color = "cream"
 
 show(name, "has", sprinkles, "sprinkles")
-show("His favorite color is", color)
+show("Her favorite color is", color)
 """},
-{"text": "He got two new sprinkles:",
+{"text": "She got two new sprinkles:",
  "code": """sprinkles = 12
 show("Before:", sprinkles)
 
@@ -148,20 +151,21 @@ show("Now:", sprinkles)
 # ───────────────────────────────────────────────────────────── 3
 {
 "id": "texts", "title": "Texts with values",
-"pose": "sign", "bubble": "My sign updates itself!",
+"place": "Signpost Square",
+"pose": "sign", "bubble": "This sign writes your name by itself!",
 "story": """
-Cupi made a sign for the door of his house: “Here lives Cupi, who has 12 sprinkles”. But every time he gets a new sprinkle, he has to make the sign all over again. What if the sign could **update itself**?
+You reach a sunny square full of signs. **Raspberry** wants one that greets every traveler: “Hello, Ana!”, “Hello, Leo!”. Painting a new sign for each person would take forever. What if the sign could **fill itself in**?
 """,
 "explanation": """
 Inside a text you can put **curly braces** `{ }` with the name of a variable. Cupcake puts its value in that spot:
 
 ```
-name = "Cupi"
+name = "Raspberry"
 sprinkles = 12
 show("Here lives {name}, who has {sprinkles} sprinkles")
 ```
 
-It shows: `Here lives Cupi, who has 12 sprinkles`.
+It shows: `Here lives Raspberry, who has 12 sprinkles`.
 
 Inside the braces you can also do **math**:
 
@@ -172,8 +176,11 @@ show("Half of his sprinkles is {sprinkles / 2}")
 And if you ever want to write a real curly brace, put a backslash before it: `\\{`.
 """,
 "examples": [
-{"text": "Cupi's sign:",
- "code": """name = "Cupi"
+{"text": "The square's sign. Change the name and run again:",
+ "code": """name = "Ana"
+show("Hello, {name}!")
+
+name = "Raspberry"
 sprinkles = 12
 show("Here lives {name}, who has {sprinkles} sprinkles")
 """},
@@ -184,7 +191,7 @@ show("If he gets 4 more sprinkles, he'll have {sprinkles + 4}")
 """},
 ],
 "exercises": [
-{"task": "Cupi shares `sprinkles = 120` between two cupcakes. Show the text `Each cupcake gets 60 sprinkles`, working out half **inside the braces**.",
+{"task": "Raspberry shares `sprinkles = 120` between two cupcakes. Show the text `Each cupcake gets 60 sprinkles`, working out half **inside the braces**.",
  "starter": "sprinkles = 120\n\n# Show how many sprinkles each cupcake gets\n",
  "solution": 'sprinkles = 120\nshow("Each cupcake gets {sprinkles // 2} sprinkles")\n',
  "checks": [
@@ -204,9 +211,12 @@ show("If he gets 4 more sprinkles, he'll have {sprinkles + 4}")
 # ───────────────────────────────────────────────────────────── 4
 {
 "id": "math", "title": "Math, math and more math",
-"pose": "calculator", "bubble": "How many cupcakes did you say?",
+"place": "The Counting Mill",
+"pose": "calculator", "bubble": "Put your fingers away, Cinnamon. Let the computer count!",
 "story": """
-Here's Cupi's problem: **his friends have a real sweet tooth**. His best friend, **Argos**, is a little monster with **100 mouths**, and every single one of them is hungry! Cupi wants to give him cupcakes: one for each mouth. And cupcakes cost money. Cupi isn't very good at math, but the computer is.
+The mill's sails turn and turn, and the door bursts open. It's **Argos**, a little monster with **100 mouths**, and every single one is hungry! He wants one cupcake per mouth, at 3 coins each.
+
+**Cinnamon** starts counting on his fingers and runs out of fingers very fast. **Raspberry** smiles: the computer is wonderful at math, so let it do the counting.
 """,
 "explanation": """
 Cupcake knows how to do math:
@@ -261,9 +271,10 @@ show(2 ** 10)
 # ───────────────────────────────────────────────────────────── 5
 {
 "id": "reading", "title": "Reading what you type",
-"pose": "question", "bubble": "And how many mouths do you have?",
+"place": "The Echo Cave",
+"pose": "question", "bubble": "Hellooo? …It answered me!",
 "story": """
-Until now, Cupi has been talking to himself. Now he wants to **have a conversation**: you type things to him, and he uses what you typed.
+The path goes into a cool, glowing cave. **Cinnamon** shouts “Hello!”, and the cave answers back. Until now, our programs only talked. Here they learn to **listen**: you type something, and the program uses what you typed.
 """,
 "explanation": """
 `read` shows a message, waits for the person to type something and press Enter, and stores it:
@@ -287,7 +298,7 @@ And if the person types letters instead of a number, `read_num` patiently asks f
 On this page, the answers are written **before running**, in the **Answers** box, one per line.
 """,
 "examples": [
-{"text": "Cupi asks you questions. The answers are already written in the **Answers** box: change them and run again.",
+{"text": "The cave asks you questions. The answers are already written in the **Answers** box: change them and run again.",
  "inputs": "Ana\n9",
  "code": """name = read("What's your name? ")
 age = read_num("How old are you? ")
@@ -323,9 +334,10 @@ show("{mouths} mouths! You need {mouths // 2} boxes of cupcakes")
 # ───────────────────────────────────────────────────────────── 6
 {
 "id": "decisions", "title": "Deciding: if and else",
-"pose": "crossroads", "bubble": "Which way do I go?",
+"place": "The Forest of Paths",
+"pose": "crossroads", "bubble": "If it rains, this way. Else, that way.",
 "story": """
-Cupi goes out for a walk and reaches a fork in the road: if it's raining, he takes the covered path; if not, he goes through the park. Programs make **decisions** too.
+Deep in the forest, the path splits in two. **Mint** checks the sky twice and reads the signpost: if it's raining, take the covered path; else, walk through the meadow. Programs make **decisions** like this too.
 """,
 "explanation": """
 To decide, you use `if`. The `if` line ends with `:` (a colon), and whatever goes **below it, indented**, happens **only if** the condition is true:
@@ -361,9 +373,9 @@ else:
 ```
 when color:
     is "pink":
-        show("Just like Cupi!")
+        show("Just like Raspberry!")
     is "red":
-        show("Like his cherry")
+        show("Like her cherry")
     else:
         show("A new color")
 ```
@@ -400,7 +412,7 @@ show(age in 10..15)
 """},
 ],
 "exercises": [
-{"task": "Cupi has `cupcakes = 100` and Argos has `mouths = 100`. If there's a cupcake for each mouth, show `Let's eat!`. If not, show `Not enough cupcakes`.",
+{"task": "Mint has `cupcakes = 100` and Argos has `mouths = 100`. If there's a cupcake for each mouth, show `Let's eat!`. If not, show `Not enough cupcakes`.",
  "starter": "cupcakes = 100\nmouths = 100\n\n# Decide what to show\n",
  "solution": 'cupcakes = 100\nmouths = 100\n\nif cupcakes >= mouths:\n    show("Let\'s eat!")\nelse:\n    show("Not enough cupcakes")\n',
  "checks": [
@@ -432,9 +444,10 @@ show(age in 10..15)
 # ───────────────────────────────────────────────────────────── 7
 {
 "id": "loops", "title": "Repeating",
-"pose": "laps", "bubble": "One sprinkle, another sprinkle, another…!",
+"place": "The Carousel",
+"pose": "laps", "bubble": "Lap one, lap two, lap three… I'm dizzy!",
 "story": """
-Cupi wants to count his sprinkles, but there are so many that he gets tired. Luckily, the computer **loves repeating things**: it can do the same thing a thousand times without getting bored.
+Music plays, and the carousel spins round and round. **Cinnamon** jumps on and counts the laps out loud, but he gets dizzy and loses count. Luckily, the computer **loves repeating things**: it can do the same thing a thousand times and never get bored.
 """,
 "explanation": """
 The easiest one: `repeat` repeats something **a number of times**:
@@ -478,7 +491,7 @@ Be careful: if the condition never changes, it repeats forever! Inside a loop, `
  "code": """repeat 3:
     show("Hip, hip, hooray!")
 """},
-{"text": "Cupi counts his first sprinkles, and then counts backwards to go into the oven:",
+{"text": "Cinnamon counts his first sprinkles, and then counts backwards to go into the oven:",
  "code": """for i in 1..5:
     show("Sprinkle number {i}")
 
@@ -486,7 +499,7 @@ for i in 3..1 by -1:
     show("{i}…")
 show("Into the oven!")
 """},
-{"text": "Cupi decorates cupcakes until he has three:",
+{"text": "Cinnamon decorates cupcakes until he has three:",
  "code": """cupcakes = 0
 while cupcakes != 3:
     cupcakes += 1
@@ -517,29 +530,30 @@ show("Done: {cupcakes} cupcakes")
 # ───────────────────────────────────────────────────────────── 8
 {
 "id": "lists", "title": "Lists: lots of things in a row",
-"pose": "row", "bubble": "My cupcakes line up in a row!",
+"place": "The Parade",
+"pose": "row", "bubble": "Everyone in line! Raspberry goes first: number 0.",
 "story": """
-Have you noticed that in the bakery's display case the cupcakes sit **in a row**? The first, the second, the third… one after another. In programming, that's a **list**.
+Drums! Flags! The whole kingdom is on parade. Raspberry, Vanilla, Cinnamon, Mint and Blueberry march **in a row**, one after another, each in their own spot. In programming, a row like that is a **list**.
 """,
 "explanation": """
 A list holds several things in order, between **square brackets** `[ ]`:
 
 ```
-friends = ["Blip", "Kora", "Zum"]
+parade = ["Raspberry", "Vanilla", "Cinnamon", "Mint", "Blueberry"]
 ```
 
 Each thing has a **position**, and counting starts **at 0**:
 
 ```
-show(friends[0])      # Blip    (the first one)
-show(friends[2])      # Zum
-show(friends[-1])     # Zum   (the last one)
+show(parade[0])       # Raspberry   (the first one)
+show(parade[2])       # Cinnamon
+show(parade[-1])      # Blueberry   (the last one)
 ```
 
-To **slice** out a piece you use `..`, like in ranges:
+To **slice** out a piece you use `..`, like in ranges. Both ends are included:
 
 ```
-show(friends[0..1])   # ["Blip", "Kora"]
+show(parade[0..1])    # ["Raspberry", "Vanilla"]
 ```
 
 Functions for lists:
@@ -551,26 +565,27 @@ Functions for lists:
 And to ask whether something is in the list, you use `in`:
 
 ```
-"Kora" in friends          # is Kora in the list?
-"Nova" not in friends      # is Nova not in it?
-friends is empty           # is it empty?
+"Mint" in parade           # is Mint in the parade?
+"Argos" not in parade      # is Argos not in it?
+parade is empty            # is it empty?
 ```
 
-`add` and `drop` **give back a new list**. That's why you store the result: `friends = add(friends, "Nova")`.
+`add` and `drop` **give back a new list**. That's why you store the result: `parade = add(parade, "Argos")`.
 
 And `for` lets you go through a list, one by one. With `at`, you also get the position:
 
 ```
-for i, friend at friends:
-    show("{i}: Hello, {friend}!")
+for i, name at parade:
+    show("{i}: Hello, {name}!")
 ```
 """,
 "examples": [
-{"text": "Cupi's friends:",
- "code": """friends = ["Blip", "Kora", "Zum"]
+{"text": "The parade at the start, and Argos's little friends:",
+ "code": """parade = ["Raspberry", "Vanilla", "Cinnamon", "Mint", "Blueberry"]
+show(parade[0], "goes first, and", parade[-1], "goes last")
 
-show(friends[0], "goes first")
-show("He has {len(friends)} friends")
+friends = ["Blip", "Kora", "Zum"]
+show("Argos has {len(friends)} friends")
 
 friends = add(friends, "Nova")
 show(friends)
@@ -590,7 +605,7 @@ for i, c at cupcakes:
 """},
 ],
 "exercises": [
-{"task": "Cupi has `fruits = [\"apple\", \"pear\"]`. Add `\"mango\"` to the list and show **how many fruits** there are (it should be 3) and **which one is last**.",
+{"task": "Vanilla has `fruits =[\"apple\", \"pear\"]`. Add `\"mango\"` to the list and show **how many fruits** there are (it should be 3) and **which one is last**.",
  "starter": 'fruits = ["apple", "pear"]\n\n# Add the mango\n\n# Show how many there are and the last one\n',
  "solution": 'fruits = ["apple", "pear"]\n\nfruits = add(fruits, "mango")\n\nshow(len(fruits), fruits[-1])\n',
  "checks": [
@@ -612,28 +627,29 @@ for i, c at cupcakes:
 # ───────────────────────────────────────────────────────────── 9
 {
 "id": "dictionaries", "title": "Dictionaries: looking things up by name",
-"pose": "book", "bubble": "I look up the word, and find its value.",
+"place": "The Flavor Library",
+"pose": "book", "bubble": "Look up the word, find its value. Easy!",
 "story": """
-At the bakery, each cupcake size has a price. Cupi doesn't want to remember “the third one on the list”: he wants to ask “how much is the small size?”. That's what **dictionaries** are for.
+The library smells of old paper and warm sugar. **Raspberry** opens her price book: every cupcake size has its price. She doesn't want to remember “the third line on the page”. She wants to ask: “how much is the small one?”. That's what **dictionaries** are for.
 """,
 "explanation": """
 A dictionary is like a list, but each thing has a **key** instead of a position. You write it just like a list, adding `key:` in front of each value:
 
 ```
-prices = ["small": 3, "medium": 5, "large": 8]
+prices = ["small": 2, "medium": 3, "large": 5]
 ```
 
 You look things up by key:
 
 ```
-show(prices["medium"])     # 5
+show(prices["medium"])     # 3
 ```
 
 You can **add** or **change** a value:
 
 ```
-prices["giant"] = 12
-prices["small"] = 4
+prices["giant"] = 8
+prices["small"] = 3
 ```
 
 Handy functions:
@@ -650,12 +666,12 @@ price = prices["mini"] else 0     # if there's no mini size, 0
 An empty dictionary is written `[:]`.
 """,
 "examples": [
-{"text": "The bakery's prices:",
- "code": """prices = ["small": 3, "medium": 5, "large": 8]
+{"text": "Raspberry's price book:",
+ "code": """prices = ["small": 2, "medium": 3, "large": 5]
 
 show("The medium size costs", prices["medium"])
 
-prices["giant"] = 12
+prices["giant"] = 8
 show(keys(prices))
 show("mini" in prices)
 show(prices["mini"] else "there's no mini size")
@@ -686,9 +702,10 @@ for size in keys(prices):
 # ───────────────────────────────────────────────────────────── 10
 {
 "id": "records", "title": "Records: cards with fields",
-"pose": "card", "bubble": "This is my card!",
+"place": "The Tower of Cards",
+"pose": "card", "bubble": "Name, mouths, color. Every field in its place!",
 "story": """
-Argos signed up for the bakers' club, and they gave him a **membership card**: name, mouths, color. Each detail in its own slot. In Cupcake, a card like that is called a **record**.
+In a tall tower, every visitor gets a card. **Mint** is writing one for Argos: name, mouths, color, each detail in its own slot. She checks it twice. In Cupcake, a card like that is called a **record**.
 """,
 "explanation": """
 A record gathers several details about **one single thing**, each with its own name (its **field**). It goes between parentheses:
@@ -754,16 +771,16 @@ for member in club:
     show("{member.name} eats with {member.mouths} mouths")
 """},
 {"text": "`has` in a game: who's still standing? With a list, `has` asks whether **anyone** has that field:",
- "code": """cupi = (name: "Cupi", energy: 3, shield: false)
+ "code": """mint = (name: "Mint", energy: 3, shield: false)
 rival = (name: "Glub", energy: 0, shield: true)
 
-if cupi has energy and rival has not energy:
-    show("{cupi.name} won the race!")
+if mint has energy and rival has not energy:
+    show("{mint.name} won the race!")
 
 if rival has shield:
     show("{rival.name} has a shield")
 
-team = [cupi, rival]
+team = [mint, rival]
 if team has energy:
     show("Someone on the team can still play")
 """},
@@ -791,9 +808,10 @@ if team has energy:
 # ───────────────────────────────────────────────────────────── 11
 {
 "id": "functions", "title": "Functions: your own instructions",
-"pose": "tool", "bubble": "I built my own tool!",
+"place": "Blueberry's Workshop",
+"pose": "tool", "bubble": "Ta-da! I built my own spell!",
 "story": """
-Cupi got tired of working out, every single time, how many boxes a friend needs. So he invented his own instruction: he tells it how many mouths someone has, and it answers how many boxes they need. That's a **function**.
+Gears, springs and a happy mess: welcome to **Blueberry's** workshop. He got tired of working out, again and again, how many boxes each little monster needs. So he invented his own instruction: you tell it the mouths, and it answers the boxes. That's a **function**.
 """,
 "explanation": """
 A function is an instruction **that you invent**. You create it with `fx`, like the f(x) from math class:
@@ -822,7 +840,7 @@ A function can receive several pieces of data, and some can have a **default val
 fx greet(name, greeting = "Hello"):
     show("{greeting}, {name}")
 
-greet("Cupi")                         # Hello, Cupi
+greet("Cinnamon")                     # Hello, Cinnamon
 greet("Blip", greeting = "Hi there")  # Hi there, Blip
 ```
 
@@ -834,7 +852,7 @@ fx friend(name, mouths):
 ```
 """,
 "examples": [
-{"text": "Cupi's tool:",
+{"text": "Blueberry's tool:",
  "code": """fx boxes(mouths):
     return mouths // 2
 
@@ -845,7 +863,7 @@ show("Blip needs", boxes(6), "boxes")
  "code": """fx greet(name, greeting = "Hello"):
     show("{greeting}, {name}")
 
-greet("Cupi")
+greet("Cinnamon")
 greet("Blip", greeting = "Hi there")
 """},
 ],
@@ -870,9 +888,10 @@ greet("Blip", greeting = "Hi there")
 # ───────────────────────────────────────────────────────────── 12
 {
 "id": "copies", "title": "Data gets copied",
-"pose": "photocopy", "bubble": "There are two Cupis! Well, one is a copy.",
+"place": "Mirror Lake",
+"pose": "photocopy", "bubble": "There are two of me! Well, one is a copy.",
 "story": """
-Cupi lent his card to Blip so he could see how to fill one in. Blip crossed things out, drew on it, wrote all over it… but Cupi's card stayed perfect! Why? Because Cupi gave him a **photocopy**.
+The lake is so still that **Cinnamon** sees a second Cinnamon in the water. He splashes the water, and the reflection goes wobbly. But the real Cinnamon is fine! The one in the lake is only a **copy**. Data in Cupcake works just like that.
 """,
 "explanation": """
 In Cupcake, when you store something in another variable, or pass it to a function, a **copy** is made. Each name has **its own data**:
@@ -894,18 +913,18 @@ fx decorate(c):
     c.sprinkles = c.sprinkles + 2
     return c
 
-cupi = decorate(cupi)       # ← store what it gave back
+cinnamon = decorate(cinnamon)    # ← store what it gave back
 ```
 
 If you forget to store the result, the change stays in the copy and gets lost.
 """,
 "examples": [
 {"text": "The photocopies:",
- "code": """cupi = (name: "Cupi", sprinkles: 12)
-copy = cupi
+ "code": """cinnamon = (name: "Cinnamon", sprinkles: 12)
+copy = cinnamon
 copy.sprinkles = 4
 
-show(cupi.sprinkles)      # the original didn't change
+show(cinnamon.sprinkles)      # the original didn't change
 show(copy.sprinkles)
 """},
 {"text": "A function that changes something and gives it back:",
@@ -913,12 +932,12 @@ show(copy.sprinkles)
     c.sprinkles = c.sprinkles + 2
     return c
 
-cupi = (name: "Cupi", sprinkles: 12)
-decorate(cupi)
-show("Without storing:", cupi.sprinkles)
+cinnamon = (name: "Cinnamon", sprinkles: 12)
+decorate(cinnamon)
+show("Without storing:", cinnamon.sprinkles)
 
-cupi = decorate(cupi)
-show("Storing it:", cupi.sprinkles)
+cinnamon = decorate(cinnamon)
+show("Storing it:", cinnamon.sprinkles)
 """},
 ],
 "exercises": [
@@ -941,9 +960,10 @@ show("Storing it:", cupi.sprinkles)
 # ───────────────────────────────────────────────────────────── 13
 {
 "id": "shortcuts", "title": "Shortcuts: nameless functions and quick lists",
-"pose": "magnifier", "bubble": "I only want the red cupcakes…",
+"place": "The Lookout",
+"pose": "magnifier", "bubble": "Only the red ones, please. I'll check twice.",
 "story": """
-Cupi has a mountain of colorful cupcakes and wants **only the red ones**, or to **sort them by size**. He could check them one by one with a `for`… or use some awesome shortcuts.
+From the top of the lookout you can see the whole kingdom. Below lies a mountain of colorful cupcakes, and **Mint** wants **only the red ones**, then **sorted by size**. She could check them one by one with a `for`… or use a few clever shortcuts.
 """,
 "explanation": """
 **Quick lists.** You can make a new list from another one in a single line:
@@ -988,7 +1008,7 @@ show([n for n in 1..10 if n % 2 == 0])
 friends = ["Blip", "Kora", "Zum"]
 show([upper(f) for f in friends])
 """},
-{"text": "Cupi's cupcakes:",
+{"text": "Mint's cupcakes:",
  "code": """cupcakes = [
     (color: "red", size: 3),
     (color: "blue", size: 1),
@@ -1024,9 +1044,10 @@ for c in sorted(cupcakes, fx: it.size):
 # ───────────────────────────────────────────────────────────── 14
 {
 "id": "errors", "title": "Errors: friends who warn you",
-"pose": "bandage", "bubble": "I tripped! But I learned something.",
+"place": "Stumble Bridge",
+"pose": "bandage", "bubble": "I tripped! But now I know where the loose board is.",
 "story": """
-Sometimes Cupi drops a sprinkle: with so many, that's normal! What matters is **getting back up and understanding what happened**. It's the same with programs: errors aren't bad. They're **warnings** that tell you what to fix.
+The old bridge creaks, and **Cinnamon** trips on a loose board. Ouch! He puts on a bandage, looks back and laughs: now he knows exactly where the problem was. Errors in programs are like that. They aren't bad: they're **friendly warnings** that tell you what to fix.
 """,
 "explanation": """
 When something goes wrong, Cupcake stops and tells you **on which line** and **what happened**, and often **how to fix it**. Read it calmly! It's like a friend giving you a heads-up.
@@ -1097,9 +1118,10 @@ except error:
 # ───────────────────────────────────────────────────────────── 15
 {
 "id": "files", "title": "Using other files",
-"pose": "backpack", "bubble": "I carry my tools in my backpack.",
+"place": "Backpack Harbor",
+"pose": "backpack", "bubble": "Everything packed and labeled. Ready to sail!",
 "story": """
-Cupi already has lots of tools: `boxes`, `cost`, `greet`… and he wants to use them in all his programs without writing them again. He keeps them in a separate file, like in a **backpack**, and takes them out when he needs them.
+Boats rock gently at the harbor. Before the next trip, **Vanilla** packs a **backpack** with the tools we've made so far: `boxes`, `cost`, `greet`… In Cupcake, that backpack is a separate file. You write the tools once, and take them out in any program.
 """,
 "explanation": """
 A Cupcake program is saved in a file that ends in `.cup`. You can put your functions in one file, for example `tools.cup`, and use them from another one with `use`:
@@ -1132,7 +1154,7 @@ fx main():
 `main` is optional: a short program doesn't need it.
 """,
 "examples": [
-{"text": "Cupi uses his backpack. Notice that `tools.cup` has a `main` with tests, but it doesn't run, because here we're only using it:",
+{"text": "Vanilla opens her backpack. Notice that `tools.cup` has a `main` with tests, but it doesn't run, because here we're only using it:",
  "files": {"tools.cup": "fx boxes(mouths):\n    return mouths // 2\n\nfx cost(mouths, price):\n    return mouths * price\n\nfx main():\n    show(\"Test:\", boxes(10))\n"},
  "code": """use boxes, cost from tools
 
@@ -1162,9 +1184,10 @@ show("Cost:", cost(100, 3))
 # ───────────────────────────────────────────────────────────── 16
 {
 "id": "random", "title": "Games of chance",
-"pose": "dice", "bubble": "Let's see what comes up!",
+"place": "The Fair of Chance",
+"pose": "dice", "bubble": "Roll the dice! Nobody knows what comes up!",
 "story": """
-Cupi organized a fair at the bakery, with dice games and a prize wheel. But there's a problem: he doesn't know how to program something when **nobody knows what will come up**! Luckily, the computer can play games of luck too.
+Lights, music and stalls everywhere: it's the fair! **Blueberry** built dice games and a prize wheel. But how do you program something when **nobody knows what will come up**? Easy: the computer can play games of chance too.
 """,
 "explanation": """
 Two functions for playing with chance:
@@ -1182,7 +1205,7 @@ Every time you run the program, something different might come up. Try it severa
 With `roll`, `read_num` and `while` you can already make your first real game: guess the number.
 """,
 "examples": [
-{"text": "Cupi's dice. Run it several times:", "random": True,
+{"text": "Blueberry's dice. Run it several times:", "random": True,
  "code": """die1 = roll(1, 6)
 die2 = roll(1, 6)
 show("You rolled {die1} and {die2}")
@@ -1194,7 +1217,7 @@ if die1 == die2:
  "code": """prizes = ["a cupcake", "a cap", "a balloon", "a medal"]
 show("You won {pick(prizes)}!")
 """},
-{"text": "**Guess the number.** Cupi thinks of a number from 1 to 10, and you get three tries. Write your answers in **Answers** and run:", "random": True,
+{"text": "**Guess the number.** Blueberry thinks of a number from 1 to 10, and you get three tries. Write your answers in **Answers** and run:", "random": True,
  "inputs": "5\n3\n8",
  "code": """secret = roll(1, 10)
 tries = 0
@@ -1235,10 +1258,11 @@ else:
 
 # ───────────────────────────────────────────────────────────── 17
 {
-"id": "project", "title": "Final project: Cupi's Bakery",
-"pose": "trophy", "bubble": "I opened my very own bakery!",
+"id": "project", "title": "Final project: Raspberry's Bakery",
+"place": "The Great Bakery",
+"pose": "trophy", "bubble": "You made it, traveler! Let's open the Bakery together.",
 "story": """
-After handing out so many cupcakes, Cupi had an idea: **open his own bakery**, for little monsters with a sweet tooth and lots of mouths. Let's program it together, using everything you've learned.
+The starry path ends at the **Great Bakery**, Raspberry's bakery, where everyone is waiting for you. The doors open for little monsters with a sweet tooth and lots of mouths: Blip, Kora, Argos… Your last task is to program the bakery, using everything you've learned on the way.
 """,
 "explanation": """
 The bakery needs:
@@ -1250,7 +1274,7 @@ The bakery needs:
 Everything you've learned, all together!
 """,
 "examples": [
-{"text": "Cupi's Bakery:",
+{"text": "Raspberry's Bakery:",
  "code": """prices = ["small": 2, "medium": 3, "large": 5]
 
 customers = [
@@ -1270,7 +1294,7 @@ for c in customers:
     payment = bill(c)
     show("{c.name} pays {payment} coins for {c.mouths} cupcakes")
     earnings = earnings + payment
-show("Today Cupi earned {earnings} coins")
+show("Today the Great Bakery earned {earnings} coins")
 """},
 ],
 "exercises": [

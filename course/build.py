@@ -1,7 +1,8 @@
 """
-Builds course.html: "Learn to program with Cupcake".
+Builds the course in each language: en/course.html (the official one) and es/course.html.
 
-    python3 build.py
+    python3 build.py          # both
+    python3 build.py es       # only one
 
 Before writing the page it checks all the content with the real interpreter:
   - every example ends as expected (fine, or with the error it wants to show);
@@ -10,6 +11,7 @@ Before writing the page it checks all the content with the real interpreter:
 If anything fails, the page is not written.
 """
 import html
+import importlib.util
 import json
 import os
 import re
@@ -20,12 +22,13 @@ ROOT = os.path.dirname(HERE)
 sys.path[:0] = [ROOT, HERE]
 
 import bridge  # noqa: E402
-from lessons import LESSONS  # noqa: E402
-from pokemon_examples import POKEMON  # noqa: E402
+from ui import UI  # noqa: E402
 
-# The Pokémon Gallery: complete programs from the examples/ folder
-# (file, title, description, inputs, uses randomness)
-GALLERY = [
+LANGUAGES = ("en", "es")
+
+# The Pokémon Gallery: complete programs (file, title, description, inputs, uses randomness).
+# English: the examples/ folder. Spanish: es/gallery/.
+GALLERY = {"en": [
     ("pokedex", "The Pokédex", "Look up a Pokémon and show its card, with a tip based on its type.", "Pikachu\nmewtwo\nSquirtle", False),
     ("battle", "A turn-based battle", "Pikachu against Squirtle, with types, random damage and effectiveness.", "", True),
     ("catch", "Catch a Pokémon", "A wild Pokémon appears and you have three Poké Balls.", "", True),
@@ -33,7 +36,15 @@ GALLERY = [
     ("evolution", "Evolutions", "Each Pokémon evolves when it reaches a certain level.", "", False),
     ("training", "Training", "Earn experience in every battle and level up.", "", False),
     ("team", "The team", "Heal the ones that can still fight and warn who needs help (uses another file).", "", False),
-]
+], "es": [
+    ("pokedex", "La Pokédex", "Busca un Pokémon y muestra su ficha, con un consejo según su tipo.", "Pikachu\nmewtwo\nSquirtle", False),
+    ("combate", "Un combate por turnos", "Pikachu contra Squirtle, con tipos, daño al azar y efectividad.", "", True),
+    ("captura", "Atrapar un Pokémon", "Un Pokémon salvaje aparece y tienes tres Poké Balls.", "", True),
+    ("tienda_pokemon", "La Tienda Pokémon", "Elige cuántas cosas compras y mira si te alcanza el dinero.", "3\n2", False),
+    ("evolucion", "Evoluciones", "Cada Pokémon evoluciona al llegar a cierto nivel.", "", False),
+    ("entrenamiento", "Entrenamiento", "Gana experiencia en cada combate y sube de nivel.", "", False),
+    ("equipo", "El equipo", "Cura a los que pueden pelear y avisa quién necesita ayuda (usa otro archivo).", "", False),
+]}
 
 PYODIDE_CDN = "https://cdn.jsdelivr.net/npm/pyodide@0.26.4/"
 
@@ -86,7 +97,16 @@ def prepare_examples(items, who, problems):
     return out
 
 
-def prepare():
+def load(lang, name):
+    spec = importlib.util.spec_from_file_location(f"{name}_{lang}", os.path.join(HERE, lang, name + ".py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def prepare(lang):
+    LESSONS = load(lang, "lessons").LESSONS
+    POKEMON = load(lang, "pokemon_examples").POKEMON
     problems, lessons = [], []
     for n, l in enumerate(LESSONS, start=1):
         examples = prepare_examples(l["examples"], l["id"], problems)
@@ -104,14 +124,15 @@ def prepare():
             exercises.append({"task": inline(x["task"]), "starter": x["starter"], "solution": x["solution"],
                               "inputs": inputs, "files": files or {}, "checks": x["checks"],
                               "hints": [inline(h) for h in x.get("hints", [])]})
-        lessons.append({"id": l["id"], "n": n, "title": l["title"], "pose": l["pose"],
+        lessons.append({"id": l["id"], "n": n, "title": l["title"], "pose": l["pose"], "place": l.get("place", ""),
                         "bubble": l["bubble"], "story": blocks(l["story"]),
                         "explanation": blocks(l["explanation"]), "examples": examples, "pokemon": pokemon,
                         "exercises": exercises, "remember": [inline(r) for r in l["remember"]]})
     gallery = []
-    pokemon_module = open(os.path.join(ROOT, "examples", "pokemon.cup"), encoding="utf-8").read()
-    for name, title, description, inputs, random in GALLERY:
-        code = open(os.path.join(ROOT, "examples", name + ".cup"), encoding="utf-8").read()
+    folder = os.path.join(ROOT, "examples") if lang == "en" else os.path.join(HERE, lang, "gallery")
+    pokemon_module = open(os.path.join(folder, "pokemon.cup"), encoding="utf-8").read()
+    for name, title, description, inputs, random in GALLERY[lang]:
+        code = open(os.path.join(folder, name + ".cup"), encoding="utf-8").read()
         files = {"pokemon.cup": pokemon_module} if "from pokemon" in code else {}
         r = bridge.run(code, inputs, files)
         if r["status"] != "ok":
@@ -125,10 +146,17 @@ def safe_json(x):
     return json.dumps(x, ensure_ascii=False).replace("</", "<\\/").replace("<!--", "<\\!--")
 
 
-def main():
-    lessons, gallery, problems = prepare()
+def main(argv):
+    status = 0
+    for lang in [a for a in argv[1:] if a in LANGUAGES] or LANGUAGES:
+        status |= build(lang)
+    return status
+
+
+def build(lang):
+    lessons, gallery, problems = prepare(lang)
     if problems:
-        print("The page was not written. Problems in the content:\n")
+        print(f"[{lang}] The page was not written. Problems in the content:\n")
         print("\n\n".join(problems))
         return 1
     sources = {
@@ -137,9 +165,11 @@ def main():
     }
     template = open(os.path.join(HERE, "template.html"), encoding="utf-8").read()
     page = (template
-            .replace("/*DATA*/null", safe_json({"lessons": lessons, "gallery": gallery, "pyodide": PYODIDE_CDN}))
+            .replace("/*DATA*/null", safe_json({"lessons": lessons, "gallery": gallery, "pyodide": PYODIDE_CDN, "lang": lang}))
+            .replace("/*UI*/null", safe_json(UI[lang]))
+            .replace('<html lang="en">', f'<html lang="{lang}">')
             .replace("/*SOURCES*/null", safe_json(sources)))
-    target = os.path.join(HERE, "course.html")
+    target = os.path.join(HERE, lang, "course.html")
     open(target, "w", encoding="utf-8").write(page)
     n_examples = sum(len(l["examples"]) + len(l["pokemon"]) for l in lessons)
     n_exercises = sum(len(l["exercises"]) for l in lessons)
@@ -150,4 +180,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv))

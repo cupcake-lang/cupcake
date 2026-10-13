@@ -3,8 +3,10 @@ __pycache__/
 *.pyc
 
 # Generated files
-course/course.html
+course/*/course.html
+course/*/_test.html
 course/pyodide/
+course/*/pyodide
 vscode-cupcake/*.vsix
 
 # Design drafts
@@ -13,3 +15,4 @@ logo/colors.html
 
 # Files created by the example programs
 *.txt
+logo/course-preview.html

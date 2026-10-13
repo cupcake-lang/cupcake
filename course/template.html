@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Learn with Cupi</title>
+<title>Learn Cupcake</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
 /* A bakery display case: the menu is a row of cupcakes, each lesson one that gets decorated when you finish it. */
 :root {
   --bg: #fbf6f8; --paper: #ffffff; --ink: #2b1d24; --muted: #7a6670; --line: #f0e2e8;
-  --cupi: #d6336c; --cupi-dark: #9e1f4f; --cupi-light: #fde3ec; --cheek: #ff8fb1; --frosting: #ffc2d9; --wrapper: #f2b263; --wrapper-dark: #b8742c;
+  --berry: #d6336c; --berry-dark: #9e1f4f; --berry-light: #fde3ec; --cheek: #ff8fb1; --frosting: #ffc2d9; --wrapper: #f2b263; --wrapper-dark: #b8742c;
   --gold: #ffc21c; --sun: #ffc93c; --glasses: #1f1f1f; --glasses-border: #000000; --sun-light: #fff4cf; --sky: #4aa3df; --sky-light: #e3f2fc;
   --ok: #2f8a41; --ok-light: #e2f5e5; --bad: #d64535; --bad-light: #fde8e5;
   --code-bg: #fff8fb;
@@ -24,7 +24,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #171114; --paper: #211920; --ink: #f6e9ef; --muted: #b9a3ae; --line: #33252d;
-    --cupi: #ff6b9a; --cupi-dark: #d0457a; --cupi-light: #3d1f2a; --cheek: #ff8fb1; --frosting: #ffc2d9; --wrapper: #f2b263; --wrapper-dark: #b8742c;
+    --berry: #ff6b9a; --berry-dark: #d0457a; --berry-light: #3d1f2a; --cheek: #ff8fb1; --frosting: #ffc2d9; --wrapper: #f2b263; --wrapper-dark: #b8742c;
     --gold: #ffd04a; --sun: #ffd25c; --glasses: #141414; --glasses-border: #8a8a8a; --sun-light: #3a3218; --sky: #6db8ec; --sky-light: #182c3a;
     --ok: #6fd383; --ok-light: #1c3324; --bad: #ff8f80; --bad-light: #3b1f1b;
     --code-bg: #1e1418;
@@ -35,7 +35,7 @@
 }
 :root[data-theme="dark"] {
   --bg: #171114; --paper: #211920; --ink: #f6e9ef; --muted: #b9a3ae; --line: #33252d;
-  --cupi: #ff6b9a; --cupi-dark: #d0457a; --cupi-light: #3d1f2a; --cheek: #ff8fb1; --frosting: #ffc2d9; --wrapper: #f2b263; --wrapper-dark: #b8742c;
+  --berry: #ff6b9a; --berry-dark: #d0457a; --berry-light: #3d1f2a; --cheek: #ff8fb1; --frosting: #ffc2d9; --wrapper: #f2b263; --wrapper-dark: #b8742c;
   --gold: #ffd04a; --sun: #ffd25c; --glasses: #141414; --glasses-border: #8a8a8a; --sun-light: #3a3218; --sky: #6db8ec; --sky-light: #182c3a;
   --ok: #6fd383; --ok-light: #1c3324; --bad: #ff8f80; --bad-light: #3b1f1b;
   --code-bg: #1e1418;
@@ -49,7 +49,7 @@ code, pre, textarea { font-variant-ligatures: none; font-feature-settings: "liga
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.65 var(--body-font); }
 h1, h2, h3 { font-family: var(--title-font); line-height: 1.15; text-wrap: balance; }
-code { font-family: var(--mono); font-size: .86em; background: var(--cupi-light); padding: .08em .38em; border-radius: 6px; }
+code { font-family: var(--mono); font-size: .86em; background: var(--berry-light); padding: .08em .38em; border-radius: 6px; }
 button { font: inherit; cursor: pointer; }
 :focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
@@ -60,14 +60,14 @@ button { font: inherit; cursor: pointer; }
 .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink); font: 800 1.35rem/1 var(--title-font); }
 .logo svg { width: 32px; height: 32px; }
 .logo b { font-weight: 800; }
-.logo span { color: var(--cupi-dark); }
+.logo span { color: var(--berry-dark); }
 .spacer { flex: 1; }
 .stars { font: 700 .95rem var(--title-font); color: var(--muted); white-space: nowrap; }
 .stars b { color: var(--ink); }
 .engine { border: 2px solid var(--line); background: var(--paper); color: var(--muted); border-radius: 999px; padding: 2px 12px; font-size: .82rem; white-space: nowrap; }
 .engine::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--line); margin-right: 6px; vertical-align: 1px; }
 .engine[data-status="loading"]::before { background: var(--sun); animation: pulse 1s infinite; }
-.engine[data-status="ready"]::before { background: var(--cupi); }
+.engine[data-status="ready"]::before { background: var(--berry); }
 .engine[data-status="error"]::before { background: var(--bad); }
 @keyframes pulse { 50% { opacity: .3; } }
 .theme { border: 2px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 10px; width: 36px; height: 32px; }
@@ -81,10 +81,10 @@ nav.sidebar ol::before { content: ""; position: absolute; left: 25px; top: 18px;
 nav.sidebar li a { position: relative; display: flex; gap: 12px; align-items: center; padding: 5px 8px 5px 0; color: var(--ink); text-decoration: none; font-size: .93rem; line-height: 1.3; border-radius: 12px; }
 nav.sidebar .seg { flex: 0 0 40px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--paper); border: 3px solid var(--line);
   font: 800 .9rem var(--title-font); color: var(--muted); z-index: 1; transition: background .3s, border-color .3s; }
-nav.sidebar li a:hover .seg { border-color: var(--cupi); }
+nav.sidebar li a:hover .seg { border-color: var(--berry); }
 nav.sidebar li a.active { font-weight: 800; }
-nav.sidebar li a.active .seg { border-color: var(--cupi-dark); color: var(--cupi-dark); }
-nav.sidebar li.done .seg { background: var(--cupi); border-color: var(--cupi-dark); color: #fff; }
+nav.sidebar li a.active .seg { border-color: var(--berry-dark); color: var(--berry-dark); }
+nav.sidebar li.done .seg { background: var(--berry); border-color: var(--berry-dark); color: #fff; }
 main { min-width: 0; max-width: 790px; }
 
 @media (max-width: 900px) {
@@ -98,20 +98,20 @@ main { min-width: 0; max-width: 790px; }
 
 /* ---- lesson heading */
 .scene { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center; gap: 12px; margin-bottom: 26px; }
-.scene .num { font: 800 .85rem var(--title-font); letter-spacing: .08em; text-transform: uppercase; color: var(--cupi-dark); }
+.scene .num { font: 800 .85rem var(--title-font); letter-spacing: .08em; text-transform: uppercase; color: var(--berry-dark); }
 .scene h1 { font-size: clamp(2rem, 5vw, 2.9rem); margin: 4px 0 0; }
 .drawing { position: relative; }
 .drawing svg { width: 100%; height: auto; display: block; overflow: visible; }
 .bubble { position: relative; background: var(--paper); border: 3px solid var(--ink); border-radius: 22px; padding: 10px 16px; font: 700 1.05rem/1.35 var(--title-font); margin: 0 0 10px auto; max-width: 300px; box-shadow: 4px 4px 0 var(--sun); }
 .bubble::after { content: ""; position: absolute; bottom: -14px; right: 70px; border: 12px solid transparent; border-top-color: var(--ink); border-bottom: 0; }
 @media (max-width: 640px) { .scene { grid-template-columns: minmax(0, 1fr); } .bubble { margin: 0 auto 8px 0; } }
-.cupi-dance { animation: dance .9s ease-in-out 2; transform-origin: 60% 80%; }
+.happy-dance { animation: dance .9s ease-in-out 2; transform-origin: 60% 80%; }
 @keyframes dance { 25% { transform: rotate(-4deg) translateY(-6px); } 75% { transform: rotate(4deg) translateY(-6px); } }
 
 /* ---- sections */
 section.part { margin: 0 0 38px; }
 h2 { display: flex; align-items: center; gap: 10px; font-size: 1.5rem; margin: 0 0 12px; }
-h2 .icon { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--cupi-light); font-size: 1rem; flex: none; }
+h2 .icon { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--berry-light); font-size: 1rem; flex: none; }
 .story { background: var(--sky-light); border-radius: 20px; padding: 6px 22px; font-size: 1.08rem; }
 .idea p, .idea li { max-width: 68ch; }
 .idea ul { padding-left: 1.3em; }
@@ -134,8 +134,8 @@ pre.code-static { margin: 14px 0; padding: 14px 18px; background: var(--code-bg)
 .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; }
 .btn { border: 2px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 12px; padding: 6px 14px; font-weight: 700; font-size: .92rem; }
 .btn:hover { border-color: var(--muted); }
-.btn.primary { background: var(--cupi); border-color: var(--cupi-dark); color: #fff; box-shadow: 0 3px 0 var(--cupi-dark); }
-.btn.primary:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--cupi-dark); }
+.btn.primary { background: var(--berry); border-color: var(--berry-dark); color: #fff; box-shadow: 0 3px 0 var(--berry-dark); }
+.btn.primary:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--berry-dark); }
 .btn.sun { background: var(--sun); border-color: #d9a419; color: #3b2d00; box-shadow: 0 3px 0 #d9a419; }
 .btn:disabled { opacity: .55; cursor: progress; }
 .actions .shortcut { margin-left: auto; color: var(--muted); font-size: .8rem; }
@@ -156,7 +156,7 @@ pre.code-static { margin: 14px 0; padding: 14px 18px; background: var(--code-bg)
 .exercise .task b.tag { display: inline-block; font: 800 .8rem var(--title-font); letter-spacing: .08em; text-transform: uppercase; color: #a16207; margin-right: 6px; }
 .exercise.solved .task { background: var(--ok-light); }
 .exercise.solved .task b.tag { color: var(--ok); }
-.exercise.solved .task b.tag::after { content: " · solved!"; }
+.exercise.solved .task b.tag::after { content: " · " attr(data-solved); }
 .checks { list-style: none; margin: 0; padding: 10px 18px; border-top: 2px solid var(--line); }
 .checks li { display: grid; grid-template-columns: 26px 1fr; gap: 2px; padding: 3px 0; }
 .checks li::before { font-weight: 800; }
@@ -178,31 +178,51 @@ pre.code-static { margin: 14px 0; padding: 14px 18px; background: var(--code-bg)
 .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 40px; }
 .pager a { text-decoration: none; padding: 10px 16px; border: 2px solid var(--line); border-radius: 14px; background: var(--paper); color: var(--ink); max-width: 48%; font-weight: 700; }
 .pager a small { display: block; color: var(--muted); font-size: .78rem; font-weight: 600; }
-.pager a.next { margin-left: auto; text-align: right; border-color: var(--cupi); }
+.pager a.next { margin-left: auto; text-align: right; border-color: var(--berry); }
 /* code looks exactly as typed: "==" is two signs, not one */
+.map { margin: 18px 0; border-radius: 22px; overflow: hidden; border: 2px solid var(--line); }
+.map svg { display: block; width: 100%; height: auto; }
+.places { list-style: none; padding: 0; margin: 0 0 20px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 18px; }
+@media (max-width: 640px) { .places { grid-template-columns: minmax(0, 1fr); } }
+.places a { display: flex; gap: 10px; align-items: baseline; text-decoration: none; color: var(--ink); padding: 4px 6px; border-radius: 10px; }
+.places a:hover { background: var(--paper); }
+.places b { font-family: var(--title-font); color: var(--berry); min-width: 1.6em; }
+.places li.lit b { color: #d99a1e; }
+.places small { display: block; color: var(--muted); font-size: .82rem; }
 code, pre, textarea, .editor > * { font-variant-ligatures: none !important; font-feature-settings: "liga" 0, "calt" 0 !important; }
 </style>
 </head>
 <body>
 <header class="topbar">
-  <a class="logo" href="#hello" aria-label="Home"><svg id="logo" viewBox="0 0 320 200" aria-hidden="true"></svg><b>Cup<span>cake</span></b></a>
+  <a class="logo" href="#hello" aria-label=""><svg id="logo" viewBox="0 0 320 200" aria-hidden="true"></svg><b>Cup<span>cake</span></b></a>
   <div class="spacer"></div>
   <div class="stars" id="stars"></div>
-  <button class="engine" id="engine" data-status="idle" title="Cupcake runs inside your browser">Cupi is in the oven</button>
-  <button class="theme" id="theme" title="Change colors" aria-label="Change colors">◐</button>
+  <button class="engine" id="engine" data-status="idle"></button>
+  <button class="theme" id="theme">◐</button>
 </header>
 <div class="frame">
-  <nav class="sidebar" aria-label="Lessons"><details id="det" open><summary>Lessons</summary><ol id="toc"></ol></details></nav>
+  <nav class="sidebar" id="sidebar"><details id="det" open><summary id="lessons-summary"></summary><ol id="toc"></ol></details></nav>
   <main id="content"></main>
 </div>
 
 <script id="data" type="application/json">/*DATA*/null</script>
 <script id="sources" type="application/json">/*SOURCES*/null</script>
+<script id="ui" type="application/json">/*UI*/null</script>
 <script>
 "use strict";
 const DATA = JSON.parse(document.getElementById("data").textContent);
 const SOURCES = JSON.parse(document.getElementById("sources").textContent);
 const LESSONS = DATA.lessons;
+const UI = JSON.parse(document.getElementById("ui").textContent);
+const fill = (text, values) => text.replace(/\{(\w+)\}/g, (_, k) => values[k]);
+document.title = UI.pageTitle;
+document.querySelector(".logo").setAttribute("aria-label", UI.home);
+document.getElementById("engine").title = UI.engineTitle;
+document.getElementById("engine").textContent = UI.engineOff;
+document.getElementById("theme").title = UI.changeColors;
+document.getElementById("theme").setAttribute("aria-label", UI.changeColors);
+document.getElementById("sidebar").setAttribute("aria-label", UI.lessons);
+document.getElementById("lessons-summary").textContent = UI.lessons;
 
 // ------------------------------------------------------------------ browser memory
 const STORAGE_KEY = "Cupcake-course-v1";
@@ -229,112 +249,158 @@ function el(tag, attrs = {}, ...children) {
 }
 const escapeHtml = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-// ------------------------------------------------------------------ Cupi, the cupcake
-// A paper cup with a little face, swirled frosting, twelve sprinkles and a cherry. No arms or legs: just cute.
-function cupiBody({ cx = 200, cy = 96, opacity = 1 } = {}) {
-  const [hx, hy] = [cx, cy];
-  let s = `<g opacity="${opacity}" stroke-linejoin="round">`;
-  // the paper cup, with little stripes
-  s += `<path d="M${hx - 54} ${hy + 2} L${hx + 54} ${hy + 2} L${hx + 40} ${hy + 64} Q${hx} ${hy + 70} ${hx - 40} ${hy + 64} Z" fill="var(--wrapper)" stroke="var(--wrapper-dark)" stroke-width="3"/>`;
-  for (const k of [-36, -18, 0, 18, 36])
-    s += `<path d="M${hx + k} ${hy + 6} L${hx + k * 0.74} ${hy + 64}" stroke="var(--wrapper-dark)" stroke-width="2.5" opacity=".45" stroke-linecap="round"/>`;
-  // the swirled frosting: three layers and a little tip
-  const layer = (y, rx, ry) => `<ellipse cx="${hx}" cy="${y}" rx="${rx}" ry="${ry}" fill="var(--frosting)" stroke="var(--cupi-dark)" stroke-width="3"/>`;
-  s += layer(hy - 2, 62, 20) + layer(hy - 24, 48, 18) + layer(hy - 44, 32, 15);
-  s += `<path d="M${hx - 12} ${hy - 54} Q${hx} ${hy - 76} ${hx + 10} ${hy - 56}" fill="var(--frosting)" stroke="var(--cupi-dark)" stroke-width="3"/>`;
-  s += `<path d="M${hx - 40} ${hy - 30} q 10 -8 22 -8" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/>`;
-  // twelve colorful sprinkles
-  const colors = ["#4aa3df", "#ffc93c", "#6fcf7f", "#9b7bea", "#ff8a3d", "#ffffff"];
-  const spots = [[-44, -6, 30], [-24, 4, -40], [6, 6, 20], [30, -2, -25], [48, -10, 50], [-34, -26, -10],
-                   [-10, -20, 60], [16, -28, -50], [36, -30, 15], [-18, -44, 35], [4, -48, -20], [22, -44, 70]];
-  spots.forEach(([dx, dy, g], i) =>
-    s += `<rect x="${hx + dx - 5}" y="${hy + dy - 2}" width="10" height="4" rx="2" fill="${colors[i % 6]}" stroke="var(--cupi-dark)" stroke-width=".8" transform="rotate(${g} ${hx + dx} ${hy + dy})"/>`);
-  // the cherry
-  s += `<path d="M${hx + 2} ${hy - 76} q 4 -14 16 -18" stroke="#6b3e1f" stroke-width="3" fill="none" stroke-linecap="round"/>`;
-  s += `<circle cx="${hx}" cy="${hy - 70}" r="11" fill="#e0233c" stroke="#9e1428" stroke-width="2.5"/><circle cx="${hx - 4}" cy="${hy - 74}" r="3" fill="#fff" opacity=".8"/>`;
-  // the little face, on the paper cup
-  for (const dx of [-17, 17]) {
-    s += `<ellipse cx="${hx + dx}" cy="${hy + 26}" rx="6" ry="7.5" fill="#2b1d24"/>`;
-    s += `<circle cx="${hx + dx + 2}" cy="${hy + 23}" r="2.3" fill="#fff"/><circle cx="${hx + dx - 2}" cy="${hy + 29}" r="1.1" fill="#fff"/>`;
-  }
-  s += `<ellipse cx="${hx - 31}" cy="${hy + 37}" rx="7" ry="4.5" fill="var(--cheek)" opacity=".85"/><ellipse cx="${hx + 31}" cy="${hy + 37}" rx="7" ry="4.5" fill="var(--cheek)" opacity=".85"/>`;
-  s += `<path d="M${hx - 7} ${hy + 36} q 3.5 5 7 0 q 3.5 5 7 0" stroke="#2b1d24" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
-  // the cupcakes in the display case, in a row (for the lists lesson)
-  const pts = [0, 1, 2, 3, 4].map(i => [hx - 196 + i * 27, hy + 62 - Math.sin(i * 0.7) * 12]);
-  return { svg: s + "</g>", hx, hy, pts };
-}
-
-const T = (x, y, text, extra = "") =>
-  `<text x="${x}" y="${y}" font-family="Baloo 2, sans-serif" font-weight="800" ${extra}>${text}</text>`;
-
-const ACCESSORIES = {
-  wave: ({ hx, hy }) => `<path d="M${hx + 84} ${hy - 70} q 12 8 10 22 M${hx + 96} ${hy - 80} q 16 12 12 34" stroke="var(--muted)" stroke-width="3" fill="none" stroke-linecap="round"/>
-    ${T(hx + 66, hy - 84, "Hello!", 'font-size="20" fill="var(--cupi-dark)"')}
-    ${T(hx - 120, hy - 50, "✦", 'font-size="18" fill="var(--sun)"')}${T(hx - 96, hy - 80, "✦", 'font-size="12" fill="var(--sky)"')}`,
-  boxes: ({ hx }) => `<g transform="translate(${hx - 196} 112)">
-    <rect x="0" y="0" width="62" height="46" rx="4" fill="#d9a066" stroke="#9a6a3a" stroke-width="3"/><path d="M0 14 h62" stroke="#9a6a3a" stroke-width="3"/>
-    <rect x="6" y="22" width="50" height="16" rx="3" fill="#fff"/>${T(9, 34, "sprinkles", 'font-size="10" fill="#1d2b26"')}
-    <rect x="68" y="10" width="56" height="36" rx="4" fill="#e8b67d" stroke="#9a6a3a" stroke-width="3"/>
-    <rect x="76" y="20" width="40" height="16" rx="3" fill="#fff"/>${T(84, 33, "name", 'font-size="11" fill="#1d2b26"')}</g>`,
-  sign: ({ hx, hy }) => `<rect x="${hx + 42}" y="${hy - 6}" width="6" height="90" fill="#9a6a3a"/>
-    <rect x="${hx + 6}" y="${hy - 70}" width="92" height="56" rx="8" fill="#fff" stroke="#9a6a3a" stroke-width="4" transform="rotate(4 ${hx + 52} ${hy - 42})"/>
-    ${T(hx + 16, hy - 46, "Hello,", 'font-size="16" fill="var(--cupi-dark)"')}${T(hx + 16, hy - 26, "{name}!", 'font-size="16" fill="var(--c-bi)"')}`,
-  calculator: ({ hx, hy }) => `<g transform="translate(${hx + 30} ${hy - 6}) rotate(10)">
-    <rect width="56" height="74" rx="9" fill="#2d3b36" stroke="#1d2b26" stroke-width="3"/><rect x="8" y="8" width="40" height="18" rx="3" fill="#bfe8c4"/>
-    ${T(12, 22, "300", 'font-size="13" fill="#1d2b26"')}
-    ${[0, 1, 2].map(r => [0, 1, 2].map(c => `<rect x="${8 + c * 14}" y="${32 + r * 13}" width="11" height="10" rx="2" fill="${c === 2 ? "var(--sun)" : "#e9f2ec"}"/>`).join("")).join("")}</g>
-    ${T(hx - 70, hy - 50, "×", 'font-size="30" fill="var(--gold)"')}${T(hx - 36, hy - 66, "+", 'font-size="26" fill="var(--sky)"')}${T(hx - 100, hy - 30, "=", 'font-size="26" fill="var(--sun)"')}`,
-  question: ({ hx, hy }) => `<circle cx="${hx + 64}" cy="${hy - 66}" r="28" fill="var(--sky-light)" stroke="var(--sky)" stroke-width="4"/>
-    ${T(hx + 53, hy - 52, "?", 'font-size="40" fill="var(--sky)"')}<circle cx="${hx + 40}" cy="${hy - 32}" r="6" fill="var(--sky-light)" stroke="var(--sky)" stroke-width="3"/>`,
-  crossroads: ({ hx, hy }) => `<rect x="${hx + 60}" y="${hy - 66}" width="7" height="150" fill="#9a6a3a"/>
-    <path d="M${hx + 67} ${hy - 62} h44 l12 12 -12 12 h-44 z" fill="var(--cupi-light)" stroke="var(--cupi-dark)" stroke-width="3"/>${T(hx + 76, hy - 44, "if", 'font-size="17" fill="var(--c-kw)"')}
-    <path d="M${hx + 60} ${hy + 46} h-46 l-12 12 12 12 h46 z" fill="var(--sun-light)" stroke="#d9a419" stroke-width="3"/>${T(hx + 18, hy + 64, "else", 'font-size="16" fill="var(--c-kw)"')}`,
-  laps: ({ hx, hy }) => `<path d="M${hx - 150} ${hy - 60} a 90 30 0 1 1 170 -4" stroke="var(--sky)" stroke-width="4" fill="none" stroke-dasharray="10 8" stroke-linecap="round"/>
-    <path d="M${hx + 22} ${hy - 72} l -2 18 -14 -10 z" fill="var(--sky)"/>
-    ${T(hx - 150, hy - 74, "1", 'font-size="22" fill="var(--gold)"')}${T(hx - 90, hy - 98, "2", 'font-size="22" fill="var(--sun)"')}${T(hx - 30, hy - 96, "3", 'font-size="22" fill="var(--cupi-dark)"')}`,
-  row: ({ pts, hx, hy }) => `<path d="M${pts[0][0] - 14} ${pts[0][1] + 8} Q ${hx - 120} ${hy + 120} ${hx - 30} ${hy + 64}" stroke="var(--line)" stroke-width="3" fill="none" stroke-dasharray="6 7"/>`
-    + pts.map(([x, y], i) => { const c = ["#ffb8d2", "#8b5a3c", "#fff4cf", "#b9e3c6", "#c9b5f5"][i];
-      return `<path d="M${x - 9} ${y} h18 l-3 12 h-12 z" fill="var(--wrapper)" stroke="#1d2b26" stroke-width="1.6"/><ellipse cx="${x}" cy="${y - 1}" rx="11" ry="7" fill="${c}" stroke="#1d2b26" stroke-width="1.6"/>`
-        + `<rect x="${x - 11}" y="${y - 50}" width="22" height="22" rx="6" fill="var(--paper)" stroke="var(--sky)" stroke-width="2.5"/>${T(x - 5, y - 33, i, 'font-size="16" fill="var(--sky)"')}`; }).join(""),
-  book: ({ hx, hy }) => `<g transform="translate(${hx + 36} ${hy + 4}) scale(.68)">
-    <path d="M0 10 q 40 -14 70 0 q 30 -14 70 0 v 60 q -40 -14 -70 0 q -30 -14 -70 0 z" fill="#fff" stroke="#2563a6" stroke-width="4"/>
-    <path d="M70 10 v60" stroke="#2563a6" stroke-width="3"/>${T(10, 38, "small: 3", 'font-size="12" fill="#1d2b26"')}${T(10, 56, "large: 8", 'font-size="12" fill="#1d2b26"')}
-    ${T(80, 38, "size?", 'font-size="12" fill="var(--cupi-dark)"')}</g>`,
-  card: ({ hx, hy }) => `<g transform="translate(${hx + 26} ${hy - 4}) rotate(-6)">
-    <rect width="96" height="66" rx="8" fill="#fff" stroke="var(--sky)" stroke-width="4"/><rect width="96" height="16" rx="6" fill="var(--sky)"/>
-    ${T(8, 31, "name:", 'font-size="11" fill="#5b6b64"')}${T(56, 31, "Argos", 'font-size="11" fill="#1d2b26"')}
-    ${T(8, 46, "mouths:", 'font-size="11" fill="#5b6b64"')}${T(56, 46, "100", 'font-size="11" fill="#1d2b26"')}
-    ${T(8, 60, "color:", 'font-size="11" fill="#5b6b64"')}${T(56, 60, "green", 'font-size="11" fill="#1d2b26"')}</g>`,
-  tool: ({ hx, hy }) => `<g transform="translate(${hx + 62} ${hy - 44}) rotate(35)">
-    <rect x="-6" y="0" width="12" height="80" rx="5" fill="#9aa8a2" stroke="#5b6b64" stroke-width="2"/>
-    <path d="M-20 -6 a 20 20 0 1 0 40 0 l -10 -2 v 10 h -20 v -10 z" fill="#9aa8a2" stroke="#5b6b64" stroke-width="2"/></g>
-    ${T(hx + 92, hy - 56, "fx", 'font-size="24" fill="var(--c-kw)"')}`,
-  photocopy: ({ hx, hy }) => cupiBody({ cx: hx - 128, cy: hy + 10, opacity: .35 }).svg,
-  magnifier: ({ hx, hy }) => `<circle cx="${hx + 18}" cy="${hy - 8}" r="30" fill="var(--sky-light)" fill-opacity=".45" stroke="#5b6b64" stroke-width="6"/>
-    <path d="M${hx + 40} ${hy + 14} l 34 34" stroke="#9a6a3a" stroke-width="11" stroke-linecap="round"/>
-    ${[[hx + 106, hy + 60, "#e0233c"], [hx + 80, hy + 80, "var(--sky)"]].map(([x, y, c]) => `<path d="M${x - 10} ${y} h20 l-3 13 h-14 z" fill="var(--wrapper)" stroke="#1d2b26" stroke-width="1.8"/><ellipse cx="${x}" cy="${y - 1}" rx="12" ry="8" fill="${c}" stroke="#1d2b26" stroke-width="1.8"/>`).join("")}`,
-  bandage: ({ hx, hy }) => `<g transform="translate(${hx + 8} ${hy - 30}) rotate(-25)"><rect x="-22" y="-7" width="44" height="14" rx="6" fill="#f4c99b" stroke="#c98f55" stroke-width="2"/></g>
-    <g transform="translate(${hx + 8} ${hy - 30}) rotate(25)"><rect x="-22" y="-7" width="44" height="14" rx="6" fill="#f4c99b" stroke="#c98f55" stroke-width="2"/></g>
-    ${T(hx + 46, hy - 46, "✦", 'font-size="18" fill="var(--sun)"')}${T(hx - 60, hy - 56, "✦", 'font-size="14" fill="var(--sun)"')}`,
-  backpack: ({ hx, hy }) => { const [x, y] = [hx - 92, hy + 50]; return `<rect x="${x - 26}" y="${y - 44}" width="52" height="48" rx="12" fill="var(--gold)" stroke="#b23b2e" stroke-width="3"/>
-    <rect x="${x - 16}" y="${y - 30}" width="32" height="16" rx="5" fill="#fff" opacity=".85"/>${T(x - 13, y - 17, ".cup", 'font-size="11" fill="#b23b2e"')}`; },
-  dice: ({ hx, hy }) => {
-    const face = (x, y, r, dots) => `<g transform="translate(${x} ${y}) rotate(${r})"><rect x="-20" y="-20" width="40" height="40" rx="8" fill="#fff" stroke="#1d2b26" stroke-width="3"/>`
-      + dots.map(([a, b]) => `<circle cx="${a}" cy="${b}" r="4" fill="${dots.length === 1 ? "var(--cupi)" : "#1d2b26"}"/>`).join("") + "</g>";
-    return face(hx + 70, hy - 50, -14, [[-9, -9], [0, 0], [9, 9]]) + face(hx + 92, hy + 6, 12, [[-9, -9], [9, -9], [-9, 9], [9, 9], [0, 0]])
-      + T(hx - 80, hy - 60, "?", 'font-size="30" fill="var(--sky)"');
-  },
-  trophy: ({ hx, hy }) => `${T(hx - 96, hy - 50, "✦", 'font-size="22" fill="var(--sun)"')}${T(hx - 70, hy - 84, "✦", 'font-size="14" fill="var(--sky)"')}${T(hx + 50, hy - 70, "✦", 'font-size="18" fill="var(--cupi)"')}
-    <g transform="translate(${hx + 48} ${hy + 20})"><path d="M0 0 h40 v14 a 20 20 0 0 1 -40 0 z" fill="var(--sun)" stroke="#d9a419" stroke-width="3"/>
-    <rect x="16" y="32" width="8" height="12" fill="#d9a419"/><rect x="6" y="44" width="28" height="8" rx="2" fill="#d9a419"/></g>`,
+const LABELS = UI.labels;
+// ------------------------------------------------------------------ the Cupcake gang
+// Five cupcakes named after flavors. Each one is drawn in a 100 × 100 box: frosting in its color,
+// a light paper cup of the same color, its own topper and a little face. No arms or legs.
+// LABELS (the words inside the drawings) comes from the page's UI strings.
+const GANG = {
+  Raspberry: { frosting: "#d6336c", edge: "#9e1f4f", cup: "#fde3ec",
+    topper: `<circle cx="50" cy="16" r="7" fill="#e0233c" stroke="#9e1428" stroke-width="1.5"/><circle cx="48" cy="14" r="2" fill="#fff" opacity=".8"/>` },
+  Vanilla:   { frosting: "#f6dfa0", edge: "#c99a2e", cup: "#fff6dc",
+    topper: `<path d="M50 6 l3 6 6.5 1 -4.7 4.5 1.1 6.5 -5.9 -3.1 -5.9 3.1 1.1 -6.5 -4.7 -4.5 6.5 -1 z" fill="#d99a1e"/>` },
+  Cinnamon:  { frosting: "#b5652b", edge: "#7a3f14", cup: "#f6e1cf",
+    topper: `<path d="M50 16 m-6 0 a6 6 0 1 1 6 6 a3.5 3.5 0 1 1 3.5 -3.5" fill="none" stroke="#7a3f14" stroke-width="3" stroke-linecap="round"/>` },
+  Mint:      { frosting: "#7fd3a4", edge: "#2f8a57", cup: "#e3f6ea",
+    topper: `<path d="M50 20 q-10 -2 -11 -12 q10 1 11 12 z M50 20 q10 -2 11 -12 q-10 1 -11 12 z" fill="#2f8a57"/>` },
+  Blueberry: { frosting: "#8f6ad8", edge: "#5b3aa8", cup: "#ece5fb",
+    topper: `<circle cx="43" cy="15" r="4.5" fill="#3b2a8a"/><circle cx="57" cy="15" r="4.5" fill="#3b2a8a"/><circle cx="50" cy="9" r="4.5" fill="#3b2a8a"/>` },
+};
+const GANG_EYES = {
+  happy:    `<path d="M39 64 q3.5 -4.5 7 0 M54 64 q3.5 -4.5 7 0" stroke="#2b1d24" stroke-width="2.6" fill="none" stroke-linecap="round"/>`,
+  dots:     `<circle cx="42.5" cy="64" r="3" fill="#2b1d24"/><circle cx="57.5" cy="64" r="3" fill="#2b1d24"/><circle cx="43.5" cy="63" r="1" fill="#fff"/><circle cx="58.5" cy="63" r="1" fill="#fff"/>`,
+  wow:      `<circle cx="42.5" cy="63" r="3.8" fill="#2b1d24"/><circle cx="57.5" cy="63" r="3.8" fill="#2b1d24"/><circle cx="43.8" cy="61.8" r="1.2" fill="#fff"/><circle cx="58.8" cy="61.8" r="1.2" fill="#fff"/>`,
+  sleepy:   `<path d="M39 64 q3.5 3 7 0 M54 64 q3.5 3 7 0" stroke="#2b1d24" stroke-width="2.6" fill="none" stroke-linecap="round"/>`,
+  wink:     `<circle cx="42.5" cy="64" r="3" fill="#2b1d24"/><path d="M54 64 q3.5 -4 7 0" stroke="#2b1d24" stroke-width="2.6" fill="none" stroke-linecap="round"/>`,
+  dizzy:    `<path d="M40 61 l5 5 M45 61 l-5 5 M55 61 l5 5 M60 61 l-5 5" stroke="#2b1d24" stroke-width="2.4" stroke-linecap="round"/>`,
+};
+const GANG_MOUTH = {
+  smile: `<path d="M45 70 q5 5 10 0" stroke="#2b1d24" stroke-width="2.4" fill="none" stroke-linecap="round"/>`,
+  o:     `<ellipse cx="50" cy="72" rx="2.8" ry="3.4" fill="#2b1d24"/>`,
+  flat:  `<path d="M45 71 h10" stroke="#2b1d24" stroke-width="2.4" stroke-linecap="round"/>`,
+  big:   `<path d="M44 69 q6 8 12 0 z" fill="#2b1d24"/><path d="M47 72.5 q3 2 6 0" fill="#ff8fb1"/>`,
+  wavy:  `<path d="M44 72 q2 -2 4 0 q2 2 4 0 q2 -2 4 0" stroke="#2b1d24" stroke-width="2.2" fill="none" stroke-linecap="round"/>`,
 };
 
-function drawCupi(pose, cls = "") {
-  const c = cupiBody();
-  const extra = ACCESSORIES[pose] ? ACCESSORIES[pose](c) : "";
-  const behind = pose === "photocopy" ? extra : "";
-  const front = pose === "photocopy" ? "" : extra;
-  return `<svg viewBox="-20 -60 400 260" role="img" aria-label="Cupi, the cupcake" class="${cls}">${behind}${c.svg}${front}</svg>`;
+// One member of the gang at (x, y), scaled. face = [eyes, mouth]; tilt in degrees.
+function member(name, x, y, s = 1, { face = ["dots", "smile"], tilt = 0, opacity = 1 } = {}) {
+  const g = GANG[name];
+  return `<g transform="translate(${x} ${y}) scale(${s})" opacity="${opacity}"><g transform="rotate(${tilt} 50 60)">
+    <path d="M24 48 H76 L69 86 Q50 91 31 86 Z" fill="${g.cup}" stroke="${g.edge}" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M37 52 L39 85 M50 52 V88 M63 52 L61 85" stroke="${g.edge}" stroke-width="1.5" opacity=".25"/>
+    <path d="M18 50 Q18 22 50 22 Q82 22 82 50 Q50 56 18 50 Z" fill="${g.frosting}" stroke="${g.edge}" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M28 38 q6 -9 16 -10" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".55"/>
+    ${g.topper}${GANG_EYES[face[0]]}${GANG_MOUTH[face[1]]}
+    <ellipse cx="35" cy="71" rx="4" ry="2.4" fill="#ff8fb1" opacity=".8"/><ellipse cx="65" cy="71" rx="4" ry="2.4" fill="#ff8fb1" opacity=".8"/>
+  </g></g>`;
+}
+
+// The Cupcake logo (the badge on GitHub), at (x, y) with a given size.
+const logoBadge = (x, y, size) => `<g transform="translate(${x} ${y}) scale(${size / 100})">
+  <rect x="6" y="6" width="88" height="88" rx="24" fill="#d6336c"/><path d="M28 54 Q28 30 50 30 Q72 30 72 54 Z" fill="#fff"/>
+  <path d="M33 58 H67 L62 78 Q50 81 38 78 Z" fill="#fff" opacity=".85"/><circle cx="50" cy="23" r="6" fill="#ffc2d9"/></g>`;
+
+const W = (x, y, text, size, color, weight = 800) =>
+  `<text x="${x}" y="${y}" font-family="Baloo 2, Nunito, sans-serif" font-weight="${weight}" font-size="${size}" fill="${color}">${text}</text>`;
+const sparkle = (x, y, size, color) => W(x, y, "✦", size, color, 400);
+const miniCupcake = (x, y, color) => `<path d="M${x - 10} ${y} h20 l-3 13 h-14 z" fill="#f2e3d8" stroke="#2b1d24" stroke-width="1.6"/><ellipse cx="${x}" cy="${y - 1}" rx="12" ry="8" fill="${color}" stroke="#2b1d24" stroke-width="1.6"/>`;
+
+// Each lesson's scene. The box is x -20…380, y -60…200.
+const SCENES = {
+  // Lesson 1: the original logo, and the gang introducing themselves
+  wave: () => logoBadge(130, -58, 130)
+    + ["Vanilla", "Cinnamon", "Raspberry", "Mint", "Blueberry"].map((n, i) =>
+        member(n, -14 + i * 78, 88, .76, { face: n === "Cinnamon" ? ["wow", "o"] : n === "Blueberry" ? ["wink", "big"] : ["happy", "smile"], tilt: [-6, 0, 0, 0, 6][i] })).join("")
+    + W(268, -10, LABELS.hello, 22, "#d6336c") + sparkle(98, -20, 18, "#d99a1e") + sparkle(272, 52, 14, "#7c3aed"),
+  // Lesson 2: Vanilla labels her boxes
+  boxes: () => member("Vanilla", 150, 10, 1.6, { face: ["happy", "smile"] })
+    + `<g transform="translate(-6 100)"><rect width="74" height="54" rx="5" fill="#e6b980" stroke="#9a6a3a" stroke-width="3"/><path d="M0 16 h74" stroke="#9a6a3a" stroke-width="3"/>
+       <rect x="7" y="26" width="60" height="18" rx="3" fill="#fff"/>${W(12, 40, LABELS.sprinkles, 12, "#2b1d24")}</g>
+       <g transform="translate(78 116)"><rect width="62" height="38" rx="5" fill="#f0c995" stroke="#9a6a3a" stroke-width="3"/>
+       <rect x="7" y="11" width="48" height="18" rx="3" fill="#fff"/>${W(13, 25, LABELS.name, 12, "#2b1d24")}</g>`,
+  // Lesson 3: Raspberry's sign that changes by itself
+  sign: () => member("Raspberry", 20, 10, 1.6, { face: ["happy", "smile"] })
+    + `<rect x="250" y="40" width="7" height="120" fill="#9a6a3a"/>
+       <g transform="rotate(4 255 20)"><rect x="196" y="-12" width="116" height="66" rx="9" fill="#fff" stroke="#9a6a3a" stroke-width="4"/>
+       ${W(208, 14, LABELS.helloComma, 19, "#d6336c")}${W(208, 40, "{" + LABELS.name + "}!", 19, "#0e7c86")}</g>`,
+  // Lesson 4: Raspberry and Cinnamon with the calculator
+  calculator: () => member("Raspberry", 0, 30, 1.4, { face: ["happy", "smile"] }) + member("Cinnamon", 130, 58, 1.1, { face: ["dots", "wavy"] })
+    + `<path d="M250 64 q4 7 0 10 q-4 -3 0 -10 z" fill="#4aa3df"/>
+       <g transform="translate(268 30) rotate(8)"><rect width="66" height="90" rx="10" fill="#7c3aed"/><rect x="9" y="9" width="48" height="20" rx="4" fill="#fff"/>
+       ${W(15, 25, "300", 15, "#2b1d24", 700)}
+       ${[0, 1, 2].map(r => [0, 1, 2].map(c => `<rect x="${9 + c * 17}" y="${38 + r * 15}" width="13" height="11" rx="3" fill="#fff" opacity=".85"/>`).join("")).join("")}</g>`
+    + W(142, 44, "1, 2, 3… 100?", 15, "#b5652b") + W(110, -6, "×", 30, "#0e7c86") + W(226, -14, "+", 28, "#2f8a57"),
+  // Lesson 5: Cinnamon asks a question
+  question: () => member("Cinnamon", 90, 12, 1.6, { face: ["wow", "o"], tilt: -6 })
+    + `<circle cx="292" cy="10" r="34" fill="#efe8fd" stroke="#7c3aed" stroke-width="4"/><circle cx="256" cy="52" r="7" fill="#efe8fd" stroke="#7c3aed" stroke-width="3"/>`
+    + W(279, 27, "?", 46, "#7c3aed"),
+  // Lesson 6: Mint at the crossroads
+  crossroads: () => member("Mint", 30, 14, 1.55, { face: ["dots", "flat"] })
+    + `<rect x="250" y="-34" width="8" height="200" fill="#9a6a3a"/>
+       <path d="M258 -28 h56 l14 15 -14 15 h-56 z" fill="#fde3ec" stroke="#d6336c" stroke-width="3"/>${W(270, -6, "if", 20, "#d6336c")}
+       <path d="M250 84 h-56 l-14 15 14 15 h56 z" fill="#fff4cf" stroke="#d99a1e" stroke-width="3"/>${W(196, 106, "else", 19, "#d6336c")}`,
+  // Lesson 7: Cinnamon running laps
+  laps: () => member("Cinnamon", 130, 40, 1.45, { face: ["happy", "big"], tilt: 10 })
+    + `<path d="M40 30 a 120 40 0 1 1 250 -6" stroke="#0e7c86" stroke-width="4" fill="none" stroke-dasharray="10 8" stroke-linecap="round"/>
+       <path d="M292 18 l -2 20 -15 -11 z" fill="#0e7c86"/><path d="M110 120 l-26 -6 M112 140 l-30 0" stroke="#b5652b" stroke-width="3.5" stroke-linecap="round"/>`
+    + W(30, 18, "1", 24, "#d99a1e") + W(110, -30, "2", 24, "#d6336c") + W(210, -36, "3", 24, "#7c3aed"),
+  // Lesson 8: the whole gang in a row, each with its position
+  row: () => ["Raspberry", "Vanilla", "Cinnamon", "Mint", "Blueberry"].map((n, i) =>
+      member(n, -14 + i * 78, 60, .76, { face: ["happy", "smile"] })
+      + `<rect x="${7 + i * 78}" y="12" width="32" height="32" rx="8" fill="#fff" stroke="#0e7c86" stroke-width="3"/>` + W(16 + i * 78, 37, i, 22, "#0e7c86")).join(""),
+  // Lesson 9: Raspberry's price book
+  book: () => member("Raspberry", 10, 14, 1.55, { face: ["dots", "smile"] })
+    + `<g transform="translate(190 20)"><path d="M0 12 q 46 -16 84 0 q 38 -16 84 0 v 92 q -46 -16 -84 0 q -38 -16 -84 0 z" fill="#fff" stroke="#0e7c86" stroke-width="4"/>
+       <path d="M84 12 v92" stroke="#0e7c86" stroke-width="3"/>
+       ${W(10, 48, LABELS.small, 15, "#2b1d24", 700)}${W(10, 74, LABELS.large, 15, "#2b1d24", 700)}${W(96, 60, LABELS.size, 16, "#d6336c")}</g>`,
+  // Lesson 10: Mint and Argos's card
+  card: () => member("Mint", 10, 14, 1.55, { face: ["dots", "smile"] })
+    + `<g transform="translate(196 6) rotate(-5)"><rect width="150" height="104" rx="10" fill="#fff" stroke="#0e7c86" stroke-width="4"/><rect width="150" height="24" rx="8" fill="#0e7c86"/>
+       ${W(12, 50, LABELS.nameField, 15, "#7a6670", 700)}${W(84, 50, "Argos", 15, "#2b1d24", 700)}
+       ${W(12, 72, LABELS.mouthsField, 15, "#7a6670", 700)}${W(84, 72, "100", 15, "#2b1d24", 700)}
+       ${W(12, 94, LABELS.colorField, 15, "#7a6670", 700)}${W(84, 94, LABELS.green, 15, "#2b1d24", 700)}</g>`,
+  // Lesson 11: Blueberry invents a tool
+  tool: () => member("Blueberry", 40, 16, 1.55, { face: ["wink", "big"], tilt: 4 })
+    + `<g transform="translate(270 -10) rotate(35)"><rect x="-8" y="0" width="16" height="104" rx="6" fill="#9aa8a2" stroke="#5b6b64" stroke-width="2.5"/>
+       <path d="M-26 -8 a 26 26 0 1 0 52 0 l -13 -3 v 13 h -26 v -13 z" fill="#9aa8a2" stroke="#5b6b64" stroke-width="2.5"/></g>`
+    + W(300, -16, "fx", 30, "#d6336c") + sparkle(20, 0, 18, "#d99a1e"),
+  // Lesson 12: Cinnamon and his photocopy
+  photocopy: () => member("Cinnamon", -10, 30, 1.35, { face: ["happy", "smile"], opacity: .35 })
+    + member("Cinnamon", 150, 14, 1.55, { face: ["wow", "o"] }) + W(320, 10, "?", 30, "#7c3aed"),
+  // Lesson 13: Mint with the magnifier, looking for the red cupcakes
+  magnifier: () => member("Mint", 30, 14, 1.5, { face: ["dots", "flat"] })
+    + `<circle cx="230" cy="40" r="40" fill="#e3f2fc" fill-opacity=".5" stroke="#0e7c86" stroke-width="8"/>
+       <path d="M258 70 l 44 44" stroke="#0e7c86" stroke-width="13" stroke-linecap="round"/>`
+    + miniCupcake(330, 150, "#e0233c") + miniCupcake(296, 172, "#4aa3df") + miniCupcake(352, 178, "#e0233c"),
+  // Lesson 14: Cinnamon trips (errors are friends)
+  bandage: () => member("Cinnamon", 110, 14, 1.6, { face: ["dizzy", "wavy"], tilt: -10 })
+    + `<g transform="translate(184 52) rotate(-25)"><rect x="-30" y="-9" width="60" height="18" rx="8" fill="#f4c99b" stroke="#c98f55" stroke-width="2"/></g>
+       <g transform="translate(184 52) rotate(25)"><rect x="-30" y="-9" width="60" height="18" rx="8" fill="#f4c99b" stroke="#c98f55" stroke-width="2"/></g>`
+    + sparkle(96, 10, 22, "#d99a1e") + sparkle(286, -4, 18, "#d6336c") + sparkle(300, 60, 14, "#7c3aed"),
+  // Lesson 15: Vanilla's backpack of tools
+  backpack: () => member("Vanilla", 140, 14, 1.55, { face: ["happy", "smile"] })
+    + `<g transform="translate(20 70)"><rect width="84" height="78" rx="18" fill="#d99a1e" stroke="#9a6a1e" stroke-width="3"/>
+       <path d="M18 0 q24 -26 48 0" stroke="#9a6a1e" stroke-width="5" fill="none"/>
+       <rect x="16" y="24" width="52" height="24" rx="6" fill="#fff"/>${W(25, 42, ".cup", 17, "#d6336c")}</g>`,
+  // Lesson 16: Blueberry's dice
+  dice: () => {
+    const face = (x, y, r, dots) => `<g transform="translate(${x} ${y}) rotate(${r})"><rect x="-26" y="-26" width="52" height="52" rx="10" fill="#fff" stroke="#2b1d24" stroke-width="3"/>`
+      + dots.map(([a, b]) => `<circle cx="${a}" cy="${b}" r="5" fill="${dots.length === 1 ? "#d6336c" : "#2b1d24"}"/>`).join("") + "</g>";
+    return member("Blueberry", 30, 16, 1.55, { face: ["wink", "big"], tilt: -4 })
+      + face(268, 6, -14, [[-11, -11], [0, 0], [11, 11]]) + face(320, 84, 12, [[-11, -11], [11, -11], [-11, 11], [11, 11], [0, 0]]) + W(220, 130, "?", 30, "#7c3aed");
+  },
+  // Lesson 17 and every win: the whole gang celebrates around the trophy
+  trophy: () => member("Vanilla", -14, 92, .72, { face: ["happy", "big"], tilt: -8 }) + member("Cinnamon", 52, 98, .66, { face: ["happy", "big"] })
+    + member("Raspberry", 118, 6, 1.3, { face: ["happy", "big"] })
+    + member("Mint", 250, 98, .66, { face: ["happy", "smile"] }) + member("Blueberry", 312, 92, .72, { face: ["wink", "big"], tilt: 8 })
+    + `<g transform="translate(272 10)"><path d="M0 0 h56 v20 a 28 28 0 0 1 -56 0 z" fill="#d99a1e" stroke="#9a6a1e" stroke-width="3"/>
+       <rect x="22" y="46" width="12" height="16" fill="#9a6a1e"/><rect x="8" y="60" width="40" height="10" rx="3" fill="#9a6a1e"/></g>`
+    + sparkle(60, 0, 24, "#d99a1e") + sparkle(96, 50, 14, "#0e7c86") + sparkle(250, -30, 18, "#d6336c") + sparkle(350, -20, 16, "#7c3aed"),
+};
+
+function drawScene(pose, cls = "") {
+  const scene = SCENES[pose] ? SCENES[pose]() : SCENES.wave();
+  return `<svg viewBox="-20 -60 400 260" role="img" aria-label="${LABELS.gang}" class="${cls}">${scene}</svg>`;
 }
 
 // ------------------------------------------------------------------ code colors
@@ -422,13 +488,14 @@ import sys, os, json, traceback
 sys.path.insert(0, "/home/pyodide")
 os.chdir("/home/pyodide")
 import bridge
+INTERNAL_ERROR = ${JSON.stringify(UI.internalError)}
 
 def _guard(fn):
     try:
         return json.dumps(fn())
     except BaseException:
         return json.dumps({"status": "error", "output": "", "line": None, "results": [], "all_passed": False,
-                           "error": "Something went wrong inside Cupcake (it is not your program's fault):\\n" + traceback.format_exc()})
+                           "error": INTERNAL_ERROR + traceback.format_exc()})
 
 def _run(source, inputs, files):
     return _guard(lambda: bridge.run(source, inputs, json.loads(files)))
@@ -456,9 +523,9 @@ const engine = {
   load() {
     if (this.promise) return this.promise;
     const startedAt = Date.now();
-    this.status("loading", "Baking Cupi…");
+    this.status("loading", UI.engineLoading);
     const ticker = setInterval(() => {
-      if (this.button.dataset.status === "loading") this.button.textContent = `Baking Cupi… ${Math.round((Date.now() - startedAt) / 1000)} s`;
+      if (this.button.dataset.status === "loading") this.button.textContent = `${UI.engineLoading} ${Math.round((Date.now() - startedAt) / 1000)} s`;
     }, 1000);
     this.promise = (async () => {
       const errors = [];
@@ -470,9 +537,9 @@ const engine = {
       for (const [n, f] of Object.entries(SOURCES)) py.FS.writeFile("/home/pyodide/" + n, f);
       py.runPython(BRIDGE);
       this.py = py;
-      this.status("ready", "Cupi is ready");
+      this.status("ready", UI.engineReady);
       return py;
-    })().catch(err => { this.status("error", "Cupi didn't bake (click to try again)"); this.promise = null; throw err; })
+    })().catch(err => { this.status("error", UI.engineError); this.promise = null; throw err; })
       .finally(() => clearInterval(ticker));
     return this.promise;
   },
@@ -504,14 +571,14 @@ function codeCard(op) {
     if (op.key) { if (v === op.code) delete memory.code[op.key]; else memory.code[op.key] = v; save(); }
     toggleAnswers();
   });
-  const answers = el("textarea", { rows: "2", placeholder: "One answer per line" });
+  const answers = el("textarea", { rows: "2", placeholder: UI.oneAnswerPerLine });
   answers.value = op.inputs || "";
-  const answersRow = el("div", { class: "answers" }, el("label", {}, "Answers"), answers);
+  const answersRow = el("div", { class: "answers" }, el("label", {}, UI.answers), answers);
   function toggleAnswers() { answersRow.hidden = !/\b(read|read_num|ask)\s*\(/.test(editor.value); }
   toggleAnswers();
 
-  const bRun = el("button", { class: "btn" + (op.main === false ? "" : " primary") }, "▶ Run");
-  const bReset = el("button", { class: "btn", title: "Go back to the original code" }, "Start over");
+  const bRun = el("button", { class: "btn" + (op.main === false ? "" : " primary") }, UI.run);
+  const bReset = el("button", { class: "btn", title: UI.startOverTitle }, UI.startOver);
   const actions = el("div", { class: "actions" }, bRun, bReset, el("span", { class: "shortcut" }, "Ctrl + Enter"));
 
   const files = Object.entries(op.files || {}).map(([n, c]) =>
@@ -522,30 +589,29 @@ function codeCard(op) {
     output.innerHTML = (note ? `<span class="note">${note}</span>` : "") + escapeHtml(r.output || (r.status === "ok" ? "(the program didn't show anything)" : ""));
     if (r.status === "error") {
       problem.hidden = false;
-      problem.replaceChildren(el("b", {}, r.line ? `Cupi found a problem on line ${r.line}:` : "Cupi found a problem:"),
-        el("pre", {}, (r.error || "") + (/\b(read|ask)\(\) (was waiting|expected)/.test(r.error || "") ? "\n→ Type the answer in the Answers box, one per line." : "")));
+      problem.replaceChildren(el("b", {}, r.line ? fill(UI.problemOnLine, { line: r.line }) : UI.problem),
+        el("pre", {}, (r.error || "") + (/\b(read|ask)\(\) (was waiting|expected|esperaba)/.test(r.error || "") ? "\n" + UI.typeAnswers : "")));
     } else problem.hidden = true;
   }
   async function run() {
     const code = editor.value, inp = answers.value;
     if (!engine.py && op.pre && code === op.code && inp === (op.inputs || "")) {
-      showResult(op.pre, op.random ? "An example result: with randomness, it comes out different every time. Cupi is baking…"
-                               : "Saved result. Cupi is baking so you can change the code.");
+      showResult(op.pre, op.random ? UI.randomNote : UI.savedNote);
       engine.load().catch(() => {});
       return;
     }
     bRun.disabled = true;
     output.hidden = false; problem.hidden = true;
-    output.textContent = engine.py ? "Running…" : "Baking Cupi (only the first time, a few seconds)…";
+    output.textContent = engine.py ? UI.running : UI.warmingFirst;
     try { showResult(await engine.run(code, inp, op.files)); }
-    catch (e) { showResult({ status: "error", output: "", error: "Couldn't wake up Cupcake. Are you connected to the internet?\n(" + e.message + ")" }); }
+    catch (e) { showResult({ status: "error", output: "", error: UI.noConnection + e.message + ")" }); }
     finally { bRun.disabled = false; }
   }
   bRun.addEventListener("click", run);
   editor.box.addEventListener("run", () => (op.onCtrlEnter || run)());
   bReset.addEventListener("click", () => {
     const restore = () => { editor.value = op.code; answers.value = op.inputs || ""; };
-    if (editor.value === op.code) restore(); else confirmWithButton(bReset, "Erase your changes? Click again", restore);
+    if (editor.value === op.code) restore(); else confirmWithButton(bReset, UI.eraseChanges, restore);
   });
   const box = el("div", { class: "card" }, ...(op.head || []), editor.box, ...files, answersRow, actions, ...(op.tail || []), output, problem);
   return { box, editor, answers, actions, showResult };
@@ -555,27 +621,27 @@ function codeCard(op) {
 function exerciseCard(l, exercise, i) {
   const key = `${l.id}:${i}`;
   const list = el("ul", { class: "checks", hidden: true });
-  const party = el("p", { class: "party", hidden: true, html: drawCupi("trophy", "cupi-dance") + "<span>You did it! Cupi is dancing.</span>" });
+  const party = el("p", { class: "party", hidden: true, html: drawScene("trophy", "happy-dance") + `<span>${UI.party}</span>` });
   const hints = el("div", { class: "hints" });
   const solution = el("div", { class: "solution", hidden: true });
-  const task = el("div", { class: "task" }, el("b", { class: "tag" }, `Challenge ${i + 1}`), el("span", { html: exercise.task }));
+  const task = el("div", { class: "task" }, el("b", { class: "tag", "data-solved": UI.solved }, fill(UI.challenge, { n: i + 1 })), el("span", { html: exercise.task }));
   const t = codeCard({ code: exercise.starter, inputs: exercise.inputs, files: exercise.files, key: "exercise:" + key, main: false,
     head: [task], tail: [hints, list, party, solution], onCtrlEnter: () => check() });
   const box = t.box;
   box.classList.add("exercise");
   if (memory.solved[key]) box.classList.add("solved");
   const bCheck = el("button", { class: "btn primary" }, "✓ Check");
-  const bHint = el("button", { class: "btn sun" }, "Hint");
-  const bSolution = el("button", { class: "btn" }, "Show solution");
+  const bHint = el("button", { class: "btn sun" }, UI.hint);
+  const bSolution = el("button", { class: "btn" }, UI.showSolution);
   t.actions.prepend(bCheck);
   t.actions.querySelector(".shortcut").before(bHint, bSolution);
   let n = 0;
-  if (!exercise.hints.length) { bHint.disabled = true; bHint.textContent = "No hints"; }
+  if (!exercise.hints.length) { bHint.disabled = true; bHint.textContent = UI.noHints; }
 
   async function check() {
     bCheck.disabled = true;
     list.hidden = false; party.hidden = true;
-    list.innerHTML = `<li>${engine.py ? "Checking…" : "Baking Cupi (only the first time)…"}</li>`;
+    list.innerHTML = `<li>${engine.py ? UI.checking : UI.warmingCheck}</li>`;
     try {
       const r = await engine.check(t.editor.value, t.answers.value, exercise.checks, exercise.files);
       t.showResult(r);
@@ -585,10 +651,10 @@ function exerciseCard(l, exercise, i) {
         party.hidden = false;
         box.classList.add("solved");
         memory.solved[key] = true; save(); updateProgress();
-        const big = $(".drawing svg"); if (big) { big.classList.remove("cupi-dance"); void big.offsetWidth; big.classList.add("cupi-dance"); }
+        const big = $(".drawing svg"); if (big) { big.classList.remove("happy-dance"); void big.offsetWidth; big.classList.add("happy-dance"); }
       }
     } catch (e) {
-      list.replaceChildren(el("li", { class: "fail" }, "Couldn't wake up Cupcake (" + e.message + "). Click the button at the top to try again."));
+      list.replaceChildren(el("li", { class: "fail" }, UI.noConnectionShort + e.message + ")"));
     } finally { bCheck.disabled = false; }
   }
   bCheck.addEventListener("click", check);
@@ -596,19 +662,19 @@ function exerciseCard(l, exercise, i) {
     if (n >= exercise.hints.length) return;
     hints.append(el("p", { html: `<b>Hint ${n + 1}:</b> ` + exercise.hints[n] }));
     n++;
-    bHint.textContent = n < exercise.hints.length ? "Another hint" : "No more hints";
+    bHint.textContent = n < exercise.hints.length ? UI.anotherHint : UI.noMoreHints;
     bHint.disabled = n >= exercise.hints.length;
   });
   bSolution.addEventListener("click", () => {
-    if (!solution.hidden) { solution.hidden = true; bSolution.textContent = "Show solution"; return; }
+    if (!solution.hidden) { solution.hidden = true; bSolution.textContent = UI.showSolution; return; }
     if (!memory.solved[key] && !bSolution.dataset.confirming) {
-      confirmWithButton(bSolution, "Are you sure? Try a hint first. Click again", () => bSolution.click());
+      confirmWithButton(bSolution, UI.sureSolution, () => bSolution.click());
       return;
     }
     delete bSolution.dataset.confirming;
     solution.replaceChildren(el("pre", { html: highlight(exercise.solution) }),
-      el("div", { class: "actions" }, el("button", { class: "btn", onclick: () => { t.editor.value = exercise.solution; } }, "Copy to editor")));
-    solution.hidden = false; bSolution.textContent = "Hide solution";
+      el("div", { class: "actions" }, el("button", { class: "btn", onclick: () => { t.editor.value = exercise.solution; } }, UI.copyToEditor)));
+    solution.hidden = false; bSolution.textContent = UI.hideSolution;
   });
   return box;
 }
@@ -618,30 +684,87 @@ const total = () => LESSONS.reduce((s, l) => s + l.exercises.length, 0);
 const done = l => l.exercises.length > 0 && l.exercises.every((_, i) => memory.solved[`${l.id}:${i}`]);
 function updateProgress() {
   const h = LESSONS.reduce((s, l) => s + l.exercises.filter((_, i) => memory.solved[`${l.id}:${i}`]).length, 0);
-  $("#stars").innerHTML = `★ <b>${h}</b> of ${total()} ${total() === 1 ? "challenge" : "challenges"}`;
+  $("#stars").innerHTML = "★ " + fill(UI.challengesDone, { done: `<b>${h}</b>`, total: total() });
   for (const l of LESSONS) {
     const a = document.querySelector(`#toc a[data-id="${l.id}"]`);
     if (a) a.parentElement.classList.toggle("done", done(l));
   }
 }
 function buildIndex() {
-  $("#toc").replaceChildren(...LESSONS.map(l => el("li", {},
+  $("#toc").replaceChildren(el("li", {}, el("a", { href: "#map", "data-id": "map" }, el("span", { class: "seg" }, "✦"), el("span", {}, UI.map))),
+    ...LESSONS.map(l => el("li", {},
     el("a", { href: "#" + l.id, "data-id": l.id }, el("span", { class: "seg" }, String(l.n)), el("span", {}, l.title)))),
-    el("li", {}, el("a", { href: "#gallery", "data-id": "gallery" }, el("span", { class: "seg" }, "★"), el("span", {}, "Pokémon Gallery"))));
+    el("li", {}, el("a", { href: "#gallery", "data-id": "gallery" }, el("span", { class: "seg" }, "★"), el("span", {}, UI.gallery))));
+}
+
+
+// ------------------------------------------------------------------ the map of the kingdom
+const MAP_POINTS = [[90, 330], [190, 280], [300, 320], [410, 270], [500, 200], [400, 150], [290, 120], [180, 150], [90, 100],
+                    [170, 50], [300, 50], [440, 70], [580, 60], [700, 110], [760, 200], [700, 290], [600, 330]];
+const MAP_COLORS = ["#d6336c", "#d99a1e", "#d6336c", "#b5652b", "#7c3aed", "#2f8a57", "#b5652b", "#0e7c86", "#d6336c",
+                    "#2f8a57", "#7c3aed", "#0e7c86", "#2f8a57", "#b5652b", "#d99a1e", "#7c3aed", "#d6336c"];
+function mapIcon(i, x, y, c) {
+  const art = [
+    "",
+    `<rect x="${x-9}" y="${y-7}" width="18" height="15" rx="2" fill="${c}"/><path d="M${x-9} ${y-2} h18" stroke="#fff" stroke-width="2"/>`,
+    `<rect x="${x-10}" y="${y-9}" width="20" height="12" rx="2" fill="${c}"/><rect x="${x-1.5}" y="${y+3}" width="3" height="8" fill="${c}"/>`,
+    `<path d="M${x} ${y} l-10 -10 M${x} ${y} l10 -10 M${x} ${y} l-10 10 M${x} ${y} l10 10" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`,
+    `<text x="${x-6}" y="${y+8}" font-family="Baloo 2, sans-serif" font-weight="800" font-size="22" fill="${c}">?</text>`,
+    `<path d="M${x} ${y-12} l9 14 h-18 z M${x-1.5} ${y+2} h3 v9 h-3 z" fill="${c}"/>`,
+    `<circle cx="${x}" cy="${y}" r="9" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="4 3"/>`,
+    `<path d="M${x-10} ${y+6} h20 M${x-6} ${y-6} v12 M${x} ${y-6} v12 M${x+6} ${y-6} v12" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+    `<path d="M${x-11} ${y-6} q6 -3 11 0 q5 -3 11 0 v13 q-6 -3 -11 0 q-5 -3 -11 0 z" fill="${c}"/>`,
+    `<rect x="${x-7}" y="${y-11}" width="14" height="22" rx="2" fill="${c}"/><path d="M${x-3} ${y-5} h6 M${x-3} ${y} h6" stroke="#fff" stroke-width="2"/>`,
+    `<text x="${x-9}" y="${y+7}" font-family="Baloo 2, sans-serif" font-weight="800" font-size="17" fill="${c}">fx</text>`,
+    `<ellipse cx="${x}" cy="${y+2}" rx="11" ry="6" fill="${c}" opacity=".6"/><ellipse cx="${x}" cy="${y-4}" rx="7" ry="4" fill="${c}"/>`,
+    `<circle cx="${x-2}" cy="${y-2}" r="7" fill="none" stroke="${c}" stroke-width="3"/><path d="M${x+3} ${y+3} l6 6" stroke="${c}" stroke-width="3.5" stroke-linecap="round"/>`,
+    `<path d="M${x-12} ${y+4} q12 -14 24 0" stroke="${c}" stroke-width="4" fill="none"/><path d="M${x-12} ${y+4} v6 M${x+12} ${y+4} v6" stroke="${c}" stroke-width="3"/>`,
+    `<rect x="${x-8}" y="${y-8}" width="16" height="16" rx="5" fill="${c}"/><path d="M${x-4} ${y-8} q4 -6 8 0" stroke="${c}" stroke-width="2.5" fill="none"/>`,
+    `<rect x="${x-8}" y="${y-8}" width="16" height="16" rx="3" fill="none" stroke="${c}" stroke-width="3"/><circle cx="${x-3}" cy="${y-3}" r="2" fill="${c}"/><circle cx="${x+3}" cy="${y+3}" r="2" fill="${c}"/>`,
+    `<path d="M${x-10} ${y+8} v-8 l10 -8 10 8 v8 z" fill="${c}"/><circle cx="${x}" cy="${y-12}" r="3" fill="#e0233c"/>`,
+  ][i];
+  if (i === 0) return logoBadge(x - 30, y - 30, 60);
+  return `<circle cx="${x}" cy="${y}" r="20" fill="#fff" stroke="${c}" stroke-width="4"/>${art}`;
+}
+function mapSvg() {
+  const path = "M" + MAP_POINTS.map(([x, y]) => `${x} ${y}`).join(" L");
+  return `<svg viewBox="0 0 860 400" role="img" aria-label="${UI.mapTitle}">
+    <rect width="860" height="400" fill="#fff7fb"/>
+    <path d="M0 260 q120 -60 240 -10 t240 0 t240 -20 t200 10 V400 H0 z" fill="#fde3ec"/>
+    <path d="M0 330 q140 -40 280 0 t300 -10 t280 10 V400 H0 z" fill="#f7d0de"/>
+    <path d="M520 0 q-30 80 20 140 t-10 120 t60 140" stroke="#bfe3f5" stroke-width="22" fill="none" stroke-linecap="round"/>
+    ${[[60, 40], [820, 30], [470, 360], [40, 220], [830, 360], [620, 170]].map(([x, y]) => `<text x="${x}" y="${y}" font-size="18" fill="#d99a1e">✦</text>`).join("")}
+    <path d="${path}" stroke="#d6336c" stroke-width="5" fill="none" stroke-dasharray="2 12" stroke-linecap="round"/>
+    ${LESSONS.map((l, i) => { const [x, y] = MAP_POINTS[i], c = MAP_COLORS[i], lit = done(l);
+      return `<a href="#${l.id}" aria-label="${l.n}. ${l.place || l.title}">${mapIcon(i, x, y, c)}
+        <circle cx="${x + 18}" cy="${y - 18}" r="11" fill="${lit ? "#d99a1e" : c}"/>
+        <text x="${x + 18}" y="${y - 14}" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="11" fill="#fff">${lit ? "★" : l.n}</text></a>`; }).join("")}
+  </svg>`;
+}
+function mapPage() {
+  const parts = [el("div", { class: "scene" },
+    el("div", {}, el("div", { class: "num" }, UI.map), el("h1", {}, UI.mapTitle)),
+    el("div", { class: "drawing" }, el("div", { html: drawScene("wave") })))];
+  parts.push(el("div", { class: "story", html: `<p>${UI.mapIntro}</p>` }));
+  parts.push(el("div", { class: "map", html: mapSvg() }));
+  parts.push(el("ol", { class: "places" }, ...LESSONS.map(l => el("li", { class: done(l) ? "lit" : "" },
+    el("a", { href: "#" + l.id }, el("b", {}, done(l) ? "★" : String(l.n)), el("span", {}, l.place || l.title, el("small", {}, l.place ? l.title : "")))))));
+  parts.push(el("div", { class: "pager" }, el("a", { href: "#" + LESSONS[0].id, class: "next" }, el("small", {}, UI.next), UI.mapStart)));
+  $("#content").replaceChildren(...parts);
 }
 
 function galleryPage() {
   const parts = [el("div", { class: "scene" },
-    el("div", {}, el("div", { class: "num" }, "Complete programs"), el("h1", {}, "Pokémon Gallery")),
-    el("div", { class: "drawing" }, el("p", { class: "bubble" }, "Real programs, to play and learn!"),
-      el("div", { html: drawCupi("trophy") })))];
-  parts.push(el("div", { class: "story", html: "<p>Longer programs that bring together everything you learned. Run them, change them and see what happens. The ones that use randomness give something different every time.</p>" }));
+    el("div", {}, el("div", { class: "num" }, UI.galleryKicker), el("h1", {}, UI.gallery)),
+    el("div", { class: "drawing" }, el("p", { class: "bubble" }, UI.galleryIntro),
+      el("div", { html: drawScene("trophy") })))];
+  parts.push(el("div", { class: "story", html: `<p>${UI.galleryStory}</p>` }));
   for (const [i, p] of DATA.gallery.entries()) {
     parts.push(el("h2", {}, p.title));
     parts.push(el("p", { class: "caption", html: p.text }));
     parts.push(codeCard({ code: p.code, inputs: p.inputs, files: p.files, pre: p.pre, random: p.random, key: `gal:${i}` }).box);
   }
-  parts.push(el("div", { class: "pager" }, el("a", { href: "#" + LESSONS[LESSONS.length - 1].id }, el("small", {}, "← Previous"), LESSONS[LESSONS.length - 1].title)));
+  parts.push(el("div", { class: "pager" }, el("a", { href: "#" + LESSONS[LESSONS.length - 1].id }, el("small", {}, UI.previous), LESSONS[LESSONS.length - 1].title)));
   $("#content").replaceChildren(...parts);
 }
 const ICONS = {
@@ -653,24 +776,24 @@ const ICONS = {
   pokeball: '<circle cx="16" cy="16" r="12" /><path d="M4 16 h8 M20 16 h8" /><circle cx="16" cy="16" r="4" />',
 };
 function section(icon, title, ...children) {
-  const svg = `<svg viewBox="0 0 32 32" width="22" height="22" fill="none" stroke="var(--cupi-dark)" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">${ICONS[icon]}</svg>`;
+  const svg = `<svg viewBox="0 0 32 32" width="22" height="22" fill="none" stroke="var(--berry-dark)" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">${ICONS[icon]}</svg>`;
   return el("section", { class: "part" }, el("h2", {}, el("span", { class: "icon", "aria-hidden": "true", html: svg }), title), ...children);
 }
 function lessonPage(l) {
   const parts = [];
   parts.push(el("div", { class: "scene" },
-    el("div", {}, el("div", { class: "num" }, `Lesson ${l.n} of ${LESSONS.length}`), el("h1", {}, l.title)),
-    el("div", { class: "drawing" }, el("p", { class: "bubble" }, l.bubble), el("div", { html: drawCupi(l.pose) }))));
-  parts.push(section("story", "The story", el("div", { class: "story", html: l.story })));
-  parts.push(section("idea", "The idea", el("div", { class: "idea", html: l.explanation })));
-  const tryIt = section("tryIt", "Try it!");
+    el("div", {}, el("div", { class: "num" }, fill(UI.lessonOf, { n: l.n, total: LESSONS.length }) + (l.place ? " · " + l.place : "")), el("h1", {}, l.title)),
+    el("div", { class: "drawing" }, el("p", { class: "bubble" }, l.bubble), el("div", { html: drawScene(l.pose) }))));
+  parts.push(section("story", UI.story, el("div", { class: "story", html: l.story })));
+  parts.push(section("idea", UI.idea, el("div", { class: "idea", html: l.explanation })));
+  const tryIt = section("tryIt", UI.tryIt);
   l.examples.forEach((e, i) => {
     tryIt.append(el("p", { class: "caption", html: e.text }));
     tryIt.append(codeCard({ code: e.code, inputs: e.inputs, files: e.files, pre: e.pre, random: e.random, key: `ex:${l.id}:${i}` }).box);
   });
   parts.push(tryIt);
   if (l.pokemon && l.pokemon.length) {
-    const poke = section("pokeball", "With Pokémon");
+    const poke = section("pokeball", UI.withPokemon);
     l.pokemon.forEach((e, i) => {
       poke.append(el("p", { class: "caption", html: e.text }));
       poke.append(codeCard({ code: e.code, inputs: e.inputs, files: e.files, pre: e.pre, random: e.random, key: `pk:${l.id}:${i}` }).box);
@@ -678,26 +801,34 @@ function lessonPage(l) {
     parts.push(poke);
   }
   if (l.exercises.length) {
-    const turn = section("turn", "Your turn");
+    const turn = section("turn", UI.yourTurn);
     l.exercises.forEach((exercise, i) => turn.append(exerciseCard(l, exercise, i)));
     parts.push(turn);
   }
-  parts.push(section("remember", "Remember", el("div", { class: "remember" }, el("ul", { html: l.remember.map(r => `<li>${r}</li>`).join("") }))));
+  parts.push(section("remember", UI.remember, el("div", { class: "remember" }, el("ul", { html: l.remember.map(r => `<li>${r}</li>`).join("") }))));
   const idx = LESSONS.indexOf(l);
   const nav = el("div", { class: "pager" });
-  if (idx > 0) nav.append(el("a", { href: "#" + LESSONS[idx - 1].id }, el("small", {}, "← Previous"), LESSONS[idx - 1].title));
-  if (idx < LESSONS.length - 1) nav.append(el("a", { href: "#" + LESSONS[idx + 1].id, class: "next" }, el("small", {}, "Next →"), LESSONS[idx + 1].title));
-  else nav.append(el("a", { href: "#gallery", class: "next" }, el("small", {}, "Next →"), "Pokémon Gallery"));
+  if (idx > 0) nav.append(el("a", { href: "#" + LESSONS[idx - 1].id }, el("small", {}, UI.previous), LESSONS[idx - 1].title));
+  if (idx < LESSONS.length - 1) nav.append(el("a", { href: "#" + LESSONS[idx + 1].id, class: "next" }, el("small", {}, UI.next), LESSONS[idx + 1].title));
+  else nav.append(el("a", { href: "#gallery", class: "next" }, el("small", {}, UI.next), UI.gallery));
   parts.push(nav);
   $("#content").replaceChildren(...parts);
   document.querySelectorAll("pre[data-cup]").forEach(p => { p.innerHTML = highlight(p.textContent).replace(/\n$/, ""); });
 }
 function route() {
   const id = decodeURIComponent(location.hash.slice(1));
+  if (id === "map") {
+    mapPage();
+    document.querySelectorAll("#toc a").forEach(a => a.classList.toggle("active", a.dataset.id === "map"));
+    document.title = `${UI.mapTitle} · ${UI.pageTitle}`;
+    if (matchMedia("(max-width: 900px)").matches) $("#det").open = false;
+    window.scrollTo(0, 0);
+    return;
+  }
   if (id === "gallery") {
     galleryPage();
     document.querySelectorAll("#toc a").forEach(a => a.classList.toggle("active", a.dataset.id === "gallery"));
-    document.title = "Pokémon Gallery · Learn with Cupi";
+    document.title = `${UI.gallery} · ${UI.pageTitle}`;
     if (matchMedia("(max-width: 900px)").matches) $("#det").open = false;
     window.scrollTo(0, 0);
     return;
@@ -705,7 +836,7 @@ function route() {
   const l = LESSONS.find(x => x.id === id) || LESSONS[0];
   lessonPage(l);
   document.querySelectorAll("#toc a").forEach(a => a.classList.toggle("active", a.dataset.id === l.id));
-  document.title = `${l.title} · Learn with Cupi`;
+  document.title = `${l.title} · ${UI.pageTitle}`;
   if (matchMedia("(max-width: 900px)").matches) $("#det").open = false;
   window.scrollTo(0, 0);
 }
@@ -759,7 +890,7 @@ if (new URLSearchParams(location.search).has("selftest")) (async () => {
     log(failures === 0, `whole course in the browser (${failures} ${failures === 1 ? "difference" : "differences"})`);
     location.hash = "#math"; await new Promise(r => setTimeout(r, 60));
     $(".card .btn.primary").click(); await new Promise(r => setTimeout(r, 1500));
-    log(/300 coins/.test($(".output").textContent), "Run button → " + $(".output").textContent.split("\n")[0]);
+    log(/300/.test($(".output").textContent), "Run button → " + $(".output").textContent.split("\n")[0]);
   } catch (e) { log(false, "exception: " + (e && e.stack || e)); }
   document.body.append(el("pre", { id: "selftest-result" }, report.join("\n")));
 })();

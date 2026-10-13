@@ -1,0 +1,22 @@
+# La Tienda Pokémon: arma tu compra
+
+precios = ["pokeball": 200, "superball": 600, "pocion": 300, "antidoto": 100]
+dinero = 3000
+
+show("Bienvenido a la Tienda Pokémon. Tienes {dinero} monedas.")
+for cosa in keys(precios):
+    show("  {cosa}: {precios[cosa]} monedas")
+
+compra = [:]
+for cosa in ["pokeball", "pocion"]:
+    cantidad = read_num("¿Cuántas {cosa} quieres? ")
+    compra[cosa] = cantidad
+
+total = sum([precios[c] * compra[c] for c in keys(compra)])
+if total > 1500:
+    show("¡Compraste mucho! Te regalamos una Premier Ball")
+
+if total <= dinero:
+    show("Total: {total} monedas. Te quedan {dinero - total}.")
+else:
+    show("Total: {total} monedas. ¡Te faltan {total - dinero}!")

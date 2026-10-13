@@ -1,3 +1,5 @@
+**English** · [Español](SPEC.es.md)
+
 # Cupcake
 
 **Version 1.0 "Frambuesa"**
@@ -200,7 +202,7 @@ else:
 ```
 when color:
     is "red":
-        show("Like Cupi's cherry!")
+        show("Like Raspberry's cherry!")
     in ["orange", "yellow"]:
         show("Warm colors")
     else:
