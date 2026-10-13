@@ -1,0 +1,44 @@
+# A turn-based Pokémon battle, with random damage
+
+fx pokemon(name, type, hp, power):
+    return (name: name, type: type, hp: hp, power: power)
+
+fx multiplier(attack, defender):
+    when attack and defender:
+        is "water" and "fire", "fire" and "grass", "grass" and "water", "electric" and "water":
+            return 2
+        is "fire" and "water", "grass" and "fire", "water" and "grass", "water" and "electric":
+            return 0.5
+        else:
+            return 1
+
+fx attack(attacker, defender):
+    effect = multiplier(attacker.type, defender.type)
+    damage = round(attacker.power * effect * roll(80, 100) / 100)
+    defender.hp = max(defender.hp - damage, 0)
+    when effect:
+        is 2:
+            message = " It's super effective!"
+        is 0.5:
+            message = " It's not very effective…"
+        else:
+            message = ""
+    show("  {attacker.name} attacks: {damage} damage.{message} {defender.name} has {defender.hp} HP left")
+    return defender
+
+ash = pokemon("Pikachu", "electric", 35, 12)
+gary = pokemon("Squirtle", "water", 44, 10)
+
+turn = 1
+while ash has hp and gary has hp:
+    show("Turn {turn}")
+    gary = attack(ash, gary)
+    if gary has hp:
+        ash = attack(gary, ash)
+    turn += 1
+
+if ash has hp:
+    winner = ash.name
+else:
+    winner = gary.name
+show("{winner} won the battle!")

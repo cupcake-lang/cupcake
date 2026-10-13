@@ -1,0 +1,32 @@
+# Pokédex: look up a Pokémon and show its entry
+
+pokedex = [
+    "pikachu":    (number: 25,  type: "electric", height: 0.4, weight: 6.0),
+    "bulbasaur":  (number: 1,   type: "grass",    height: 0.7, weight: 6.9),
+    "charmander": (number: 4,   type: "fire",     height: 0.6, weight: 8.5),
+    "squirtle":   (number: 7,   type: "water",    height: 0.5, weight: 9.0),
+    "eevee":      (number: 133, type: "normal",   height: 0.3, weight: 6.5),
+]
+
+fx tip(type):
+    when type:
+        is "fire":
+            return "Watch out for Water-type Pokémon"
+        is "water":
+            return "Watch out for Grass and Electric-type Pokémon"
+        is "grass":
+            return "Watch out for Fire-type Pokémon"
+        is "electric":
+            return "Watch out for Ground-type Pokémon"
+        else:
+            return "No special weaknesses"
+
+repeat 3:
+    name = lower(strip(read("Which Pokémon are you looking for? ")))
+    if name in pokedex:
+        p = pokedex[name]
+        show("  #{p.number} {upper(name)}  ·  {p.type} type")
+        show("  It is {p.height} m tall and weighs {p.weight} kg")
+        show("  Tip: {tip(p.type)}")
+    else:
+        show("  '{name}' is not in the Pokédex. I know: {join(keys(pokedex), ", ")}")

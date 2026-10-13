@@ -1,0 +1,2 @@
+team = ["Pikachu", "Charmander"]
+team.append("Eevee")

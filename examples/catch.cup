@@ -1,0 +1,22 @@
+# Catching a wild Pokémon: you have three Poké Balls
+
+wild = pick(["Pidgey", "Rattata", "Caterpie", "Pikachu", "Abra", "Eevee"])
+when wild:
+    in ["Pikachu", "Abra", "Eevee"]:
+        chance = 30
+    else:
+        chance = 60
+show("A wild {wild} appeared!")
+
+caught = false
+for attempt in 1..3:
+    show("You throw Poké Ball number {attempt}…")
+    if roll(1, 100) <= chance:
+        caught = true
+        break
+    show("  It broke free!")
+
+if caught:
+    show("You caught {wild}!")
+else:
+    show("{wild} ran away. Next time!")

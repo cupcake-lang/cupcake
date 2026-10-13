@@ -2,14 +2,14 @@
 __pycache__/
 *.pyc
 
-# Lo que se genera
-curso/curso.html
-curso/pyodide/
+# Generated files
+course/course.html
+course/pyodide/
 vscode-cupcake/*.vsix
 
-# Bocetos de diseño
-logo/propuestas.html
-logo/colores.html
+# Design drafts
+logo/proposals.html
+logo/colors.html
 
-# Archivos que crean los programas de ejemplo
+# Files created by the example programs
 *.txt

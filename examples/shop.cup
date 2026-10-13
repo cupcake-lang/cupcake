@@ -1,0 +1,22 @@
+# The Poké Mart: put together your order
+
+prices = ["pokeball": 200, "greatball": 600, "potion": 300, "antidote": 100]
+money = 3000
+
+show("Welcome to the Poké Mart. You have {money} coins.")
+for item in keys(prices):
+    show("  {item}: {prices[item]} coins")
+
+order = [:]
+for item in ["pokeball", "potion"]:
+    amount = read_num("How many {item}s do you want? ")
+    order[item] = amount
+
+total = sum([prices[i] * order[i] for i in keys(order)])
+if total > 1500:
+    show("That's a big order! Here's a free Premier Ball")
+
+if total <= money:
+    show("Total: {total} coins. You have {money - total} left.")
+else:
+    show("Total: {total} coins. You're {total - money} short!")

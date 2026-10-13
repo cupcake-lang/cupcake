@@ -1,0 +1,13 @@
+# Functions for working with Pokémon.
+# Other files use them with:  use describe, heal from pokemon
+
+fx pokemon(name, type, hp = 35):
+    return (name: name, type: type, hp: hp)
+
+fx describe(p):
+    return "{p.name} ({p.type}): {p.hp} HP"
+
+fx heal(p, amount):
+    assert amount > 0
+    p.hp = min(p.hp + amount, 40)
+    return p

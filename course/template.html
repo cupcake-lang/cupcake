@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Learn with Cupi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* A bakery display case: the menu is a row of cupcakes, each lesson one that gets decorated when you finish it. */
+:root {
+  --bg: #fbf6f8; --paper: #ffffff; --ink: #2b1d24; --muted: #7a6670; --line: #f0e2e8;
+  --cupi: #d6336c; --cupi-dark: #9e1f4f; --cupi-light: #fde3ec; --cheek: #ff8fb1; --frosting: #ffc2d9; --wrapper: #f2b263; --wrapper-dark: #b8742c;
+  --gold: #ffc21c; --sun: #ffc93c; --glasses: #1f1f1f; --glasses-border: #000000; --sun-light: #fff4cf; --sky: #4aa3df; --sky-light: #e3f2fc;
+  --ok: #2f8a41; --ok-light: #e2f5e5; --bad: #d64535; --bad-light: #fde8e5;
+  --code-bg: #fff8fb;
+  --c-kw: #d6336c; --c-bi: #0e7c86; --c-str: #2f8a57; --c-num: #c2571a; --c-com: #a08a95; --c-cons: #a3368f; --c-fn: #7c3aed; --c-field: #b5476e;
+  --shadow: 0 2px 0 rgba(29, 43, 38, .06), 0 8px 24px rgba(29, 43, 38, .06);
+  --title-font: "Baloo 2", "Nunito", system-ui, sans-serif;
+  --body-font: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171114; --paper: #211920; --ink: #f6e9ef; --muted: #b9a3ae; --line: #33252d;
+    --cupi: #ff6b9a; --cupi-dark: #d0457a; --cupi-light: #3d1f2a; --cheek: #ff8fb1; --frosting: #ffc2d9; --wrapper: #f2b263; --wrapper-dark: #b8742c;
+    --gold: #ffd04a; --sun: #ffd25c; --glasses: #141414; --glasses-border: #8a8a8a; --sun-light: #3a3218; --sky: #6db8ec; --sky-light: #182c3a;
+    --ok: #6fd383; --ok-light: #1c3324; --bad: #ff8f80; --bad-light: #3b1f1b;
+    --code-bg: #1e1418;
+    --c-kw: #ff6b9a; --c-bi: #6cd4e0; --c-str: #8fe0a8; --c-num: #ffb86b; --c-com: #8a7480; --c-cons: #f2a3e0; --c-fn: #c4a3ff; --c-field: #ffb3cd;
+    --shadow: 0 2px 0 rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #171114; --paper: #211920; --ink: #f6e9ef; --muted: #b9a3ae; --line: #33252d;
+  --cupi: #ff6b9a; --cupi-dark: #d0457a; --cupi-light: #3d1f2a; --cheek: #ff8fb1; --frosting: #ffc2d9; --wrapper: #f2b263; --wrapper-dark: #b8742c;
+  --gold: #ffd04a; --sun: #ffd25c; --glasses: #141414; --glasses-border: #8a8a8a; --sun-light: #3a3218; --sky: #6db8ec; --sky-light: #182c3a;
+  --ok: #6fd383; --ok-light: #1c3324; --bad: #ff8f80; --bad-light: #3b1f1b;
+  --code-bg: #1e1418;
+  --c-kw: #ff6b9a; --c-bi: #6cd4e0; --c-str: #8fe0a8; --c-num: #ffb86b; --c-com: #8a7480; --c-cons: #f2a3e0; --c-fn: #c4a3ff; --c-field: #ffb3cd;
+  --shadow: 0 2px 0 rgba(0, 0, 0, .25);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+code, pre, textarea { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.65 var(--body-font); }
+h1, h2, h3 { font-family: var(--title-font); line-height: 1.15; text-wrap: balance; }
+code { font-family: var(--mono); font-size: .86em; background: var(--cupi-light); padding: .08em .38em; border-radius: 6px; }
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---- header */
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; display: flex; align-items: center; gap: 12px;
+  padding: 8px 20px; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(8px); border-bottom: 2px solid var(--line); }
+.logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink); font: 800 1.35rem/1 var(--title-font); }
+.logo svg { width: 32px; height: 32px; }
+.logo b { font-weight: 800; }
+.logo span { color: var(--cupi-dark); }
+.spacer { flex: 1; }
+.stars { font: 700 .95rem var(--title-font); color: var(--muted); white-space: nowrap; }
+.stars b { color: var(--ink); }
+.engine { border: 2px solid var(--line); background: var(--paper); color: var(--muted); border-radius: 999px; padding: 2px 12px; font-size: .82rem; white-space: nowrap; }
+.engine::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--line); margin-right: 6px; vertical-align: 1px; }
+.engine[data-status="loading"]::before { background: var(--sun); animation: pulse 1s infinite; }
+.engine[data-status="ready"]::before { background: var(--cupi); }
+.engine[data-status="error"]::before { background: var(--bad); }
+@keyframes pulse { 50% { opacity: .3; } }
+.theme { border: 2px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 10px; width: 36px; height: 32px; }
+
+/* ---- layout */
+.frame { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 36px; max-width: 1150px; margin: 0 auto; padding: 26px 20px 90px; }
+nav.sidebar { position: sticky; top: 76px; align-self: start; max-height: calc(100vh - 96px); overflow: auto; padding: 4px 4px 4px 0; }
+nav.sidebar summary { display: none; }
+nav.sidebar ol { list-style: none; margin: 0; padding: 0 0 0 6px; position: relative; }
+nav.sidebar ol::before { content: ""; position: absolute; left: 25px; top: 18px; bottom: 18px; width: 4px; background: var(--line); border-radius: 4px; }
+nav.sidebar li a { position: relative; display: flex; gap: 12px; align-items: center; padding: 5px 8px 5px 0; color: var(--ink); text-decoration: none; font-size: .93rem; line-height: 1.3; border-radius: 12px; }
+nav.sidebar .seg { flex: 0 0 40px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--paper); border: 3px solid var(--line);
+  font: 800 .9rem var(--title-font); color: var(--muted); z-index: 1; transition: background .3s, border-color .3s; }
+nav.sidebar li a:hover .seg { border-color: var(--cupi); }
+nav.sidebar li a.active { font-weight: 800; }
+nav.sidebar li a.active .seg { border-color: var(--cupi-dark); color: var(--cupi-dark); }
+nav.sidebar li.done .seg { background: var(--cupi); border-color: var(--cupi-dark); color: #fff; }
+main { min-width: 0; max-width: 790px; }
+
+@media (max-width: 900px) {
+  .frame { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 16px 16px 70px; }
+  nav.sidebar { position: static; max-height: none; background: var(--paper); border: 2px solid var(--line); border-radius: 16px; padding: 4px 8px; }
+  nav.sidebar summary { display: block; padding: 8px 4px; font: 700 1rem var(--title-font); cursor: pointer; }
+  .stars { display: none; }
+  .topbar { padding: 8px 16px; }
+}
+@media (max-width: 480px) { .logo { font-size: 1.15rem; } .engine { font-size: .72rem; } }
+
+/* ---- lesson heading */
+.scene { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center; gap: 12px; margin-bottom: 26px; }
+.scene .num { font: 800 .85rem var(--title-font); letter-spacing: .08em; text-transform: uppercase; color: var(--cupi-dark); }
+.scene h1 { font-size: clamp(2rem, 5vw, 2.9rem); margin: 4px 0 0; }
+.drawing { position: relative; }
+.drawing svg { width: 100%; height: auto; display: block; overflow: visible; }
+.bubble { position: relative; background: var(--paper); border: 3px solid var(--ink); border-radius: 22px; padding: 10px 16px; font: 700 1.05rem/1.35 var(--title-font); margin: 0 0 10px auto; max-width: 300px; box-shadow: 4px 4px 0 var(--sun); }
+.bubble::after { content: ""; position: absolute; bottom: -14px; right: 70px; border: 12px solid transparent; border-top-color: var(--ink); border-bottom: 0; }
+@media (max-width: 640px) { .scene { grid-template-columns: minmax(0, 1fr); } .bubble { margin: 0 auto 8px 0; } }
+.cupi-dance { animation: dance .9s ease-in-out 2; transform-origin: 60% 80%; }
+@keyframes dance { 25% { transform: rotate(-4deg) translateY(-6px); } 75% { transform: rotate(4deg) translateY(-6px); } }
+
+/* ---- sections */
+section.part { margin: 0 0 38px; }
+h2 { display: flex; align-items: center; gap: 10px; font-size: 1.5rem; margin: 0 0 12px; }
+h2 .icon { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--cupi-light); font-size: 1rem; flex: none; }
+.story { background: var(--sky-light); border-radius: 20px; padding: 6px 22px; font-size: 1.08rem; }
+.idea p, .idea li { max-width: 68ch; }
+.idea ul { padding-left: 1.3em; }
+.idea li { margin: .25em 0; }
+pre.code-static { margin: 14px 0; padding: 14px 18px; background: var(--code-bg); border: 2px solid var(--line); border-radius: 14px; font: 14.5px/1.6 var(--mono); overflow-x: auto; }
+.caption { margin: 18px 0 8px; }
+
+/* ---- code card */
+.card { background: var(--paper); border: 2px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); margin: 10px 0 24px; overflow: hidden; }
+.editor { position: relative; display: grid; background: var(--code-bg); border-bottom: 2px solid var(--line); }
+.editor > * { grid-area: 1 / 1; margin: 0; padding: 16px 18px; font: 15px/1.6 var(--mono); tab-size: 4; white-space: pre; border: 0; letter-spacing: 0; }
+.editor pre { overflow: hidden; pointer-events: none; color: var(--ink); }
+.editor textarea { resize: none; background: transparent; color: transparent; caret-color: var(--ink); outline: none; overflow-x: auto; overflow-y: hidden; min-height: 3.2em; }
+.editor textarea:focus-visible { box-shadow: inset 0 0 0 3px var(--sky); }
+.editor textarea::selection { background: color-mix(in srgb, var(--sky) 35%, transparent); }
+.t-kw { color: var(--c-kw); font-weight: 600; } .t-bi { color: var(--c-bi); } .t-str { color: var(--c-str); }
+.t-num { color: var(--c-num); } .t-com { color: var(--c-com); font-style: italic; } .t-cons { color: var(--c-cons); font-weight: 600; }
+.t-int { color: var(--c-kw); }
+.t-fn { color: var(--c-fn); font-weight: 600; } .t-field { color: var(--c-field); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; }
+.btn { border: 2px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 12px; padding: 6px 14px; font-weight: 700; font-size: .92rem; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--cupi); border-color: var(--cupi-dark); color: #fff; box-shadow: 0 3px 0 var(--cupi-dark); }
+.btn.primary:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--cupi-dark); }
+.btn.sun { background: var(--sun); border-color: #d9a419; color: #3b2d00; box-shadow: 0 3px 0 #d9a419; }
+.btn:disabled { opacity: .55; cursor: progress; }
+.actions .shortcut { margin-left: auto; color: var(--muted); font-size: .8rem; }
+.answers { display: flex; gap: 10px; align-items: flex-start; padding: 0 12px 10px; }
+.answers label { font: 700 .85rem var(--title-font); color: var(--muted); padding-top: 6px; white-space: nowrap; }
+.answers textarea { flex: 1; min-width: 0; font: 14px/1.5 var(--mono); border: 2px solid var(--line); border-radius: 10px; background: var(--code-bg); color: var(--ink); padding: 6px 10px; resize: vertical; }
+.output { margin: 0; padding: 12px 18px; border-top: 2px solid var(--line); font: 14.5px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 420px; overflow: auto; background: var(--code-bg); }
+.output .note { display: block; font: 600 .78rem var(--body-font); color: var(--muted); margin-bottom: 4px; }
+.problem { margin: 0; padding: 12px 18px; border-top: 2px solid var(--line); background: var(--bad-light); }
+.problem b { display: block; font: 800 1rem var(--title-font); color: var(--bad); }
+.problem pre { margin: 4px 0 0; font: 14px/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.file { border-top: 2px dashed var(--line); }
+.file .name { padding: 8px 18px 0; font: 700 .82rem var(--title-font); color: var(--muted); }
+.file pre { margin: 0; padding: 6px 18px 12px; font: 13.5px/1.55 var(--mono); overflow-x: auto; }
+
+/* ---- exercises */
+.exercise .task { padding: 14px 18px; border-bottom: 2px solid var(--line); background: var(--sun-light); }
+.exercise .task b.tag { display: inline-block; font: 800 .8rem var(--title-font); letter-spacing: .08em; text-transform: uppercase; color: #a16207; margin-right: 6px; }
+.exercise.solved .task { background: var(--ok-light); }
+.exercise.solved .task b.tag { color: var(--ok); }
+.exercise.solved .task b.tag::after { content: " · solved!"; }
+.checks { list-style: none; margin: 0; padding: 10px 18px; border-top: 2px solid var(--line); }
+.checks li { display: grid; grid-template-columns: 26px 1fr; gap: 2px; padding: 3px 0; }
+.checks li::before { font-weight: 800; }
+.checks li.pass::before { content: "✓"; color: var(--ok); }
+.checks li.fail::before { content: "✗"; color: var(--bad); }
+.checks li .check-hint { grid-column: 2; color: var(--muted); font-size: .92rem; }
+.party { display: flex; align-items: center; gap: 12px; margin: 0; padding: 10px 18px; background: var(--ok-light); border-top: 2px solid var(--line); font: 800 1.1rem var(--title-font); color: var(--ok); }
+.party svg { width: 70px; height: 46px; flex: none; }
+.hints { padding: 0 18px; }
+.hints p { margin: 10px 0; padding: 8px 12px; background: var(--sun-light); border-radius: 10px; font-size: .95rem; }
+.solution { border-top: 2px solid var(--line); }
+.solution pre { margin: 0; padding: 14px 18px; font: 14px/1.6 var(--mono); background: var(--code-bg); overflow-x: auto; }
+
+/* ---- remember */
+.remember { background: var(--sun-light); border-radius: 6px 22px 22px 22px; padding: 14px 22px; transform: rotate(-.4deg); box-shadow: 4px 5px 0 var(--sun); }
+.remember ul { margin: 6px 0; padding-left: 1.2em; }
+.remember li { margin: .3em 0; }
+
+.pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 40px; }
+.pager a { text-decoration: none; padding: 10px 16px; border: 2px solid var(--line); border-radius: 14px; background: var(--paper); color: var(--ink); max-width: 48%; font-weight: 700; }
+.pager a small { display: block; color: var(--muted); font-size: .78rem; font-weight: 600; }
+.pager a.next { margin-left: auto; text-align: right; border-color: var(--cupi); }
+/* code looks exactly as typed: "==" is two signs, not one */
+code, pre, textarea, .editor > * { font-variant-ligatures: none !important; font-feature-settings: "liga" 0, "calt" 0 !important; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="logo" href="#hello" aria-label="Home"><svg id="logo" viewBox="0 0 320 200" aria-hidden="true"></svg><b>Cup<span>cake</span></b></a>
+  <div class="spacer"></div>
+  <div class="stars" id="stars"></div>
+  <button class="engine" id="engine" data-status="idle" title="Cupcake runs inside your browser">Cupi is in the oven</button>
+  <button class="theme" id="theme" title="Change colors" aria-label="Change colors">◐</button>
+</header>
+<div class="frame">
+  <nav class="sidebar" aria-label="Lessons"><details id="det" open><summary>Lessons</summary><ol id="toc"></ol></details></nav>
+  <main id="content"></main>
+</div>
+
+<script id="data" type="application/json">/*DATA*/null</script>
+<script id="sources" type="application/json">/*SOURCES*/null</script>
+<script>
+"use strict";
+const DATA = JSON.parse(document.getElementById("data").textContent);
+const SOURCES = JSON.parse(document.getElementById("sources").textContent);
+const LESSONS = DATA.lessons;
+
+// ------------------------------------------------------------------ browser memory
+const STORAGE_KEY = "Cupcake-course-v1";
+let memory = { solved: {}, code: {}, theme: null };
+try { Object.assign(memory, JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}")); } catch (e) {}
+let pending = null;
+function save() {
+  clearTimeout(pending);
+  pending = setTimeout(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(memory)); } catch (e) {} }, 250);
+}
+
+const $ = (s, r = document) => r.querySelector(s);
+function el(tag, attrs = {}, ...children) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "html") n.innerHTML = v;
+    else if (k === "class") n.className = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else if (v === true) n.setAttribute(k, "");
+    else if (v !== false && v != null) n.setAttribute(k, v);
+  }
+  for (const h of children) if (h != null) n.append(h);
+  return n;
+}
+const escapeHtml = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+// ------------------------------------------------------------------ Cupi, the cupcake
+// A paper cup with a little face, swirled frosting, twelve sprinkles and a cherry. No arms or legs: just cute.
+function cupiBody({ cx = 200, cy = 96, opacity = 1 } = {}) {
+  const [hx, hy] = [cx, cy];
+  let s = `<g opacity="${opacity}" stroke-linejoin="round">`;
+  // the paper cup, with little stripes
+  s += `<path d="M${hx - 54} ${hy + 2} L${hx + 54} ${hy + 2} L${hx + 40} ${hy + 64} Q${hx} ${hy + 70} ${hx - 40} ${hy + 64} Z" fill="var(--wrapper)" stroke="var(--wrapper-dark)" stroke-width="3"/>`;
+  for (const k of [-36, -18, 0, 18, 36])
+    s += `<path d="M${hx + k} ${hy + 6} L${hx + k * 0.74} ${hy + 64}" stroke="var(--wrapper-dark)" stroke-width="2.5" opacity=".45" stroke-linecap="round"/>`;
+  // the swirled frosting: three layers and a little tip
+  const layer = (y, rx, ry) => `<ellipse cx="${hx}" cy="${y}" rx="${rx}" ry="${ry}" fill="var(--frosting)" stroke="var(--cupi-dark)" stroke-width="3"/>`;
+  s += layer(hy - 2, 62, 20) + layer(hy - 24, 48, 18) + layer(hy - 44, 32, 15);
+  s += `<path d="M${hx - 12} ${hy - 54} Q${hx} ${hy - 76} ${hx + 10} ${hy - 56}" fill="var(--frosting)" stroke="var(--cupi-dark)" stroke-width="3"/>`;
+  s += `<path d="M${hx - 40} ${hy - 30} q 10 -8 22 -8" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/>`;
+  // twelve colorful sprinkles
+  const colors = ["#4aa3df", "#ffc93c", "#6fcf7f", "#9b7bea", "#ff8a3d", "#ffffff"];
+  const spots = [[-44, -6, 30], [-24, 4, -40], [6, 6, 20], [30, -2, -25], [48, -10, 50], [-34, -26, -10],
+                   [-10, -20, 60], [16, -28, -50], [36, -30, 15], [-18, -44, 35], [4, -48, -20], [22, -44, 70]];
+  spots.forEach(([dx, dy, g], i) =>
+    s += `<rect x="${hx + dx - 5}" y="${hy + dy - 2}" width="10" height="4" rx="2" fill="${colors[i % 6]}" stroke="var(--cupi-dark)" stroke-width=".8" transform="rotate(${g} ${hx + dx} ${hy + dy})"/>`);
+  // the cherry
+  s += `<path d="M${hx + 2} ${hy - 76} q 4 -14 16 -18" stroke="#6b3e1f" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  s += `<circle cx="${hx}" cy="${hy - 70}" r="11" fill="#e0233c" stroke="#9e1428" stroke-width="2.5"/><circle cx="${hx - 4}" cy="${hy - 74}" r="3" fill="#fff" opacity=".8"/>`;
+  // the little face, on the paper cup
+  for (const dx of [-17, 17]) {
+    s += `<ellipse cx="${hx + dx}" cy="${hy + 26}" rx="6" ry="7.5" fill="#2b1d24"/>`;
+    s += `<circle cx="${hx + dx + 2}" cy="${hy + 23}" r="2.3" fill="#fff"/><circle cx="${hx + dx - 2}" cy="${hy + 29}" r="1.1" fill="#fff"/>`;
+  }
+  s += `<ellipse cx="${hx - 31}" cy="${hy + 37}" rx="7" ry="4.5" fill="var(--cheek)" opacity=".85"/><ellipse cx="${hx + 31}" cy="${hy + 37}" rx="7" ry="4.5" fill="var(--cheek)" opacity=".85"/>`;
+  s += `<path d="M${hx - 7} ${hy + 36} q 3.5 5 7 0 q 3.5 5 7 0" stroke="#2b1d24" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+  // the cupcakes in the display case, in a row (for the lists lesson)
+  const pts = [0, 1, 2, 3, 4].map(i => [hx - 196 + i * 27, hy + 62 - Math.sin(i * 0.7) * 12]);
+  return { svg: s + "</g>", hx, hy, pts };
+}
+
+const T = (x, y, text, extra = "") =>
+  `<text x="${x}" y="${y}" font-family="Baloo 2, sans-serif" font-weight="800" ${extra}>${text}</text>`;
+
+const ACCESSORIES = {
+  wave: ({ hx, hy }) => `<path d="M${hx + 84} ${hy - 70} q 12 8 10 22 M${hx + 96} ${hy - 80} q 16 12 12 34" stroke="var(--muted)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    ${T(hx + 66, hy - 84, "Hello!", 'font-size="20" fill="var(--cupi-dark)"')}
+    ${T(hx - 120, hy - 50, "✦", 'font-size="18" fill="var(--sun)"')}${T(hx - 96, hy - 80, "✦", 'font-size="12" fill="var(--sky)"')}`,
+  boxes: ({ hx }) => `<g transform="translate(${hx - 196} 112)">
+    <rect x="0" y="0" width="62" height="46" rx="4" fill="#d9a066" stroke="#9a6a3a" stroke-width="3"/><path d="M0 14 h62" stroke="#9a6a3a" stroke-width="3"/>
+    <rect x="6" y="22" width="50" height="16" rx="3" fill="#fff"/>${T(9, 34, "sprinkles", 'font-size="10" fill="#1d2b26"')}
+    <rect x="68" y="10" width="56" height="36" rx="4" fill="#e8b67d" stroke="#9a6a3a" stroke-width="3"/>
+    <rect x="76" y="20" width="40" height="16" rx="3" fill="#fff"/>${T(84, 33, "name", 'font-size="11" fill="#1d2b26"')}</g>`,
+  sign: ({ hx, hy }) => `<rect x="${hx + 42}" y="${hy - 6}" width="6" height="90" fill="#9a6a3a"/>
+    <rect x="${hx + 6}" y="${hy - 70}" width="92" height="56" rx="8" fill="#fff" stroke="#9a6a3a" stroke-width="4" transform="rotate(4 ${hx + 52} ${hy - 42})"/>
+    ${T(hx + 16, hy - 46, "Hello,", 'font-size="16" fill="var(--cupi-dark)"')}${T(hx + 16, hy - 26, "{name}!", 'font-size="16" fill="var(--c-bi)"')}`,
+  calculator: ({ hx, hy }) => `<g transform="translate(${hx + 30} ${hy - 6}) rotate(10)">
+    <rect width="56" height="74" rx="9" fill="#2d3b36" stroke="#1d2b26" stroke-width="3"/><rect x="8" y="8" width="40" height="18" rx="3" fill="#bfe8c4"/>
+    ${T(12, 22, "300", 'font-size="13" fill="#1d2b26"')}
+    ${[0, 1, 2].map(r => [0, 1, 2].map(c => `<rect x="${8 + c * 14}" y="${32 + r * 13}" width="11" height="10" rx="2" fill="${c === 2 ? "var(--sun)" : "#e9f2ec"}"/>`).join("")).join("")}</g>
+    ${T(hx - 70, hy - 50, "×", 'font-size="30" fill="var(--gold)"')}${T(hx - 36, hy - 66, "+", 'font-size="26" fill="var(--sky)"')}${T(hx - 100, hy - 30, "=", 'font-size="26" fill="var(--sun)"')}`,
+  question: ({ hx, hy }) => `<circle cx="${hx + 64}" cy="${hy - 66}" r="28" fill="var(--sky-light)" stroke="var(--sky)" stroke-width="4"/>
+    ${T(hx + 53, hy - 52, "?", 'font-size="40" fill="var(--sky)"')}<circle cx="${hx + 40}" cy="${hy - 32}" r="6" fill="var(--sky-light)" stroke="var(--sky)" stroke-width="3"/>`,
+  crossroads: ({ hx, hy }) => `<rect x="${hx + 60}" y="${hy - 66}" width="7" height="150" fill="#9a6a3a"/>
+    <path d="M${hx + 67} ${hy - 62} h44 l12 12 -12 12 h-44 z" fill="var(--cupi-light)" stroke="var(--cupi-dark)" stroke-width="3"/>${T(hx + 76, hy - 44, "if", 'font-size="17" fill="var(--c-kw)"')}
+    <path d="M${hx + 60} ${hy + 46} h-46 l-12 12 12 12 h46 z" fill="var(--sun-light)" stroke="#d9a419" stroke-width="3"/>${T(hx + 18, hy + 64, "else", 'font-size="16" fill="var(--c-kw)"')}`,
+  laps: ({ hx, hy }) => `<path d="M${hx - 150} ${hy - 60} a 90 30 0 1 1 170 -4" stroke="var(--sky)" stroke-width="4" fill="none" stroke-dasharray="10 8" stroke-linecap="round"/>
+    <path d="M${hx + 22} ${hy - 72} l -2 18 -14 -10 z" fill="var(--sky)"/>
+    ${T(hx - 150, hy - 74, "1", 'font-size="22" fill="var(--gold)"')}${T(hx - 90, hy - 98, "2", 'font-size="22" fill="var(--sun)"')}${T(hx - 30, hy - 96, "3", 'font-size="22" fill="var(--cupi-dark)"')}`,
+  row: ({ pts, hx, hy }) => `<path d="M${pts[0][0] - 14} ${pts[0][1] + 8} Q ${hx - 120} ${hy + 120} ${hx - 30} ${hy + 64}" stroke="var(--line)" stroke-width="3" fill="none" stroke-dasharray="6 7"/>`
+    + pts.map(([x, y], i) => { const c = ["#ffb8d2", "#8b5a3c", "#fff4cf", "#b9e3c6", "#c9b5f5"][i];
+      return `<path d="M${x - 9} ${y} h18 l-3 12 h-12 z" fill="var(--wrapper)" stroke="#1d2b26" stroke-width="1.6"/><ellipse cx="${x}" cy="${y - 1}" rx="11" ry="7" fill="${c}" stroke="#1d2b26" stroke-width="1.6"/>`
+        + `<rect x="${x - 11}" y="${y - 50}" width="22" height="22" rx="6" fill="var(--paper)" stroke="var(--sky)" stroke-width="2.5"/>${T(x - 5, y - 33, i, 'font-size="16" fill="var(--sky)"')}`; }).join(""),
+  book: ({ hx, hy }) => `<g transform="translate(${hx + 36} ${hy + 4}) scale(.68)">
+    <path d="M0 10 q 40 -14 70 0 q 30 -14 70 0 v 60 q -40 -14 -70 0 q -30 -14 -70 0 z" fill="#fff" stroke="#2563a6" stroke-width="4"/>
+    <path d="M70 10 v60" stroke="#2563a6" stroke-width="3"/>${T(10, 38, "small: 3", 'font-size="12" fill="#1d2b26"')}${T(10, 56, "large: 8", 'font-size="12" fill="#1d2b26"')}
+    ${T(80, 38, "size?", 'font-size="12" fill="var(--cupi-dark)"')}</g>`,
+  card: ({ hx, hy }) => `<g transform="translate(${hx + 26} ${hy - 4}) rotate(-6)">
+    <rect width="96" height="66" rx="8" fill="#fff" stroke="var(--sky)" stroke-width="4"/><rect width="96" height="16" rx="6" fill="var(--sky)"/>
+    ${T(8, 31, "name:", 'font-size="11" fill="#5b6b64"')}${T(56, 31, "Argos", 'font-size="11" fill="#1d2b26"')}
+    ${T(8, 46, "mouths:", 'font-size="11" fill="#5b6b64"')}${T(56, 46, "100", 'font-size="11" fill="#1d2b26"')}
+    ${T(8, 60, "color:", 'font-size="11" fill="#5b6b64"')}${T(56, 60, "green", 'font-size="11" fill="#1d2b26"')}</g>`,
+  tool: ({ hx, hy }) => `<g transform="translate(${hx + 62} ${hy - 44}) rotate(35)">
+    <rect x="-6" y="0" width="12" height="80" rx="5" fill="#9aa8a2" stroke="#5b6b64" stroke-width="2"/>
+    <path d="M-20 -6 a 20 20 0 1 0 40 0 l -10 -2 v 10 h -20 v -10 z" fill="#9aa8a2" stroke="#5b6b64" stroke-width="2"/></g>
+    ${T(hx + 92, hy - 56, "fx", 'font-size="24" fill="var(--c-kw)"')}`,
+  photocopy: ({ hx, hy }) => cupiBody({ cx: hx - 128, cy: hy + 10, opacity: .35 }).svg,
+  magnifier: ({ hx, hy }) => `<circle cx="${hx + 18}" cy="${hy - 8}" r="30" fill="var(--sky-light)" fill-opacity=".45" stroke="#5b6b64" stroke-width="6"/>
+    <path d="M${hx + 40} ${hy + 14} l 34 34" stroke="#9a6a3a" stroke-width="11" stroke-linecap="round"/>
+    ${[[hx + 106, hy + 60, "#e0233c"], [hx + 80, hy + 80, "var(--sky)"]].map(([x, y, c]) => `<path d="M${x - 10} ${y} h20 l-3 13 h-14 z" fill="var(--wrapper)" stroke="#1d2b26" stroke-width="1.8"/><ellipse cx="${x}" cy="${y - 1}" rx="12" ry="8" fill="${c}" stroke="#1d2b26" stroke-width="1.8"/>`).join("")}`,
+  bandage: ({ hx, hy }) => `<g transform="translate(${hx + 8} ${hy - 30}) rotate(-25)"><rect x="-22" y="-7" width="44" height="14" rx="6" fill="#f4c99b" stroke="#c98f55" stroke-width="2"/></g>
+    <g transform="translate(${hx + 8} ${hy - 30}) rotate(25)"><rect x="-22" y="-7" width="44" height="14" rx="6" fill="#f4c99b" stroke="#c98f55" stroke-width="2"/></g>
+    ${T(hx + 46, hy - 46, "✦", 'font-size="18" fill="var(--sun)"')}${T(hx - 60, hy - 56, "✦", 'font-size="14" fill="var(--sun)"')}`,
+  backpack: ({ hx, hy }) => { const [x, y] = [hx - 92, hy + 50]; return `<rect x="${x - 26}" y="${y - 44}" width="52" height="48" rx="12" fill="var(--gold)" stroke="#b23b2e" stroke-width="3"/>
+    <rect x="${x - 16}" y="${y - 30}" width="32" height="16" rx="5" fill="#fff" opacity=".85"/>${T(x - 13, y - 17, ".cup", 'font-size="11" fill="#b23b2e"')}`; },
+  dice: ({ hx, hy }) => {
+    const face = (x, y, r, dots) => `<g transform="translate(${x} ${y}) rotate(${r})"><rect x="-20" y="-20" width="40" height="40" rx="8" fill="#fff" stroke="#1d2b26" stroke-width="3"/>`
+      + dots.map(([a, b]) => `<circle cx="${a}" cy="${b}" r="4" fill="${dots.length === 1 ? "var(--cupi)" : "#1d2b26"}"/>`).join("") + "</g>";
+    return face(hx + 70, hy - 50, -14, [[-9, -9], [0, 0], [9, 9]]) + face(hx + 92, hy + 6, 12, [[-9, -9], [9, -9], [-9, 9], [9, 9], [0, 0]])
+      + T(hx - 80, hy - 60, "?", 'font-size="30" fill="var(--sky)"');
+  },
+  trophy: ({ hx, hy }) => `${T(hx - 96, hy - 50, "✦", 'font-size="22" fill="var(--sun)"')}${T(hx - 70, hy - 84, "✦", 'font-size="14" fill="var(--sky)"')}${T(hx + 50, hy - 70, "✦", 'font-size="18" fill="var(--cupi)"')}
+    <g transform="translate(${hx + 48} ${hy + 20})"><path d="M0 0 h40 v14 a 20 20 0 0 1 -40 0 z" fill="var(--sun)" stroke="#d9a419" stroke-width="3"/>
+    <rect x="16" y="32" width="8" height="12" fill="#d9a419"/><rect x="6" y="44" width="28" height="8" rx="2" fill="#d9a419"/></g>`,
+};
+
+function drawCupi(pose, cls = "") {
+  const c = cupiBody();
+  const extra = ACCESSORIES[pose] ? ACCESSORIES[pose](c) : "";
+  const behind = pose === "photocopy" ? extra : "";
+  const front = pose === "photocopy" ? "" : extra;
+  return `<svg viewBox="-20 -60 400 260" role="img" aria-label="Cupi, the cupcake" class="${cls}">${behind}${c.svg}${front}</svg>`;
+}
+
+// ------------------------------------------------------------------ code colors
+const KEYWORDS = new Set("if else when while repeat for in at by break continue return stop fx try except finally raise assert use from as and or not has is".split(" "));
+const CONSTANTS = new Set(["true", "false", "none", "it"]);
+const BUILTINS = new Set("show read read_num len add drop sorted reversed filter map reduce count first last min max sum abs round int float str bool upper lower strip split join replace keys values load save roll pick".split(" "));
+const TOKEN = /(#[^\n]*)|("""[\s\S]*?(?:"""|$)|"(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?)|(\b\d+(?:\.\d+)?)|(λ)|([^\W\d][\w]*)/gu;
+function highlight(code) {
+  let out = "", last = 0, m;
+  TOKEN.lastIndex = 0;
+  while ((m = TOKEN.exec(code))) {
+    out += escapeHtml(code.slice(last, m.index));
+    const t = escapeHtml(m[0]);
+    let cls = null;
+    if (m[1]) cls = "t-com";
+    else if (m[2]) {
+      out += `<span class="t-str">${t.replace(/(\{[^}]*\})/g, '<span class="t-int">$1</span>')}</span>`;
+      last = TOKEN.lastIndex; continue;
+    }
+    else if (m[3]) cls = "t-num";
+    else if (m[4]) cls = "t-kw";
+    else if (/\.\s*$/.test(code.slice(Math.max(0, m.index - 2), m.index)) && !/\.\.$/.test(code.slice(Math.max(0, m.index - 2), m.index))) cls = "t-field";
+    else if (/\b(fx|λ)\s+$/.test(code.slice(Math.max(0, m.index - 8), m.index)) && code[m.index + m[0].length] === "(") cls = "t-fn";
+    else if (KEYWORDS.has(m[5])) cls = "t-kw";
+    else if (CONSTANTS.has(m[5])) cls = "t-cons";
+    else if (BUILTINS.has(m[5])) cls = "t-bi";
+    out += cls ? `<span class="${cls}">${t}</span>` : t;
+    last = TOKEN.lastIndex;
+  }
+  return out + escapeHtml(code.slice(last)) + "\n";
+}
+
+// ------------------------------------------------------------------ the editor
+function makeEditor(code, whenChanged) {
+  const pre = el("pre", { "aria-hidden": "true" });
+  const area = el("textarea", { spellcheck: "false", autocapitalize: "off", autocomplete: "off", wrap: "off", "aria-label": "Cupcake code" });
+  area.value = code;
+  const box = el("div", { class: "editor" }, pre, area);
+  function refresh() {
+    pre.innerHTML = highlight(area.value);
+    area.style.height = "auto";
+    area.style.height = area.scrollHeight + "px";
+  }
+  area.addEventListener("input", () => { refresh(); whenChanged && whenChanged(area.value); });
+  area.addEventListener("scroll", () => { pre.scrollLeft = area.scrollLeft; });
+  area.addEventListener("focus", () => engine.load().catch(() => {}), { once: true });
+  area.addEventListener("keydown", ev => {
+    if (ev.key === "Tab" && !ev.shiftKey && !ev.ctrlKey && !ev.metaKey) {
+      ev.preventDefault();
+      document.execCommand("insertText", false, "    ") || area.setRangeText("    ", area.selectionStart, area.selectionEnd, "end");
+      refresh();
+    } else if (ev.key === "Tab" && ev.shiftKey) {             // Shift+Tab: removes indentation
+      ev.preventDefault();
+      const lineStart = area.value.lastIndexOf("\n", area.selectionStart - 1) + 1;
+      const toRemove = area.value.slice(lineStart, lineStart + 4).match(/^ */)[0].length;
+      if (toRemove) {
+        const pos = area.selectionStart;
+        area.setRangeText("", lineStart, lineStart + toRemove, "preserve");
+        area.selectionStart = area.selectionEnd = Math.max(lineStart, pos - toRemove);
+        refresh(); whenChanged && whenChanged(area.value);
+      }
+    } else if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)) {
+      ev.preventDefault();
+      box.dispatchEvent(new CustomEvent("run", { bubbles: true }));
+    } else if (ev.key === "Enter" && !ev.shiftKey && !ev.altKey) {   // Enter: keeps the indentation, and adds 4 after ":"
+      const lineStart = area.value.lastIndexOf("\n", area.selectionStart - 1) + 1;
+      const line = area.value.slice(lineStart, area.selectionStart);
+      let indent = line.match(/^ */)[0];
+      if (/:\s*(#.*)?$/.test(line.split("#")[0].trimEnd() + " ") || /:\s*$/.test(line)) indent += "    ";
+      ev.preventDefault();
+      document.execCommand("insertText", false, "\n" + indent) || area.setRangeText("\n" + indent, area.selectionStart, area.selectionEnd, "end");
+      refresh();
+    }
+  });
+  const editor = { box, area, get value() { return area.value; }, set value(v) { area.value = v; refresh(); whenChanged && whenChanged(v); }, refresh };
+  requestAnimationFrame(refresh);
+  new ResizeObserver(() => refresh()).observe(box);
+  refresh();
+  return editor;
+}
+
+// ------------------------------------------------------------------ Cupcake inside the browser (Pyodide)
+const BRIDGE = `
+import sys, os, json, traceback
+sys.path.insert(0, "/home/pyodide")
+os.chdir("/home/pyodide")
+import bridge
+
+def _guard(fn):
+    try:
+        return json.dumps(fn())
+    except BaseException:
+        return json.dumps({"status": "error", "output": "", "line": None, "results": [], "all_passed": False,
+                           "error": "Something went wrong inside Cupcake (it is not your program's fault):\\n" + traceback.format_exc()})
+
+def _run(source, inputs, files):
+    return _guard(lambda: bridge.run(source, inputs, json.loads(files)))
+
+def _check(source, inputs, checks, files):
+    return _guard(lambda: bridge.check(source, inputs, json.loads(checks), json.loads(files)))
+`;
+const engine = {
+  py: null, promise: null, button: $("#engine"),
+  status(e, text) { this.button.dataset.status = e; this.button.textContent = text; },
+  origins() { return location.protocol === "file:" ? [DATA.pyodide] : ["pyodide/", DATA.pyodide]; },
+  async tryBase(base) {
+    if (typeof loadPyodide !== "function") {
+      await new Promise((ok, reject) => {
+        const s = el("script", { src: base + "pyodide.js" });
+        s.onload = ok; s.onerror = () => { s.remove(); reject(new Error("could not find " + base + "pyodide.js")); };
+        document.head.append(s);
+      });
+    }
+    let timer;
+    const deadline = new Promise((_, reject) => { timer = setTimeout(() => reject(new Error("did not respond within 90 seconds")), 90000); });
+    const options = base === "pyodide/" ? { indexURL: base, stdLibURL: base + "python_stdlib.zip.wasm" } : { indexURL: base };
+    try { return await Promise.race([loadPyodide(options), deadline]); } finally { clearTimeout(timer); }
+  },
+  load() {
+    if (this.promise) return this.promise;
+    const startedAt = Date.now();
+    this.status("loading", "Baking Cupi…");
+    const ticker = setInterval(() => {
+      if (this.button.dataset.status === "loading") this.button.textContent = `Baking Cupi… ${Math.round((Date.now() - startedAt) / 1000)} s`;
+    }, 1000);
+    this.promise = (async () => {
+      const errors = [];
+      let py = null;
+      for (const base of this.origins()) {
+        try { py = await this.tryBase(base); break; } catch (e) { errors.push(e.message); }
+      }
+      if (!py) throw new Error(errors.join("; "));
+      for (const [n, f] of Object.entries(SOURCES)) py.FS.writeFile("/home/pyodide/" + n, f);
+      py.runPython(BRIDGE);
+      this.py = py;
+      this.status("ready", "Cupi is ready");
+      return py;
+    })().catch(err => { this.status("error", "Cupi didn't bake (click to try again)"); this.promise = null; throw err; })
+      .finally(() => clearInterval(ticker));
+    return this.promise;
+  },
+  async call(name, ...args) {
+    const py = await this.load();
+    await new Promise(r => setTimeout(r, 15));
+    const fn = py.globals.get(name);
+    try { return JSON.parse(fn(...args)); } finally { fn.destroy(); }
+  },
+  run(code, inputs, files) { return this.call("_run", code, inputs, JSON.stringify(files || {})); },
+  check(code, inputs, checks, files) { return this.call("_check", code, inputs, JSON.stringify(checks), JSON.stringify(files || {})); },
+};
+engine.button.addEventListener("click", () => engine.load().catch(() => {}));
+
+function confirmWithButton(button, question, action) {
+  if (button.dataset.confirming) { delete button.dataset.confirming; button.textContent = button.dataset.text; action(); return; }
+  button.dataset.text = button.textContent;
+  button.dataset.confirming = "1";
+  button.textContent = question;
+  setTimeout(() => { if (button.dataset.confirming) { delete button.dataset.confirming; button.textContent = button.dataset.text; } }, 4000);
+}
+
+// ------------------------------------------------------------------ a code card
+function codeCard(op) {
+  const saved = op.key ? memory.code[op.key] : null;
+  const output = el("pre", { class: "output", hidden: true, "aria-live": "polite" });
+  const problem = el("div", { class: "problem", hidden: true, "aria-live": "polite" });
+  const editor = makeEditor(saved ?? op.code, v => {
+    if (op.key) { if (v === op.code) delete memory.code[op.key]; else memory.code[op.key] = v; save(); }
+    toggleAnswers();
+  });
+  const answers = el("textarea", { rows: "2", placeholder: "One answer per line" });
+  answers.value = op.inputs || "";
+  const answersRow = el("div", { class: "answers" }, el("label", {}, "Answers"), answers);
+  function toggleAnswers() { answersRow.hidden = !/\b(read|read_num|ask)\s*\(/.test(editor.value); }
+  toggleAnswers();
+
+  const bRun = el("button", { class: "btn" + (op.main === false ? "" : " primary") }, "▶ Run");
+  const bReset = el("button", { class: "btn", title: "Go back to the original code" }, "Start over");
+  const actions = el("div", { class: "actions" }, bRun, bReset, el("span", { class: "shortcut" }, "Ctrl + Enter"));
+
+  const files = Object.entries(op.files || {}).map(([n, c]) =>
+    el("div", { class: "file" }, el("div", { class: "name" }, `file ${n}`), el("pre", { html: highlight(c) })));
+
+  function showResult(r, note) {
+    output.hidden = !(r.output || r.status === "ok");
+    output.innerHTML = (note ? `<span class="note">${note}</span>` : "") + escapeHtml(r.output || (r.status === "ok" ? "(the program didn't show anything)" : ""));
+    if (r.status === "error") {
+      problem.hidden = false;
+      problem.replaceChildren(el("b", {}, r.line ? `Cupi found a problem on line ${r.line}:` : "Cupi found a problem:"),
+        el("pre", {}, (r.error || "") + (/\b(read|ask)\(\) (was waiting|expected)/.test(r.error || "") ? "\n→ Type the answer in the Answers box, one per line." : "")));
+    } else problem.hidden = true;
+  }
+  async function run() {
+    const code = editor.value, inp = answers.value;
+    if (!engine.py && op.pre && code === op.code && inp === (op.inputs || "")) {
+      showResult(op.pre, op.random ? "An example result: with randomness, it comes out different every time. Cupi is baking…"
+                               : "Saved result. Cupi is baking so you can change the code.");
+      engine.load().catch(() => {});
+      return;
+    }
+    bRun.disabled = true;
+    output.hidden = false; problem.hidden = true;
+    output.textContent = engine.py ? "Running…" : "Baking Cupi (only the first time, a few seconds)…";
+    try { showResult(await engine.run(code, inp, op.files)); }
+    catch (e) { showResult({ status: "error", output: "", error: "Couldn't wake up Cupcake. Are you connected to the internet?\n(" + e.message + ")" }); }
+    finally { bRun.disabled = false; }
+  }
+  bRun.addEventListener("click", run);
+  editor.box.addEventListener("run", () => (op.onCtrlEnter || run)());
+  bReset.addEventListener("click", () => {
+    const restore = () => { editor.value = op.code; answers.value = op.inputs || ""; };
+    if (editor.value === op.code) restore(); else confirmWithButton(bReset, "Erase your changes? Click again", restore);
+  });
+  const box = el("div", { class: "card" }, ...(op.head || []), editor.box, ...files, answersRow, actions, ...(op.tail || []), output, problem);
+  return { box, editor, answers, actions, showResult };
+}
+
+// ------------------------------------------------------------------ an exercise
+function exerciseCard(l, exercise, i) {
+  const key = `${l.id}:${i}`;
+  const list = el("ul", { class: "checks", hidden: true });
+  const party = el("p", { class: "party", hidden: true, html: drawCupi("trophy", "cupi-dance") + "<span>You did it! Cupi is dancing.</span>" });
+  const hints = el("div", { class: "hints" });
+  const solution = el("div", { class: "solution", hidden: true });
+  const task = el("div", { class: "task" }, el("b", { class: "tag" }, `Challenge ${i + 1}`), el("span", { html: exercise.task }));
+  const t = codeCard({ code: exercise.starter, inputs: exercise.inputs, files: exercise.files, key: "exercise:" + key, main: false,
+    head: [task], tail: [hints, list, party, solution], onCtrlEnter: () => check() });
+  const box = t.box;
+  box.classList.add("exercise");
+  if (memory.solved[key]) box.classList.add("solved");
+  const bCheck = el("button", { class: "btn primary" }, "✓ Check");
+  const bHint = el("button", { class: "btn sun" }, "Hint");
+  const bSolution = el("button", { class: "btn" }, "Show solution");
+  t.actions.prepend(bCheck);
+  t.actions.querySelector(".shortcut").before(bHint, bSolution);
+  let n = 0;
+  if (!exercise.hints.length) { bHint.disabled = true; bHint.textContent = "No hints"; }
+
+  async function check() {
+    bCheck.disabled = true;
+    list.hidden = false; party.hidden = true;
+    list.innerHTML = `<li>${engine.py ? "Checking…" : "Baking Cupi (only the first time)…"}</li>`;
+    try {
+      const r = await engine.check(t.editor.value, t.answers.value, exercise.checks, exercise.files);
+      t.showResult(r);
+      list.replaceChildren(...r.results.map(x => el("li", { class: x.ok ? "pass" : "fail" },
+        el("span", {}, x.text), x.hint ? el("span", { class: "check-hint" }, "→ " + x.hint) : null)));
+      if (r.all_passed) {
+        party.hidden = false;
+        box.classList.add("solved");
+        memory.solved[key] = true; save(); updateProgress();
+        const big = $(".drawing svg"); if (big) { big.classList.remove("cupi-dance"); void big.offsetWidth; big.classList.add("cupi-dance"); }
+      }
+    } catch (e) {
+      list.replaceChildren(el("li", { class: "fail" }, "Couldn't wake up Cupcake (" + e.message + "). Click the button at the top to try again."));
+    } finally { bCheck.disabled = false; }
+  }
+  bCheck.addEventListener("click", check);
+  bHint.addEventListener("click", () => {
+    if (n >= exercise.hints.length) return;
+    hints.append(el("p", { html: `<b>Hint ${n + 1}:</b> ` + exercise.hints[n] }));
+    n++;
+    bHint.textContent = n < exercise.hints.length ? "Another hint" : "No more hints";
+    bHint.disabled = n >= exercise.hints.length;
+  });
+  bSolution.addEventListener("click", () => {
+    if (!solution.hidden) { solution.hidden = true; bSolution.textContent = "Show solution"; return; }
+    if (!memory.solved[key] && !bSolution.dataset.confirming) {
+      confirmWithButton(bSolution, "Are you sure? Try a hint first. Click again", () => bSolution.click());
+      return;
+    }
+    delete bSolution.dataset.confirming;
+    solution.replaceChildren(el("pre", { html: highlight(exercise.solution) }),
+      el("div", { class: "actions" }, el("button", { class: "btn", onclick: () => { t.editor.value = exercise.solution; } }, "Copy to editor")));
+    solution.hidden = false; bSolution.textContent = "Hide solution";
+  });
+  return box;
+}
+
+// ------------------------------------------------------------------ pages
+const total = () => LESSONS.reduce((s, l) => s + l.exercises.length, 0);
+const done = l => l.exercises.length > 0 && l.exercises.every((_, i) => memory.solved[`${l.id}:${i}`]);
+function updateProgress() {
+  const h = LESSONS.reduce((s, l) => s + l.exercises.filter((_, i) => memory.solved[`${l.id}:${i}`]).length, 0);
+  $("#stars").innerHTML = `★ <b>${h}</b> of ${total()} ${total() === 1 ? "challenge" : "challenges"}`;
+  for (const l of LESSONS) {
+    const a = document.querySelector(`#toc a[data-id="${l.id}"]`);
+    if (a) a.parentElement.classList.toggle("done", done(l));
+  }
+}
+function buildIndex() {
+  $("#toc").replaceChildren(...LESSONS.map(l => el("li", {},
+    el("a", { href: "#" + l.id, "data-id": l.id }, el("span", { class: "seg" }, String(l.n)), el("span", {}, l.title)))),
+    el("li", {}, el("a", { href: "#gallery", "data-id": "gallery" }, el("span", { class: "seg" }, "★"), el("span", {}, "Pokémon Gallery"))));
+}
+
+function galleryPage() {
+  const parts = [el("div", { class: "scene" },
+    el("div", {}, el("div", { class: "num" }, "Complete programs"), el("h1", {}, "Pokémon Gallery")),
+    el("div", { class: "drawing" }, el("p", { class: "bubble" }, "Real programs, to play and learn!"),
+      el("div", { html: drawCupi("trophy") })))];
+  parts.push(el("div", { class: "story", html: "<p>Longer programs that bring together everything you learned. Run them, change them and see what happens. The ones that use randomness give something different every time.</p>" }));
+  for (const [i, p] of DATA.gallery.entries()) {
+    parts.push(el("h2", {}, p.title));
+    parts.push(el("p", { class: "caption", html: p.text }));
+    parts.push(codeCard({ code: p.code, inputs: p.inputs, files: p.files, pre: p.pre, random: p.random, key: `gal:${i}` }).box);
+  }
+  parts.push(el("div", { class: "pager" }, el("a", { href: "#" + LESSONS[LESSONS.length - 1].id }, el("small", {}, "← Previous"), LESSONS[LESSONS.length - 1].title)));
+  $("#content").replaceChildren(...parts);
+}
+const ICONS = {
+  story: '<path d="M4 6 q6-3 12 0 q6-3 12 0 v16 q-6-3-12 0 q-6-3-12 0z M16 6v16" />',
+  idea: '<path d="M16 4 a8 8 0 0 1 5 14 v3 h-10 v-3 a8 8 0 0 1 5-14z M12 25 h8" />',
+  tryIt: '<path d="M11 7 l13 9 -13 9z" />',
+  turn: '<path d="M16 4 l3.5 7.5 8 1 -6 5.5 1.6 8 -7.1-4 -7.1 4 1.6-8 -6-5.5 8-1z" />',
+  remember: '<path d="M16 4 a5 5 0 0 1 5 5 c0 4 -5 6 -5 6 s-5-2-5-6 a5 5 0 0 1 5-5z M16 15 v13" />',
+  pokeball: '<circle cx="16" cy="16" r="12" /><path d="M4 16 h8 M20 16 h8" /><circle cx="16" cy="16" r="4" />',
+};
+function section(icon, title, ...children) {
+  const svg = `<svg viewBox="0 0 32 32" width="22" height="22" fill="none" stroke="var(--cupi-dark)" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">${ICONS[icon]}</svg>`;
+  return el("section", { class: "part" }, el("h2", {}, el("span", { class: "icon", "aria-hidden": "true", html: svg }), title), ...children);
+}
+function lessonPage(l) {
+  const parts = [];
+  parts.push(el("div", { class: "scene" },
+    el("div", {}, el("div", { class: "num" }, `Lesson ${l.n} of ${LESSONS.length}`), el("h1", {}, l.title)),
+    el("div", { class: "drawing" }, el("p", { class: "bubble" }, l.bubble), el("div", { html: drawCupi(l.pose) }))));
+  parts.push(section("story", "The story", el("div", { class: "story", html: l.story })));
+  parts.push(section("idea", "The idea", el("div", { class: "idea", html: l.explanation })));
+  const tryIt = section("tryIt", "Try it!");
+  l.examples.forEach((e, i) => {
+    tryIt.append(el("p", { class: "caption", html: e.text }));
+    tryIt.append(codeCard({ code: e.code, inputs: e.inputs, files: e.files, pre: e.pre, random: e.random, key: `ex:${l.id}:${i}` }).box);
+  });
+  parts.push(tryIt);
+  if (l.pokemon && l.pokemon.length) {
+    const poke = section("pokeball", "With Pokémon");
+    l.pokemon.forEach((e, i) => {
+      poke.append(el("p", { class: "caption", html: e.text }));
+      poke.append(codeCard({ code: e.code, inputs: e.inputs, files: e.files, pre: e.pre, random: e.random, key: `pk:${l.id}:${i}` }).box);
+    });
+    parts.push(poke);
+  }
+  if (l.exercises.length) {
+    const turn = section("turn", "Your turn");
+    l.exercises.forEach((exercise, i) => turn.append(exerciseCard(l, exercise, i)));
+    parts.push(turn);
+  }
+  parts.push(section("remember", "Remember", el("div", { class: "remember" }, el("ul", { html: l.remember.map(r => `<li>${r}</li>`).join("") }))));
+  const idx = LESSONS.indexOf(l);
+  const nav = el("div", { class: "pager" });
+  if (idx > 0) nav.append(el("a", { href: "#" + LESSONS[idx - 1].id }, el("small", {}, "← Previous"), LESSONS[idx - 1].title));
+  if (idx < LESSONS.length - 1) nav.append(el("a", { href: "#" + LESSONS[idx + 1].id, class: "next" }, el("small", {}, "Next →"), LESSONS[idx + 1].title));
+  else nav.append(el("a", { href: "#gallery", class: "next" }, el("small", {}, "Next →"), "Pokémon Gallery"));
+  parts.push(nav);
+  $("#content").replaceChildren(...parts);
+  document.querySelectorAll("pre[data-cup]").forEach(p => { p.innerHTML = highlight(p.textContent).replace(/\n$/, ""); });
+}
+function route() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (id === "gallery") {
+    galleryPage();
+    document.querySelectorAll("#toc a").forEach(a => a.classList.toggle("active", a.dataset.id === "gallery"));
+    document.title = "Pokémon Gallery · Learn with Cupi";
+    if (matchMedia("(max-width: 900px)").matches) $("#det").open = false;
+    window.scrollTo(0, 0);
+    return;
+  }
+  const l = LESSONS.find(x => x.id === id) || LESSONS[0];
+  lessonPage(l);
+  document.querySelectorAll("#toc a").forEach(a => a.classList.toggle("active", a.dataset.id === l.id));
+  document.title = `${l.title} · Learn with Cupi`;
+  if (matchMedia("(max-width: 900px)").matches) $("#det").open = false;
+  window.scrollTo(0, 0);
+}
+
+function applyTheme() { if (memory.theme) document.documentElement.dataset.theme = memory.theme; else delete document.documentElement.dataset.theme; }
+$("#theme").addEventListener("click", () => {
+  const isDark = memory.theme ? memory.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  memory.theme = isDark ? "light" : "dark"; applyTheme(); save();
+});
+
+$("#logo").setAttribute("viewBox", "0 0 100 100");            // the Cupcake logo: the Badge
+$("#logo").innerHTML = '<rect x="6" y="6" width="88" height="88" rx="24" fill="#d6336c"/><path d="M28 54 Q28 30 50 30 Q72 30 72 54 Z" fill="#fff"/>'
+  + '<path d="M33 58 H67 L62 78 Q50 81 38 78 Z" fill="#fff" opacity=".85"/><circle cx="50" cy="23" r="6" fill="#ffc2d9"/>';
+applyTheme();
+buildIndex();
+if (matchMedia("(max-width: 900px)").matches) $("#det").open = false;
+window.addEventListener("hashchange", route);
+route();
+updateProgress();
+
+// ------------------------------------------------------------------ automatic test (?selftest)
+if (new URLSearchParams(location.search).has("selftest")) (async () => {
+  const report = [];
+  const log = (ok, t) => report.push((ok ? "OK  " : "FAIL") + " " + t);
+  try {
+    await engine.load();
+    log(true, "Pyodide loaded");
+    let failures = 0;
+    for (const l of LESSONS) {
+      for (const [i, e] of l.examples.entries()) {
+        const r = await engine.run(e.code, e.inputs, e.files);
+        const differs = e.random ? r.status !== "ok" : (r.status !== e.pre.status || r.output !== e.pre.output);
+        if (differs) { failures++; log(false, `${l.id} example ${i + 1}: ${r.status} ${r.error}\n${r.output}`); }
+      }
+      for (const [i, e] of (l.pokemon || []).entries()) {
+        const r = await engine.run(e.code, e.inputs, e.files);
+        const differs = e.random ? r.status !== "ok" : (r.status !== e.pre.status || r.output !== e.pre.output);
+        if (differs) { failures++; log(false, `${l.id} pokémon ${i + 1}: ${r.status} ${r.error}\n${r.output}`); }
+      }
+      for (const [i, exercise] of l.exercises.entries()) {
+        const s = await engine.check(exercise.solution, exercise.inputs, exercise.checks, exercise.files);
+        const a = await engine.check(exercise.starter, exercise.inputs, exercise.checks, exercise.files);
+        if (!s.all_passed || a.all_passed) { failures++; log(false, `${l.id} challenge ${i + 1}: solution ${s.all_passed}, starting code ${a.all_passed} ${s.error}`); }
+      }
+    }
+    for (const p of DATA.gallery) {
+      const r = await engine.run(p.code, p.inputs, p.files);
+      const differs = p.random ? r.status !== "ok" : (r.status !== p.pre.status || r.output !== p.pre.output);
+      if (differs) { failures++; log(false, `gallery ${p.title}: ${r.status} ${r.error}`); }
+    }
+    log(failures === 0, `whole course in the browser (${failures} ${failures === 1 ? "difference" : "differences"})`);
+    location.hash = "#math"; await new Promise(r => setTimeout(r, 60));
+    $(".card .btn.primary").click(); await new Promise(r => setTimeout(r, 1500));
+    log(/300 coins/.test($(".output").textContent), "Run button → " + $(".output").textContent.split("\n")[0]);
+  } catch (e) { log(false, "exception: " + (e && e.stack || e)); }
+  document.body.append(el("pre", { id: "selftest-result" }, report.join("\n")));
+})();
+</script>
+</body>
+</html>

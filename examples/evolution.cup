@@ -1,0 +1,24 @@
+# Evolutions: each Pokémon evolves when it reaches a certain level
+
+evolutions = [
+    "Charmander": (into: "Charmeleon", level: 16),
+    "Charmeleon": (into: "Charizard", level: 36),
+    "Bulbasaur":  (into: "Ivysaur", level: 16),
+    "Squirtle":   (into: "Wartortle", level: 16),
+]
+
+fx train(name, start, finish):
+    current = name
+    for level in start..finish:
+        evo = evolutions[current] else none
+        if evo is not none and level == evo.level:
+            show("  Level {level}: {current} evolved into {evo.into}!")
+            current = evo.into
+    return current
+
+for starter in ["Charmander", "Bulbasaur", "Pikachu"]:
+    show("{starter} trains from level 5 to 40:")
+    result = train(starter, 5, 40)
+    if result == starter:
+        show("  {starter} didn't evolve (it needs a Thunder Stone)")
+    show("  In the end it's {result}")

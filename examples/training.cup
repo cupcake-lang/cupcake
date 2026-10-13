@@ -1,0 +1,17 @@
+# Training: earn experience and level up
+
+fx experience_for(level):
+    return level * level * 10
+
+pika = (name: "Pikachu", level: 5, experience: 0)
+battles = [120, 300, 450, 80, 600, 900]
+
+for i, earned at battles:
+    pika.experience += earned
+    show("Battle {i + 1}: +{earned} experience")
+    while pika.experience >= experience_for(pika.level):
+        pika.experience -= experience_for(pika.level)
+        pika.level += 1
+        show("  {pika.name} grew to level {pika.level}!")
+
+show("Final: {pika.name}, level {pika.level}, with {pika.experience} experience points")

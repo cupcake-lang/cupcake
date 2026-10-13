@@ -1,0 +1,29 @@
+# A small Pokémon team in Cupcake
+
+use pokemon, describe, heal from pokemon
+
+team = [
+    pokemon("Pikachu", "electric", hp = 12),
+    pokemon("Charmander", "fire", hp = 39),
+    pokemon("Squirtle", "water", hp = 0),
+]
+
+# The ones that can battle, healed
+alive = [p for p in team if p.hp > 0]
+alive = [heal(p, 20) for p in alive]
+
+show("Ready to battle:")
+for p in sorted(alive, fx: it.name):
+    show("  " + describe(p))
+
+# The ones that need help
+for p in team:
+    if p.hp == 0:
+        show("{p.name} needs to go to the Pokémon Center")
+    else if p.hp < 20:
+        show("{p.name} was weak")
+
+# A dictionary with the shop's prices
+prices = ["pokeball": 200, "potion": 300, "greatball": 600]
+total = sum([prices[item] for item in ["pokeball", "potion"]])
+show("A Poké Ball and a Potion cost {total}")

@@ -1,0 +1,5 @@
+# My first Cupcake program
+show("Hello, world")
+
+name = read("What's your name? ")
+show("Hi, {name}! Welcome to Cupcake.")

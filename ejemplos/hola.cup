@@ -1,5 +1,0 @@
-# Mi primer programa en Cupcake
-show("Hola, mundo")
-
-nombre = read("¿Cómo te llamas? ")
-show("¡Hola, {nombre}! Bienvenido a Cupcake.")

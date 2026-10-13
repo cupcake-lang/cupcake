@@ -1,7 +1,7 @@
 {
   "name": "cupcake",
   "displayName": "Cupcake",
-  "description": "Cupcake 1.0 «Frambuesa»: colores, sangría y atajos para los archivos .cup",
+  "description": "Cupcake 1.0 \"Frambuesa\": colors, indentation and snippets for .cup files",
   "version": "1.0.0",
   "publisher": "jesus-local",
   "engines": {
@@ -24,8 +24,8 @@
         ],
         "configuration": "./language-configuration.json",
         "icon": {
-          "light": "./icono-archivo.svg",
-          "dark": "./icono-archivo.svg"
+          "light": "./file-icon.svg",
+          "dark": "./file-icon.svg"
         }
       }
     ],
@@ -50,5 +50,10 @@
       }
     }
   },
-  "icon": "icono.png"
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cupcake-lang/cupcake"
+  },
+  "license": "MIT"
 }

@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-Cupcake: un lenguaje de scripting como Python, sin clases, sin objetos y sin métodos.
+Cupcake: a small scripting language with no classes, no objects and no methods.
 
-    cupcake archivo.cup
+    cupcake file.cup
 
-Este intérprete tampoco usa clases: solo funciones, diccionarios, listas y tuplas,
-igual que el lenguaje que implementa.
+This interpreter doesn't use classes either: only functions, dictionaries, lists and tuples,
+just like the language it implements.
 
-Partes:
-  1. Léxico:      el texto se convierte en una lista de piezas (tokens).
-  2. Sintaxis:    las piezas se convierten en un árbol de nodos (diccionarios).
-  3. Ejecución:   se recorre el árbol.
-  4. Integradas:  show, read, add, drop, sorted…
-  5. Programa:    la línea de comandos.
+Parts:
+  1. Lexer:      the text becomes a list of pieces (tokens).
+  2. Parser:     the pieces become a tree of nodes (dictionaries).
+  3. Execution:  the tree is walked.
+  4. Builtins:   show, read, add, drop, sorted…
+  5. Program:    the command line.
 """
 import difflib
 import os
@@ -22,25 +22,25 @@ import sys
 sys.setrecursionlimit(10000)
 
 
-# ================================================================ errores
+# ================================================================ errors
 
-def error(mensaje, linea=None):
-    """Todos los errores de Cupcake son un Exception con ("cupcake", mensaje, linea)."""
-    return Exception("cupcake", mensaje, linea)
+def error(message, line=None):
+    """Every Cupcake error is an Exception with ("cupcake", message, line)."""
+    return Exception("cupcake", message, line)
 
 
-def es_error_cupcake(ex):
+def is_cupcake_error(ex):
     return len(ex.args) == 3 and ex.args[0] == "cupcake"
 
 
-def parecido(nombre, opciones):
-    p = difflib.get_close_matches(nombre, list(opciones), 1, 0.6)
-    return f" ¿Quisiste decir «{p[0]}»?" if p else ""
+def did_you_mean(name, options):
+    p = difflib.get_close_matches(name, list(options), 1, 0.6)
+    return f" Did you mean '{p[0]}'?" if p else ""
 
 
-# ================================================================ 1. léxico
+# ================================================================ 1. lexer
 
-PALABRAS = {
+KEYWORDS = {
     "true", "false", "none", "and", "or", "not", "in", "has", "is",
     "if", "when", "else", "while", "repeat", "for", "at", "by",
     "break", "continue", "return", "stop",
@@ -48,997 +48,997 @@ PALABRAS = {
     "use", "from", "as",
 }
 
-# Después de «is», estas palabras son tipos: x is number, lista is empty…
-TIPOS = {"number", "text", "list", "dict", "record", "function", "bool", "empty"}
+# After 'is', these words are types: x is number, list is empty…
+TYPES = {"number", "text", "list", "dict", "record", "function", "bool", "empty"}
 
-DOBLES = {"..", "=>", "==", "!=", "<=", ">=", "**", "//", "+=", "-=", "*=", "/="}
-SIMPLES = set("+-*/%<>=()[]{},:.")
+DOUBLE_OPS = {"..", "=>", "==", "!=", "<=", ">=", "**", "//", "+=", "-=", "*=", "/="}
+SINGLE_OPS = set("+-*/%<>=()[]{},:.")
 
-# Palabras que Cupcake tuvo antes y ya no usa: se avisa con la forma nueva.
-VIEJAS = {
-    "other": "else  (y «other if» es «else if»; «x other 0» es «x else 0»)",
+# Words Cupcake used to have and no longer uses: the error shows the new form.
+OLD_WORDS = {
+    "other": "else  (and 'other if' is 'else if'; 'x other 0' is 'x else 0')",
     "unless": "if not",
     "until": "while not",
-    "each": "for x in lista",
+    "each": "for x in list",
     "between": "x in 1..10",
-    "then": ":  (los dos puntos al final de la línea)",
+    "then": ":  (a colon at the end of the line)",
 }
 
-PALABRAS_DE_PYTHON = {
+OTHER_WORDS = {
     "def": "fx", "elif": "else if", "lambda": "fx(…): …", "True": "true", "False": "false",
-    "None": "none", "print": "show", "input": "read", "ask": "read", "ask_number": "read_num", "read_number": "read_num", "write": "save", "class": None, "pass": "none (una línea con none no hace nada)", "import": "use",
+    "None": "none", "print": "show", "input": "read", "ask": "read", "ask_number": "read_num", "read_number": "read_num", "write": "save", "class": None, "pass": "none (a line with none does nothing)", "import": "use",
     "nonlocal": None, "global": None, "del": "drop(…)", "with": None, "yield": None,
     "fn": "fx", "lam": "fx(…): …", "range": "a..b", "elsif": "else if", "switch": "when", "match": "when",
 }
 
 
-def tokenizar(fuente, linea_inicial=1):
-    """Devuelve una lista de (tipo, valor, línea). Tipos: num, str, name, kw, op, nl, indent, dedent, eof.
-    La sangría marca los bloques: «indent» abre uno y «dedent» lo cierra."""
+def tokenize(source, first_line=1):
+    """Returns a list of (kind, value, line). Kinds: num, str, name, kw, op, nl, indent, dedent, eof.
+    Indentation marks the blocks: 'indent' opens one and 'dedent' closes it."""
     toks = []
-    i, n, linea, profundidad = 0, len(fuente), linea_inicial, 0
-    niveles = [0]
+    i, n, line, depth = 0, len(source), first_line, 0
+    levels = [0]
 
-    def sangria(i, linea):
-        """Al empezar una línea: compara su sangría con la de las de arriba."""
-        j, ancho = i, 0
-        while j < n and fuente[j] in " \t":
-            ancho += 4 if fuente[j] == "\t" else 1
+    def indentation(i, line):
+        """At the start of a line: compares its indentation with the lines above."""
+        j, width = i, 0
+        while j < n and source[j] in " \t":
+            width += 4 if source[j] == "\t" else 1
             j += 1
-        if j >= n or fuente[j] in "\n\r#":           # línea vacía o solo una nota: no cuenta
+        if j >= n or source[j] in "\n\r#":           # empty line, or just a comment: doesn't count
             return
-        if ancho > niveles[-1]:
-            niveles.append(ancho)
-            toks.append(("indent", ancho, linea))
-        while ancho < niveles[-1]:
-            niveles.pop()
-            toks.append(("dedent", ancho, linea))
-        if ancho != niveles[-1]:
-            raise error("la sangría de esta línea no coincide con la de ninguna línea de arriba", linea)
+        if width > levels[-1]:
+            levels.append(width)
+            toks.append(("indent", width, line))
+        while width < levels[-1]:
+            levels.pop()
+            toks.append(("dedent", width, line))
+        if width != levels[-1]:
+            raise error("this line's indentation doesn't match any line above", line)
 
-    sangria(0, linea)
+    indentation(0, line)
     while i < n:
-        c = fuente[i]
+        c = source[i]
         if c == "\n":
-            linea += 1
+            line += 1
             i += 1
-            if profundidad == 0:
-                toks.append(("nl", "\n", linea - 1))
-                sangria(i, linea)
+            if depth == 0:
+                toks.append(("nl", "\n", line - 1))
+                indentation(i, line)
             continue
         if c in " \t\r":
             i += 1
             continue
         if c == "#":
-            while i < n and fuente[i] != "\n":
+            while i < n and source[i] != "\n":
                 i += 1
             continue
         if c.isdigit():
             j = i
-            while j < n and fuente[j].isdigit():
+            while j < n and source[j].isdigit():
                 j += 1
-            es_decimal = j + 1 < n and fuente[j] == "." and fuente[j + 1].isdigit()
-            if es_decimal:
+            is_decimal = j + 1 < n and source[j] == "." and source[j + 1].isdigit()
+            if is_decimal:
                 j += 1
-                while j < n and fuente[j].isdigit():
+                while j < n and source[j].isdigit():
                     j += 1
-                toks.append(("num", float(fuente[i:j]), linea))
+                toks.append(("num", float(source[i:j]), line))
             else:
-                toks.append(("num", int(fuente[i:j]), linea))
+                toks.append(("num", int(source[i:j]), line))
             i = j
             continue
         if c == "λ":
-            toks.append(("kw", "fx", linea))
+            toks.append(("kw", "fx", line))
             i += 1
             continue
         if c.isalpha() or c == "_":
             j = i
-            while j < n and (fuente[j].isalnum() or fuente[j] == "_"):
+            while j < n and (source[j].isalnum() or source[j] == "_"):
                 j += 1
-            palabra = fuente[i:j]
-            toks.append(("kw" if palabra in PALABRAS else "name", palabra, linea))
+            word = source[i:j]
+            toks.append(("kw" if word in KEYWORDS else "name", word, line))
             i = j
             continue
         if c in "\"'":
-            i, linea, partes = leer_texto(fuente, i, linea)
-            toks.append(("str", partes, linea))
+            i, line, parts = read_text(source, i, line)
+            toks.append(("str", parts, line))
             continue
-        if fuente[i:i + 2] in DOBLES:
-            toks.append(("op", fuente[i:i + 2], linea))
+        if source[i:i + 2] in DOUBLE_OPS:
+            toks.append(("op", source[i:i + 2], line))
             i += 2
             continue
-        if c in SIMPLES:
+        if c in SINGLE_OPS:
             if c in "([":
-                profundidad += 1
+                depth += 1
             elif c in ")]":
-                profundidad = max(0, profundidad - 1)
-            toks.append(("op", c, linea))
+                depth = max(0, depth - 1)
+            toks.append(("op", c, line))
             i += 1
             continue
-        raise error(f"no entiendo el símbolo «{c}»", linea)
-    toks.append(("nl", "\n", linea))
-    for _ in niveles[1:]:
-        toks.append(("dedent", 0, linea))
-    toks.append(("eof", None, linea))
+        raise error(f"I don't understand the symbol '{c}'", line)
+    toks.append(("nl", "\n", line))
+    for _ in levels[1:]:
+        toks.append(("dedent", 0, line))
+    toks.append(("eof", None, line))
     return toks
 
 
 ESCAPES = {"n": "\n", "t": "\t", "\\": "\\", '"': '"', "'": "'", "{": "{", "}": "}"}
 
 
-def leer_texto(fuente, i, linea):
-    """Lee un texto entre comillas. Devuelve (posición, línea, partes); cada parte es un texto
-    o ("expr", código, línea) para lo que va entre llaves."""
-    comilla = fuente[i]
-    triple = fuente[i:i + 3] == comilla * 3
-    cierre = comilla * 3 if triple else comilla
-    i += len(cierre)
-    linea_inicio = linea
-    partes, actual = [], []
-    n = len(fuente)
+def read_text(source, i, line):
+    """Reads a quoted text. Returns (position, line, parts); each part is a text
+    or ("expr", code, line) for what goes between braces."""
+    quote = source[i]
+    triple = source[i:i + 3] == quote * 3
+    closing = quote * 3 if triple else quote
+    i += len(closing)
+    start_line = line
+    parts, current = [], []
+    n = len(source)
     while True:
         if i >= n:
-            raise error("falta cerrar las comillas de este texto", linea_inicio)
-        if fuente.startswith(cierre, i):
-            i += len(cierre)
+            raise error("this text is missing its closing quote", start_line)
+        if source.startswith(closing, i):
+            i += len(closing)
             break
-        c = fuente[i]
+        c = source[i]
         if c == "\n":
             if not triple:
-                raise error("falta cerrar las comillas de este texto (para varias líneas usa \"\"\"…\"\"\")",
-                            linea_inicio)
-            linea += 1
+                raise error("this text is missing its closing quote (for several lines use \"\"\"…\"\"\")",
+                            start_line)
+            line += 1
         if c == "\\" and i + 1 < n:
-            actual.append(ESCAPES.get(fuente[i + 1], "\\" + fuente[i + 1]))
+            current.append(ESCAPES.get(source[i + 1], "\\" + source[i + 1]))
             i += 2
             continue
         if c == "{":
-            j, nivel = i + 1, 1
-            while j < n and nivel:
-                if fuente[j] in "\"'":                  # un texto dentro de las llaves
-                    q = fuente[j]
+            j, level = i + 1, 1
+            while j < n and level:
+                if source[j] in "\"'":                  # a text inside the braces
+                    q = source[j]
                     j += 1
-                    while j < n and fuente[j] != q:
-                        j += 2 if fuente[j] == "\\" else 1
-                elif fuente[j] == "{":
-                    nivel += 1
-                elif fuente[j] == "}":
-                    nivel -= 1
+                    while j < n and source[j] != q:
+                        j += 2 if source[j] == "\\" else 1
+                elif source[j] == "{":
+                    level += 1
+                elif source[j] == "}":
+                    level -= 1
                 j += 1
-            if nivel:
-                raise error("falta cerrar una llave «}» dentro del texto", linea)
-            if actual:
-                partes.append("".join(actual))
-                actual = []
-            partes.append(("expr", fuente[i + 1:j - 1], linea))
+            if level:
+                raise error("a brace '}' is missing inside the text", line)
+            if current:
+                parts.append("".join(current))
+                current = []
+            parts.append(("expr", source[i + 1:j - 1], line))
             i = j
             continue
-        actual.append(c)
+        current.append(c)
         i += 1
-    if actual or not partes:
-        partes.append("".join(actual))
-    return i, linea, partes
+    if current or not parts:
+        parts.append("".join(current))
+    return i, line, parts
 
 
-# ================================================================ 2. sintaxis
-# El estado del lector es un diccionario: {"t": tokens, "i": posición}.
-# Cada nodo del árbol es un diccionario con "t" (qué es) y "l" (la línea).
+# ================================================================ 2. parser
+# The parser state is a dictionary: {"t": tokens, "i": position}.
+# Each tree node is a dictionary with "t" (what it is) and "l" (the line).
 
-def nodo(t, l, **campos):
-    campos["t"] = t
-    campos["l"] = l
-    return campos
+def node(t, l, **fields):
+    fields["t"] = t
+    fields["l"] = l
+    return fields
 
 
-def ver(P, k=0):
+def peek(P, k=0):
     return P["t"][min(P["i"] + k, len(P["t"]) - 1)]
 
 
-def tomar(P):
-    tok = ver(P)
+def take(P):
+    tok = peek(P)
     P["i"] += 1
     return tok
 
 
-def es(P, valor, k=0):
-    tok = ver(P, k)
-    return tok[0] in ("op", "kw") and tok[1] == valor
+def is_op(P, value, k=0):
+    tok = peek(P, k)
+    return tok[0] in ("op", "kw") and tok[1] == value
 
 
-def acepta(P, valor):
-    if es(P, valor):
-        return tomar(P)
+def accept(P, value):
+    if is_op(P, value):
+        return take(P)
     return None
 
 
-def espera(P, valor, explicacion=None):
-    tok = ver(P)
-    if es(P, valor):
-        return tomar(P)
-    llego = "el final de la línea" if tok[0] == "nl" else "el final del archivo" if tok[0] == "eof" \
-        else f"«{tok[1]}»" if tok[0] != "str" else "un texto"
-    raise error(explicacion or f"se esperaba «{valor}» y llegó {llego}", tok[2])
+def expect(P, value, explanation=None):
+    tok = peek(P)
+    if is_op(P, value):
+        return take(P)
+    got = "the end of the line" if tok[0] == "nl" else "the end of the file" if tok[0] == "eof" \
+        else f"'{tok[1]}'" if tok[0] != "str" else "a text"
+    raise error(explanation or f"expected '{value}' but got {got}", tok[2])
 
 
-def saltar_lineas(P):
-    while ver(P)[0] == "nl":
-        tomar(P)
+def skip_newlines(P):
+    while peek(P)[0] == "nl":
+        take(P)
 
 
-def nombre(P, que="un nombre"):
-    tok = tomar(P)
+def name(P, what="a name"):
+    tok = take(P)
     if tok[0] != "name":
-        raise error(f"se esperaba {que} y llegó «{tok[1]}»", tok[2])
+        raise error(f"expected {what} but got '{tok[1]}'", tok[2])
     return tok[1]
 
 
-def programa(fuente):
-    P = {"t": tokenizar(fuente), "i": 0}
-    sentencias = []
-    saltar_lineas(P)
-    while ver(P)[0] != "eof":
-        sentencias.append(sentencia(P))
-        fin_de_sentencia(P)
-        saltar_lineas(P)
-    return sentencias
+def parse_program(source):
+    P = {"t": tokenize(source), "i": 0}
+    statements = []
+    skip_newlines(P)
+    while peek(P)[0] != "eof":
+        statements.append(statement(P))
+        end_of_statement(P)
+        skip_newlines(P)
+    return statements
 
 
-LLAVES = "Cupcake no usa llaves para los bloques: escribe «:» al final de la línea y, debajo, las instrucciones con sangría (4 espacios)"
+BRACES = "Cupcake doesn't use braces for blocks: put ':' at the end of the line and, below it, the indented instructions (4 spaces)"
 
 
-def fin_de_sentencia(P):
-    tok = ver(P)
+def end_of_statement(P):
+    tok = peek(P)
     if tok[0] in ("nl", "eof", "dedent") or P["t"][P["i"] - 1][0] == "dedent":
         return
-    if es(P, "{") or es(P, "}"):
-        raise error(LLAVES, tok[2])
-    if tok[0] == "name" and tok[1] in VIEJAS:
-        raise error(f"Cupcake ya no usa «{tok[1]}». Se escribe:  {VIEJAS[tok[1]]}", tok[2])
-    raise error(f"sobra «{tok[1] if tok[0] != 'str' else 'un texto'}» al final de esta instrucción", tok[2])
+    if is_op(P, "{") or is_op(P, "}"):
+        raise error(BRACES, tok[2])
+    if tok[0] == "name" and tok[1] in OLD_WORDS:
+        raise error(f"Cupcake no longer uses '{tok[1]}'. Write:  {OLD_WORDS[tok[1]]}", tok[2])
+    raise error(f"there's an extra '{tok[1] if tok[0] != 'str' else 'text'}' at the end of this instruction", tok[2])
 
 
-def bloque(P):
-    """«:» y un bloque: en la misma línea (una sola instrucción) o debajo, con sangría."""
-    tok = ver(P)
-    if es(P, "{"):
-        raise error(LLAVES, tok[2])
-    if tok[0] == "indent" or (tok[0] == "nl" and ver(P, 1)[0] == "indent"):
-        raise error("falta «:» al final de la línea de arriba, antes del bloque con sangría", tok[2])
-    if ver(P)[0] == "name" and ver(P)[1] == "then":
-        raise error(f"Cupcake ya no usa «then». Se escribe:  {VIEJAS['then']}", ver(P)[2])
-    espera(P, ":", "falta «:» al final de la línea, antes del bloque")
-    if ver(P)[0] in ("nl", "eof"):
-        L = ver(P)[2]
-        saltar_lineas(P)
-        if ver(P)[0] != "indent":
-            raise error("después de «:» van las instrucciones del bloque, debajo y con sangría (4 espacios)", L)
-        tomar(P)
-        sentencias = []
-        while ver(P)[0] not in ("dedent", "eof"):
-            sentencias.append(sentencia(P))
-            fin_de_sentencia(P)
-            saltar_lineas(P)
-        acepta_dedent(P)
-        return sentencias
-    if es(P, "}"):
-        raise error(LLAVES, ver(P)[2])
-    raise error("lo que hace el bloque va en la línea de abajo, con sangría (4 espacios), no en la misma línea", ver(P)[2])
+def block(P):
+    """ ':' and a block, below, indented."""
+    tok = peek(P)
+    if is_op(P, "{"):
+        raise error(BRACES, tok[2])
+    if tok[0] == "indent" or (tok[0] == "nl" and peek(P, 1)[0] == "indent"):
+        raise error("missing ':' at the end of the line above, before the indented block", tok[2])
+    if peek(P)[0] == "name" and peek(P)[1] == "then":
+        raise error(f"Cupcake no longer uses 'then'. Write:  {OLD_WORDS['then']}", peek(P)[2])
+    expect(P, ":", "missing ':' at the end of the line, before the block")
+    if peek(P)[0] in ("nl", "eof"):
+        L = peek(P)[2]
+        skip_newlines(P)
+        if peek(P)[0] != "indent":
+            raise error("after ':' come the block's instructions, below and indented (4 spaces)", L)
+        take(P)
+        statements = []
+        while peek(P)[0] not in ("dedent", "eof"):
+            statements.append(statement(P))
+            end_of_statement(P)
+            skip_newlines(P)
+        accept_dedent(P)
+        return statements
+    if is_op(P, "}"):
+        raise error(BRACES, peek(P)[2])
+    raise error("what the block does goes on the next line, indented (4 spaces), not on the same line", peek(P)[2])
 
 
-def acepta_dedent(P):
-    if ver(P)[0] == "dedent":
-        tomar(P)
+def accept_dedent(P):
+    if peek(P)[0] == "dedent":
+        take(P)
 
 
-def bloque_o_cabecera(P):
-    return bloque(P)
+def block_or_header(P):
+    return block(P)
 
 
-def sentencia(P):
-    tok = ver(P)
+def statement(P):
+    tok = peek(P)
     L = tok[2]
     if tok[0] == "kw" and tok[1] == "else":
-        raise error("este «else» no tiene un «if» antes (o está con otra sangría que su if)", L)
-    if tok[0] == "name" and tok[1] in VIEJAS and not (es(P, "=", 1) or es(P, "(", 1) or es(P, ".", 1) or es(P, "[", 1)
-                                                      or es(P, "+=", 1) or es(P, "-=", 1)):
-        raise error(f"Cupcake ya no usa «{tok[1]}». Se escribe:  {VIEJAS[tok[1]]}", L)
+        raise error("this 'else' has no 'if' before it (or it is indented differently from its if)", L)
+    if tok[0] == "name" and tok[1] in OLD_WORDS and not (is_op(P, "=", 1) or is_op(P, "(", 1) or is_op(P, ".", 1) or is_op(P, "[", 1)
+                                                      or is_op(P, "+=", 1) or is_op(P, "-=", 1)):
+        raise error(f"Cupcake no longer uses '{tok[1]}'. Write:  {OLD_WORDS[tok[1]]}", L)
     if tok[0] == "indent":
-        raise error("esta línea tiene sangría de más (¿falta «:» en la línea de arriba?)", L)
-    if es(P, "{") or es(P, "}"):
-        raise error(LLAVES, L)
-    if tok[0] == "name" and tok[1] in PALABRAS_DE_PYTHON and (
-            ver(P, 1)[0] in ("name", "nl") or es(P, ":", 1) or tok[1] in ("def", "class", "else", "elif", "fn")):
-        cambio = PALABRAS_DE_PYTHON[tok[1]]
-        pista = f" Se escribe «{cambio}»." if cambio else " Cupcake no lo tiene."
-        raise error(f"«{tok[1]}» no es una palabra de Cupcake.{pista}", L)
+        raise error("this line is indented too much (is ':' missing on the line above?)", L)
+    if is_op(P, "{") or is_op(P, "}"):
+        raise error(BRACES, L)
+    if tok[0] == "name" and tok[1] in OTHER_WORDS and (
+            peek(P, 1)[0] in ("name", "nl") or is_op(P, ":", 1) or tok[1] in ("def", "class", "else", "elif", "fn")):
+        replacement = OTHER_WORDS[tok[1]]
+        hint = f" Write '{replacement}'." if replacement else " Cupcake doesn't have it."
+        raise error(f"'{tok[1]}' is not a Cupcake word.{hint}", L)
     if tok[0] == "kw":
         v = tok[1]
-        if v == "fx" and ver(P, 1)[0] == "name":
-            tomar(P)
-            n = nombre(P, "el nombre de la función")
-            no_tapar(n, L)
-            parametros = lista_parametros(P)
-            cuerpo = bloque_o_cabecera(P)
-            revisar_return(cuerpo)
-            return nodo("def", L, nombre=n, params=parametros, cuerpo=cuerpo)
+        if v == "fx" and peek(P, 1)[0] == "name":
+            take(P)
+            n = name(P, "the function's name")
+            dont_shadow(n, L)
+            parameters = parameter_list(P)
+            body = block_or_header(P)
+            check_return(body)
+            return node("def", L, name=n, params=parameters, body=body)
         if v == "if":
-            return sentencia_if(P)
+            return if_statement(P)
         if v == "when":
-            return sentencia_when(P)
+            return when_statement(P)
         if v == "while":
-            tomar(P)
-            return nodo("while", L, cond=expresion(P), cuerpo=bloque_o_cabecera(P))
+            take(P)
+            return node("while", L, cond=expression(P), body=block_or_header(P))
         if v == "repeat":
-            tomar(P)
-            return nodo("repeat", L, veces=expresion(P), cuerpo=bloque_o_cabecera(P))
+            take(P)
+            return node("repeat", L, times=expression(P), body=block_or_header(P))
         if v == "for":
-            tomar(P)
-            var, indice, iterable = cabeza_for(P, o_completo=True)
-            return nodo("for", L, var=var, iterable=iterable, indice=indice, cuerpo=bloque_o_cabecera(P))
+            take(P)
+            var, position, iterable = for_header(P, full_expression=True)
+            return node("for", L, var=var, iterable=iterable, position=position, body=block_or_header(P))
         if v == "return":
-            tomar(P)
-            valor = None if ver(P)[0] in ("nl", "eof", "dedent") else expresion(P)
-            return nodo("return", L, valor=valor)
+            take(P)
+            value = None if peek(P)[0] in ("nl", "eof", "dedent") else expression(P)
+            return node("return", L, value=value)
         if v in ("break", "continue", "stop"):
-            tomar(P)
-            return nodo(v, L)
+            take(P)
+            return node(v, L)
         if v == "raise":
-            tomar(P)
-            return nodo("raise", L, valor=expresion(P))
+            take(P)
+            return node("raise", L, value=expression(P))
         if v == "assert":
-            tomar(P)
-            inicio = P["i"]
-            cond = expresion(P)
-            texto = texto_de(P, inicio)
-            mensaje = expresion(P) if acepta(P, ",") else None
-            return nodo("assert", L, cond=cond, texto=texto, mensaje=mensaje)
+            take(P)
+            begin = P["i"]
+            cond = expression(P)
+            text = text_of(P, begin)
+            message = expression(P) if accept(P, ",") else None
+            return node("assert", L, cond=cond, text=text, message=message)
         if v == "try":
-            return sentencia_try(P)
+            return try_statement(P)
         if v == "use":
-            return sentencia_use(P)
-    e = expresion(P)
-    if es(P, "=") or es(P, "+=") or es(P, "-=") or es(P, "*=") or es(P, "/="):
-        op = tomar(P)[1]
-        if e["t"] not in ("name", "index", "campo"):
-            raise error("solo se puede asignar a una variable, a un elemento ([…]) o a un campo (.campo)", L)
+            return use_statement(P)
+    e = expression(P)
+    if is_op(P, "=") or is_op(P, "+=") or is_op(P, "-=") or is_op(P, "*=") or is_op(P, "/="):
+        op = take(P)[1]
+        if e["t"] not in ("name", "index", "field"):
+            raise error("you can only assign to a variable, an element ([…]) or a field (.field)", L)
         if e["t"] == "name":
-            no_tapar(e["nombre"], L)
-        valor = expresion(P)
+            dont_shadow(e["name"], L)
+        value = expression(P)
         if op != "=":
-            valor = nodo("bin", L, op=op[0], a=e, b=valor)
-        return nodo("asignar", L, destino=e, valor=valor)
-    return nodo("expr", L, expr=e)
+            value = node("bin", L, op=op[0], a=e, b=value)
+        return node("assign", L, target=e, value=value)
+    return node("expr", L, expr=e)
 
 
-def texto_de(P, inicio):
-    """Reconstruye el código de una expresión, para los mensajes de assert."""
-    partes = []
-    for tok in P["t"][inicio:P["i"]]:
+def text_of(P, begin):
+    """Rebuilds the code of an expression, for assert messages."""
+    parts = []
+    for tok in P["t"][begin:P["i"]]:
         if tok[0] == "str":
-            partes.append('"' + "".join(x if isinstance(x, str) else "{" + x[1] + "}" for x in tok[1]) + '"')
+            parts.append('"' + "".join(x if isinstance(x, str) else "{" + x[1] + "}" for x in tok[1]) + '"')
         else:
-            partes.append(str(tok[1]))
-    texto = " ".join(partes)
+            parts.append(str(tok[1]))
+    text = " ".join(parts)
     for a, b in ((" . ", "."), (" ( ", "("), (" )", ")"), ("( ", "("), (" [ ", "["), (" ]", "]"), (" ,", ",")):
-        texto = texto.replace(a, b)
-    return texto
+        text = text.replace(a, b)
+    return text
 
 
-def sentencia_if(P, como_valor=False):
-    L = tomar(P)[2]
-    ramas = [(expresion(P), bloque_o_cabecera(P))]
-    otro = None
+def if_statement(P, as_value=False):
+    L = take(P)[2]
+    branches = [(expression(P), block_or_header(P))]
+    otherwise = None
     while True:
-        guardado = P["i"]
-        saltar_lineas(P)
-        tok = ver(P)
+        saved = P["i"]
+        skip_newlines(P)
+        tok = peek(P)
         if tok[1] == "elif":
-            raise error("en Cupcake, «elif» se escribe «else if»", tok[2])
+            raise error("in Cupcake, 'elif' is written 'else if'", tok[2])
         if tok[0] == "name" and tok[1] == "other":
-            raise error(f"Cupcake ya no usa «other». Se escribe:  {VIEJAS['other']}", tok[2])
-        if not acepta(P, "else"):
-            P["i"] = guardado
+            raise error(f"Cupcake no longer uses 'other'. Write:  {OLD_WORDS['other']}", tok[2])
+        if not accept(P, "else"):
+            P["i"] = saved
             break
-        if acepta(P, "if"):
-            ramas.append((expresion(P), bloque_o_cabecera(P)))
+        if accept(P, "if"):
+            branches.append((expression(P), block_or_header(P)))
             continue
-        otro = bloque_o_cabecera(P)
+        otherwise = block_or_header(P)
         break
-    return nodo("ifvalor" if como_valor else "if", L, ramas=ramas, otro=otro)
+    return node("ifvalue" if as_value else "if", L, branches=branches, otherwise=otherwise)
 
 
-def cuerpo_de_caso(P):
-    """Lo que hace un caso de when: «:» y, debajo, un bloque con sangría."""
-    return bloque(P)
+def case_body(P):
+    """What a when case does: ':' and, below, an indented block."""
+    return block(P)
 
 
-def cuerpo_de_else(P):
-    return bloque(P)
+def else_body(P):
+    return block(P)
 
 
-def other_en_when(tok):
-    return error("en un when, el último caso se escribe «else:»", tok[2])
+def other_in_when(tok):
+    return error("in a when, the last case is written 'else:'", tok[2])
 
 
-def abrir_casos(P, L):
-    """Después de «when x»: «:» y los casos debajo, con sangría (o en la misma línea). Devuelve si van debajo."""
-    if es(P, "{"):
-        raise error(LLAVES, ver(P)[2])
-    espera(P, ":", "falta «:» al final del when:  when x:")
-    if ver(P)[0] not in ("nl", "eof"):
-        raise error("los casos del when van en las líneas de abajo, con sangría:  is 1:", ver(P)[2])
-    saltar_lineas(P)
-    if ver(P)[0] != "indent":
-        raise error("los casos del when van debajo, con sangría:  is 1:", L)
-    tomar(P)
+def open_cases(P, L):
+    """After 'when x': ':' and the cases below, indented. Returns True."""
+    if is_op(P, "{"):
+        raise error(BRACES, peek(P)[2])
+    expect(P, ":", "missing ':' at the end of the when:  when x:")
+    if peek(P)[0] not in ("nl", "eof"):
+        raise error("the cases of a when go on the lines below, indented:  is 1:", peek(P)[2])
+    skip_newlines(P)
+    if peek(P)[0] != "indent":
+        raise error("the cases of a when go below, indented:  is 1:", L)
+    take(P)
     return True
 
 
-def fin_de_casos(P, debajo):
-    if debajo:
-        return ver(P)[0] in ("dedent", "eof")
-    return ver(P)[0] in ("nl", "eof", "dedent") or es(P, ")") or es(P, "]") or es(P, ",")
+def end_of_cases(P, below):
+    if below:
+        return peek(P)[0] in ("dedent", "eof")
+    return peek(P)[0] in ("nl", "eof", "dedent") or is_op(P, ")") or is_op(P, "]") or is_op(P, ",")
 
 
-def patron_de_par(P, clase):
-    """Un patrón de un caso de when con varias cosas: un tipo o un valor (con is), o un grupo (con in)."""
-    if clase == "is" and ((ver(P)[0] == "name" and ver(P)[1] in TIPOS) or es(P, "none")):
-        return ("tipo", tomar(P)[1])
-    return ("valor" if clase == "is" else "en", no(P))
+def pair_pattern(P, kind):
+    """A pattern of a when case with several things: a type or a value (with is), or a group (with in)."""
+    if kind == "is" and ((peek(P)[0] == "name" and peek(P)[1] in TYPES) or is_op(P, "none")):
+        return ("type_", take(P)[1])
+    return ("value" if kind == "is" else "in", not_(P))
 
 
-def casos_de_par(P, clase, cuantos, nombres, L):
-    """«"agua" and "fuego", "fuego" and "planta"»: alternativas separadas por coma, cada una con un patrón por cosa."""
-    alternativas = []
+def pair_cases(P, kind, how_many, names, L):
+    """'"water" and "fire", "fire" and "grass"': alternatives separated by commas, each with one pattern per thing."""
+    alternatives = []
     while True:
-        alt = [patron_de_par(P, clase)]
-        while acepta(P, "and"):
-            alt.append(patron_de_par(P, clase))
-        if len(alt) != cuantos:
-            raise error(f"este when compara {cuantos} cosas ({nombres}): cada caso necesita {cuantos} valores unidos con «and», "
-                        f"como  {clase} {' and '.join(['…'] * cuantos)}: …", L)
-        alternativas.append(alt)
-        if not acepta(P, ","):
-            return alternativas
+        alt = [pair_pattern(P, kind)]
+        while accept(P, "and"):
+            alt.append(pair_pattern(P, kind))
+        if len(alt) != how_many:
+            raise error(f"this when compares {how_many} things ({names}): each case needs {how_many} values joined with 'and', "
+                        f"like  {kind} {' and '.join(['…'] * how_many)}: …", L)
+        alternatives.append(alt)
+        if not accept(P, ","):
+            return alternatives
 
 
-def sentencia_when(P, como_valor=False):
-    L = tomar(P)[2]
-    # «when ataque and defensor:  is "agua" and "fuego": …» compara varias cosas a la vez
-    inicio = P["i"]
-    sujetos = [no(P)]
-    while acepta(P, "and"):
-        sujetos.append(no(P))
-    if len(sujetos) > 1 and (es(P, ":") or es(P, "{")):
-        return when_de_varias(P, L, sujetos, inicio, como_valor)
-    P["i"] = inicio
-    valor = expresion(P)
-    debajo = abrir_casos(P, L)
-    casos, otro = [], None
-    while not fin_de_casos(P, debajo):
-        tok = ver(P)
+def when_statement(P, as_value=False):
+    L = take(P)[2]
+    # 'when attack and defender:  is "water" and "fire": …' compares several things at once
+    begin = P["i"]
+    subjects = [not_(P)]
+    while accept(P, "and"):
+        subjects.append(not_(P))
+    if len(subjects) > 1 and (is_op(P, ":") or is_op(P, "{")):
+        return multi_when(P, L, subjects, begin, as_value)
+    P["i"] = begin
+    value = expression(P)
+    below = open_cases(P, L)
+    cases, otherwise = [], None
+    while not end_of_cases(P, below):
+        tok = peek(P)
         if tok[0] == "name" and tok[1] == "other":
-            raise other_en_when(tok)
-        if acepta(P, "else"):
-            otro = cuerpo_de_else(P)
-        elif acepta(P, "is"):
-            negado = bool(acepta(P, "not"))
-            if (ver(P)[0] == "name" and ver(P)[1] in TIPOS) or es(P, "none"):
-                patron = ("tipo", tomar(P)[1])
+            raise other_in_when(tok)
+        if accept(P, "else"):
+            otherwise = else_body(P)
+        elif accept(P, "is"):
+            negated = bool(accept(P, "not"))
+            if (peek(P)[0] == "name" and peek(P)[1] in TYPES) or is_op(P, "none"):
+                pattern = ("type_", take(P)[1])
             else:
-                valores = [o(P)]
-                while acepta(P, ","):
-                    valores.append(o(P))
-                patron = ("valores", valores)
-            casos.append((patron, negado, cuerpo_de_caso(P), tok[2]))
-        elif acepta(P, "in"):
-            casos.append((("en", o(P)), False, cuerpo_de_caso(P), tok[2]))
+                values_ = [or_(P)]
+                while accept(P, ","):
+                    values_.append(or_(P))
+                pattern = ("values", values_)
+            cases.append((pattern, negated, case_body(P), tok[2]))
+        elif accept(P, "in"):
+            cases.append((("in", or_(P)), False, case_body(P), tok[2]))
         else:
-            raise error("cada caso de when empieza con «is», «in» o «else»:  is \"rojo\": show(\"rojo\")", tok[2])
-        if debajo:
-            saltar_lineas(P)
-    if debajo:
-        acepta_dedent(P)
-    return nodo("whenvalor" if como_valor else "when", L, valor=valor, casos=casos, otro=otro)
+            raise error("each case of a when starts with 'is', 'in' or 'else':  is \"red\":", tok[2])
+        if below:
+            skip_newlines(P)
+    if below:
+        accept_dedent(P)
+    return node("whenvalue" if as_value else "when", L, value=value, cases=cases, otherwise=otherwise)
 
 
-def when_de_varias(P, L, sujetos, inicio, como_valor):
-    nombres = " and ".join(nombre_de(s) or "…" for s in sujetos)
-    debajo = abrir_casos(P, L)
-    casos, otro = [], None
-    while not fin_de_casos(P, debajo):
-        tok = ver(P)
+def multi_when(P, L, subjects, begin, as_value):
+    names = " and ".join(name_of(s) or "…" for s in subjects)
+    below = open_cases(P, L)
+    cases, otherwise = [], None
+    while not end_of_cases(P, below):
+        tok = peek(P)
         if tok[0] == "name" and tok[1] == "other":
-            raise other_en_when(tok)
-        if acepta(P, "else"):
-            otro = cuerpo_de_else(P)
+            raise other_in_when(tok)
+        if accept(P, "else"):
+            otherwise = else_body(P)
         elif tok[0] == "kw" and tok[1] in ("is", "in"):
-            clase = tomar(P)[1]
-            negado = clase == "is" and bool(acepta(P, "not"))
-            alternativas = casos_de_par(P, clase, len(sujetos), nombres, tok[2])
-            casos.append((("pares", alternativas), negado, cuerpo_de_caso(P), tok[2]))
+            kind = take(P)[1]
+            negated = kind == "is" and bool(accept(P, "not"))
+            alternatives = pair_cases(P, kind, len(subjects), names, tok[2])
+            cases.append((("pairs", alternatives), negated, case_body(P), tok[2]))
         else:
-            raise error(f"cada caso de when empieza con «is», «in» o «else»:  is {' and '.join(['…'] * len(sujetos))}: …", tok[2])
-        if debajo:
-            saltar_lineas(P)
-    if debajo:
-        acepta_dedent(P)
-    return nodo("whenvalor" if como_valor else "when", L, valor=None, sujetos=sujetos, casos=casos, otro=otro)
+            raise error(f"each case of a when starts with 'is', 'in' or 'else':  is {' and '.join(['…'] * len(subjects))}: …", tok[2])
+        if below:
+            skip_newlines(P)
+    if below:
+        accept_dedent(P)
+    return node("whenvalue" if as_value else "when", L, value=None, subjects=subjects, cases=cases, otherwise=otherwise)
 
 
-def sentencia_try(P):
-    L = tomar(P)[2]
-    cuerpo = bloque_o_cabecera(P)
-    var = manejo = final = None
-    guardado = P["i"]
-    saltar_lineas(P)
-    if acepta(P, "except"):
-        if ver(P)[0] == "name":
-            var = tomar(P)[1]
-        manejo = bloque_o_cabecera(P)
-        guardado = P["i"]
-        saltar_lineas(P)
-    if acepta(P, "finally"):
-        final = bloque_o_cabecera(P)
+def try_statement(P):
+    L = take(P)[2]
+    body = block_or_header(P)
+    var = handler = finally_ = None
+    saved = P["i"]
+    skip_newlines(P)
+    if accept(P, "except"):
+        if peek(P)[0] == "name":
+            var = take(P)[1]
+        handler = block_or_header(P)
+        saved = P["i"]
+        skip_newlines(P)
+    if accept(P, "finally"):
+        finally_ = block_or_header(P)
     else:
-        P["i"] = guardado
-    if manejo is None and final is None:
-        raise error("después de try va «except» o «finally»", L)
-    return nodo("try", L, cuerpo=cuerpo, var=var, manejo=manejo, final=final)
+        P["i"] = saved
+    if handler is None and finally_ is None:
+        raise error("after try comes 'except' or 'finally'", L)
+    return node("try", L, body=body, var=var, handler=handler, finally_=finally_)
 
 
-def sentencia_use(P):
-    L = tomar(P)[2]
-    nombres = []
+def use_statement(P):
+    L = take(P)[2]
+    names = []
     while True:
-        n = nombre(P, "el nombre de lo que quieres usar")
-        alias = nombre(P, "el nuevo nombre") if acepta(P, "as") else n
-        nombres.append((n, alias))
-        if not acepta(P, ","):
+        n = name(P, "the name of what you want to use")
+        alias = name(P, "the new name") if accept(P, "as") else n
+        names.append((n, alias))
+        if not accept(P, ","):
             break
-    if acepta(P, "from"):
-        modulo = nombre(P, "el nombre del archivo")
-        return nodo("use", L, modulo=modulo, nombres=nombres)
-    if len(nombres) > 1 or nombres[0][0] != nombres[0][1]:
-        raise error("falta «from»: use curar, describir from pokemon", L)
-    return nodo("use", L, modulo=nombres[0][0], nombres=None)
+    if accept(P, "from"):
+        module = name(P, "the file name")
+        return node("use", L, module=module, names=names)
+    if len(names) > 1 or names[0][0] != names[0][1]:
+        raise error("missing 'from':  use heal, describe from pokemon", L)
+    return node("use", L, module=names[0][0], names=None)
 
 
-def lista_parametros(P):
-    espera(P, "(")
+def parameter_list(P):
+    expect(P, "(")
     params = []
-    while not es(P, ")"):
-        n = nombre(P, "el nombre de un parámetro")
-        no_tapar(n, ver(P)[2])
-        defecto = expresion(P) if acepta(P, "=") else None
-        params.append((n, defecto))
-        if not acepta(P, ","):
+    while not is_op(P, ")"):
+        n = name(P, "a parameter name")
+        dont_shadow(n, peek(P)[2])
+        default = expression(P) if accept(P, "=") else None
+        params.append((n, default))
+        if not accept(P, ","):
             break
-    espera(P, ")")
+    expect(P, ")")
     return params
 
 
-# -- expresiones, de menor a mayor prioridad
+# -- expressions, from lowest to highest priority
 
-def expresion(P):
-    e = o(P)
-    # «else» como reserva: si lo de la izquierda falla, vale lo de la derecha.
-    while es(P, "else") and not es(P, ":", 1) and not es(P, "if", 1):
-        L = tomar(P)[2]
-        e = nodo("reserva", L, a=e, b=o(P))
+def expression(P):
+    e = or_(P)
+    # 'else' as a fallback: if the left side fails, the right side is used.
+    while is_op(P, "else") and not is_op(P, ":", 1) and not is_op(P, "if", 1):
+        L = take(P)[2]
+        e = node("fallback", L, a=e, b=or_(P))
     return e
 
 
-def fx_anonima(P, L):
-    """fx(p): … o fx: … (con «it»): una función sin nombre."""
-    params = lista_parametros(P) if es(P, "(") else [("it", None)]
-    if es(P, "=>"):
-        raise error("Cupcake ya no usa «=>». Escribe:  fx(p): p.vida > 0", ver(P)[2])
-    if es(P, ":") and ver(P, 1)[0] not in ("nl", "eof"):     # fx: it.vida   → da ese valor
-        tomar(P)
-        return nodo("anon", L, params=params, cuerpo=expresion(P), lam=True)
-    cuerpo = bloque_o_cabecera(P)
-    revisar_return(cuerpo)
-    return nodo("anon", L, params=params, cuerpo=cuerpo, lam=False)
+def anonymous_fx(P, L):
+    """fx(p): … or fx: … (with 'it'): a function without a name."""
+    params = parameter_list(P) if is_op(P, "(") else [("it", None)]
+    if is_op(P, "=>"):
+        raise error("Cupcake no longer uses '=>'. Write:  fx(p): p.hp > 0", peek(P)[2])
+    if is_op(P, ":") and peek(P, 1)[0] not in ("nl", "eof"):     # fx: it.hp   → gives that value
+        take(P)
+        return node("anon", L, params=params, body=expression(P), lam=True)
+    body = block_or_header(P)
+    check_return(body)
+    return node("anon", L, params=params, body=body, lam=False)
 
 
-def o(P):
-    a = y(P)
-    while es(P, "or"):
-        L = tomar(P)[2]
-        a = nodo("o", L, a=a, b=y(P))
+def or_(P):
+    a = and_(P)
+    while is_op(P, "or"):
+        L = take(P)[2]
+        a = node("or", L, a=a, b=and_(P))
     return a
 
 
-def y(P):
-    a = no(P)
-    while es(P, "and"):
-        L = tomar(P)[2]
-        a = nodo("y", L, a=a, b=no(P))
+def and_(P):
+    a = not_(P)
+    while is_op(P, "and"):
+        L = take(P)[2]
+        a = node("and", L, a=a, b=not_(P))
     return a
 
 
-def no(P):
-    if es(P, "not"):
-        L = tomar(P)[2]
-        return nodo("no", L, a=no(P))
-    return comparacion(P)
+def not_(P):
+    if is_op(P, "not"):
+        L = take(P)[2]
+        return node("not", L, a=not_(P))
+    return comparison(P)
 
 
-COMPARACIONES = ("==", "!=", "<", ">", "<=", ">=")
+COMPARISONS = ("==", "!=", "<", ">", "<=", ">=")
 
 
-def comparacion(P):
-    a = rango(P)
-    tok = ver(P)
+def comparison(P):
+    a = range_(P)
+    tok = peek(P)
     L = tok[2]
-    if tok[0] == "op" and tok[1] in COMPARACIONES:
-        t = tomar(P)
-        e = nodo("bin", t[2], op=t[1], a=a, b=rango(P))
-        if ver(P)[0] == "op" and ver(P)[1] in COMPARACIONES:
-            raise error("compara de a una cosa:  x > 0 and x < 10  (o, para un rango:  x in 0..10)", L)
+    if tok[0] == "op" and tok[1] in COMPARISONS:
+        t = take(P)
+        e = node("bin", t[2], op=t[1], a=a, b=range_(P))
+        if peek(P)[0] == "op" and peek(P)[1] in COMPARISONS:
+            raise error("compare one thing at a time:  x > 0 and x < 10  (or, for a range:  x in 0..10)", L)
         return e
-    if es(P, "in"):
-        tomar(P)
-        return nodo("en", L, a=a, b=rango(P))
-    if es(P, "not") and es(P, "in", 1):
-        tomar(P)
-        tomar(P)
-        return nodo("no", L, a=nodo("en", L, a=a, b=rango(P)))
-    if es(P, "has"):
-        tomar(P)
-        negado = bool(acepta(P, "not"))
-        if ver(P)[0] != "name":
-            raise error("después de «has» va el nombre de un campo:  pika has vida. "
-                        "Para preguntar si algo está en una lista o un texto se usa in:  \"Pikachu\" in equipo", L)
-        e = nodo("tiene", L, obj=a, campos=campos_de_has(P))
-        return nodo("no", L, a=e) if negado else e
-    if es(P, "is"):
-        tomar(P)
-        negado = bool(acepta(P, "not"))
-        if (ver(P)[0] == "name" and ver(P)[1] in TIPOS) or es(P, "none"):
-            e = nodo("es_tipo", L, a=a, tipo=tomar(P)[1])
+    if is_op(P, "in"):
+        take(P)
+        return node("in", L, a=a, b=range_(P))
+    if is_op(P, "not") and is_op(P, "in", 1):
+        take(P)
+        take(P)
+        return node("not", L, a=node("in", L, a=a, b=range_(P)))
+    if is_op(P, "has"):
+        take(P)
+        negated = bool(accept(P, "not"))
+        if peek(P)[0] != "name":
+            raise error("after 'has' comes a field name:  pika has hp. "
+                        "To ask whether something is in a list or a text, use in:  \"Pikachu\" in team", L)
+        e = node("has", L, obj=a, fields=has_fields(P))
+        return node("not", L, a=e) if negated else e
+    if is_op(P, "is"):
+        take(P)
+        negated = bool(accept(P, "not"))
+        if (peek(P)[0] == "name" and peek(P)[1] in TYPES) or is_op(P, "none"):
+            e = node("is_type", L, a=a, type_=take(P)[1])
         else:
-            raise error("fuera de un when, «is» es para tipos (x is number, x is empty). "
-                        "Para comparar valores se usa ==:  color == \"rojo\"", L)
-        return nodo("no", L, a=e) if negado else e
-    if ver(P)[0] == "name" and ver(P)[1] == "between":
-        raise error(f"Cupcake ya no usa «between». Se escribe:  {VIEJAS['between']}", L)
+            raise error("outside a when, 'is' is for types (x is number, x is empty). "
+                        "To compare values use ==:  color == \"red\"", L)
+        return node("not", L, a=e) if negated else e
+    if peek(P)[0] == "name" and peek(P)[1] == "between":
+        raise error(f"Cupcake no longer uses 'between'. Write:  {OLD_WORDS['between']}", L)
     return a
 
 
-FIN_DE_CAMPOS = (":", ")", ",", "]", "else")
+END_OF_FIELDS = (":", ")", ",", "]", "else")
 
 
-def campos_de_has(P):
-    """Después de has: un campo, o varios unidos con and / or:  pika has piedra and amistad.
-    Un «and» sigue la lista solo si lo que viene es otro campo suelto (no  «and rival has vida»)."""
-    def termino():
-        return ("campo", nombre(P, "el nombre de un campo"))
+def has_fields(P):
+    """After has: a field, or several joined with and / or:  pika has stone and friendship.
+    An 'and' continues the list only if what follows is another bare field (not  'and rival has hp')."""
+    def term():
+        return ("field", name(P, "a field name"))
 
-    def sigue_campo():
-        if not (es(P, "and") or es(P, "or")) or ver(P, 1)[0] != "name":
+    def next_is_field():
+        if not (is_op(P, "and") or is_op(P, "or")) or peek(P, 1)[0] != "name":
             return False
-        despues = ver(P, 2)
-        return despues[0] in ("nl", "eof", "dedent") or (despues[0] in ("op", "kw") and despues[1] in FIN_DE_CAMPOS + ("and", "or"))
+        after = peek(P, 2)
+        return after[0] in ("nl", "eof", "dedent") or (after[0] in ("op", "kw") and after[1] in END_OF_FIELDS + ("and", "or"))
 
-    arbol = termino()
-    while sigue_campo():
-        op = tomar(P)[1]
-        arbol = ("y" if op == "and" else "o", arbol, termino())
-    return arbol
-
-
-def termina_rango(P):
-    return es(P, "]") or es(P, ")") or es(P, ",") or ver(P)[0] in ("nl", "eof") or es(P, ":") or es(P, "by") or es(P, "at")
+    tree = term()
+    while next_is_field():
+        op = take(P)[1]
+        tree = ("and" if op == "and" else "or", tree, term())
+    return tree
 
 
-def cabeza_for(P, o_completo):
-    """for p in lista  ·  for i, p at lista  ·  for i at lista.  Devuelve (variable, posición, recorrible)."""
-    if ver(P)[0] == "name" and ver(P)[1] == "each":
-        raise error(f"Cupcake ya no usa «each». Se escribe:  {VIEJAS['each']}", ver(P)[2])
-    nombres = [nombre(P, "el nombre de la variable del ciclo")]
-    if acepta(P, ","):
-        nombres.append(nombre(P, "el nombre de la variable del ciclo"))
-    for n in nombres:
-        no_tapar(n, ver(P)[2])
-    leer = expresion if o_completo else o
-    if acepta(P, "in"):
-        if len(nombres) == 2:
-            raise error(f"con dos nombres se usa at:  for {nombres[0]}, {nombres[1]} at …", ver(P)[2])
-        iterable = leer(P)
-        if es(P, "at"):
-            raise error(f"la posición va primero:  for posicion, {nombres[0]} at …", ver(P)[2])
-        return nombres[0], None, iterable
-    if acepta(P, "at"):
-        iterable = leer(P)
-        if len(nombres) == 1:
-            return None, nombres[0], iterable
-        return nombres[1], nombres[0], iterable
-    raise error("después de la variable va «in» (cada cosa) o «at» (las posiciones):  for p in equipo", ver(P)[2])
+def range_ends(P):
+    return is_op(P, "]") or is_op(P, ")") or is_op(P, ",") or peek(P)[0] in ("nl", "eof") or is_op(P, ":") or is_op(P, "by") or is_op(P, "at")
 
 
-def rango(P):
-    if es(P, ".."):                                   # ..b: solo dentro de [ ]
-        L = tomar(P)[2]
-        return nodo("rango", L, a=None, b=suma(P), paso=None)
-    a = suma(P)
-    if es(P, ".."):
-        L = tomar(P)[2]
-        b = None if termina_rango(P) else suma(P)
-        paso = suma(P) if acepta(P, "by") else None
-        return nodo("rango", L, a=a, b=b, paso=paso)
+def for_header(P, full_expression):
+    """for p in list  ·  for i, p at list  ·  for i at list.  Returns (variable, position, iterable)."""
+    if peek(P)[0] == "name" and peek(P)[1] == "each":
+        raise error(f"Cupcake no longer uses 'each'. Write:  {OLD_WORDS['each']}", peek(P)[2])
+    names = [name(P, "the name of the loop variable")]
+    if accept(P, ","):
+        names.append(name(P, "the name of the loop variable"))
+    for n in names:
+        dont_shadow(n, peek(P)[2])
+    read_with = expression if full_expression else or_
+    if accept(P, "in"):
+        if len(names) == 2:
+            raise error(f"with two names use at:  for {names[0]}, {names[1]} at …", peek(P)[2])
+        iterable = read_with(P)
+        if is_op(P, "at"):
+            raise error(f"the position goes first:  for position, {names[0]} at …", peek(P)[2])
+        return names[0], None, iterable
+    if accept(P, "at"):
+        iterable = read_with(P)
+        if len(names) == 1:
+            return None, names[0], iterable
+        return names[1], names[0], iterable
+    raise error("after the variable comes 'in' (each thing) or 'at' (the positions):  for p in team", peek(P)[2])
+
+
+def range_(P):
+    if is_op(P, ".."):                                   # ..b: only inside [ ]
+        L = take(P)[2]
+        return node("range", L, a=None, b=sum_expr(P), step=None)
+    a = sum_expr(P)
+    if is_op(P, ".."):
+        L = take(P)[2]
+        b = None if range_ends(P) else sum_expr(P)
+        step = sum_expr(P) if accept(P, "by") else None
+        return node("range", L, a=a, b=b, step=step)
     return a
 
 
-def suma(P):
-    a = producto(P)
-    while ver(P)[0] == "op" and ver(P)[1] in ("+", "-"):
-        tok = tomar(P)
-        a = nodo("bin", tok[2], op=tok[1], a=a, b=producto(P))
+def sum_expr(P):
+    a = product(P)
+    while peek(P)[0] == "op" and peek(P)[1] in ("+", "-"):
+        tok = take(P)
+        a = node("bin", tok[2], op=tok[1], a=a, b=product(P))
     return a
 
 
-def producto(P):
-    a = unario(P)
-    while ver(P)[0] == "op" and ver(P)[1] in ("*", "/", "//", "%"):
-        tok = tomar(P)
-        a = nodo("bin", tok[2], op=tok[1], a=a, b=unario(P))
+def product(P):
+    a = unary(P)
+    while peek(P)[0] == "op" and peek(P)[1] in ("*", "/", "//", "%"):
+        tok = take(P)
+        a = node("bin", tok[2], op=tok[1], a=a, b=unary(P))
     return a
 
 
-def unario(P):
-    if ver(P)[0] == "op" and ver(P)[1] in ("-", "+"):
-        tok = tomar(P)
-        return nodo("neg" if tok[1] == "-" else "pos", tok[2], a=unario(P))
-    return potencia(P)
+def unary(P):
+    if peek(P)[0] == "op" and peek(P)[1] in ("-", "+"):
+        tok = take(P)
+        return node("neg" if tok[1] == "-" else "pos", tok[2], a=unary(P))
+    return power(P)
 
 
-def potencia(P):
-    a = postfijo(P)
-    if es(P, "**"):
-        L = tomar(P)[2]
-        return nodo("bin", L, op="**", a=a, b=unario(P))
+def power(P):
+    a = postfix(P)
+    if is_op(P, "**"):
+        L = take(P)[2]
+        return node("bin", L, op="**", a=a, b=unary(P))
     return a
 
 
-SUGERENCIAS_METODOS = {
+METHOD_HINTS = {
     "append": "add", "remove": "drop", "sort": "sorted", "reverse": "reversed", "pop": "drop",
     "upper": "upper", "lower": "lower", "strip": "strip", "split": "split", "replace": "replace",
-    "keys": "keys", "values": "values", "items": "keys", "get": "dic[clave] other valor", "join": "join", "insert": "add",
-    "extend": "+", "count": "count", "index": "in", "format": "\"{…}\"", "startswith": "has", "endswith": "has",
+    "keys": "keys", "values": "values", "items": "keys", "get": "dict[key] else value", "join": "join", "insert": "add",
+    "extend": "+", "count": "count", "index": "in", "format": "\"{…}\"", "startswith": "in", "endswith": "in",
 }
-CAMBIAN_EL_DATO = {"append", "remove", "sort", "reverse", "pop", "insert", "extend"}
+CHANGE_THE_DATA = {"append", "remove", "sort", "reverse", "pop", "insert", "extend"}
 
 
-def postfijo(P):
-    e = primario(P)
+def postfix(P):
+    e = primary(P)
     while True:
-        tok = ver(P)
-        if es(P, "("):
-            tomar(P)
-            posicionales, nombrados = [], []
-            while not es(P, ")"):
-                if ver(P)[0] == "name" and es(P, "=", 1):
-                    n = tomar(P)[1]
-                    tomar(P)
-                    nombrados.append((n, expresion(P)))
+        tok = peek(P)
+        if is_op(P, "("):
+            take(P)
+            positional, named = [], []
+            while not is_op(P, ")"):
+                if peek(P)[0] == "name" and is_op(P, "=", 1):
+                    n = take(P)[1]
+                    take(P)
+                    named.append((n, expression(P)))
                 else:
-                    if nombrados:
-                        raise error("los datos sin nombre van antes de los que tienen nombre", ver(P)[2])
-                    posicionales.append(expresion(P))
-                if not acepta(P, ","):
+                    if named:
+                        raise error("values without a name go before the ones with a name", peek(P)[2])
+                    positional.append(expression(P))
+                if not accept(P, ","):
                     break
-            espera(P, ")", "falta cerrar el paréntesis «)» de esta llamada")
-            e = nodo("llamar", tok[2], f=e, args=posicionales, nombrados=nombrados)
-        elif es(P, "["):
-            tomar(P)
-            indice = expresion(P)
-            espera(P, "]")
-            e = nodo("index", tok[2], obj=e, idx=indice)
-        elif es(P, "."):
-            tomar(P)
-            campo = nombre(P, "el nombre de un campo")
-            if es(P, "(") and ver(P)[2] == tok[2]:
-                raise error(mensaje_metodo(e, campo, argumentos_como_texto(P)), tok[2])
-            e = nodo("campo", tok[2], obj=e, campo=campo)
+            expect(P, ")", "the ')' of this call is missing")
+            e = node("call", tok[2], f=e, args=positional, named=named)
+        elif is_op(P, "["):
+            take(P)
+            position = expression(P)
+            expect(P, "]")
+            e = node("index", tok[2], obj=e, idx=position)
+        elif is_op(P, "."):
+            take(P)
+            field = name(P, "a field name")
+            if is_op(P, "(") and peek(P)[2] == tok[2]:
+                raise error(method_message(e, field, args_as_text(P)), tok[2])
+            e = node("field", tok[2], obj=e, field=field)
         else:
             return e
 
 
-def argumentos_como_texto(P):
-    """El código que va entre los paréntesis de una llamada, para sugerirlo en un mensaje."""
-    inicio, nivel, j = P["i"], 0, P["i"]
+def args_as_text(P):
+    """The code between the parentheses of a call, to suggest it in a message."""
+    begin, level, j = P["i"], 0, P["i"]
     while j < len(P["t"]):
         v = P["t"][j]
         if v[0] == "op" and v[1] in "([":
-            nivel += 1
+            level += 1
         elif v[0] == "op" and v[1] in ")]":
-            nivel -= 1
-            if nivel == 0:
+            level -= 1
+            if level == 0:
                 break
         elif v[0] in ("nl", "eof"):
             break
         j += 1
-    guardado = P["i"]
+    saved = P["i"]
     P["i"] = j
-    texto = texto_de(P, inicio + 1)
-    P["i"] = guardado
-    return texto
+    text = text_of(P, begin + 1)
+    P["i"] = saved
+    return text
 
 
-def mensaje_metodo(obj, metodo, args):
-    quien = obj["nombre"] if obj["t"] == "name" else "dato"
-    funcion = SUGERENCIAS_METODOS.get(metodo, metodo)
-    dentro = f"{quien}, {args}" if args else quien
-    if metodo in CAMBIAN_EL_DATO:
-        ejemplo = f"{quien} = {funcion}({dentro})"
-    elif metodo == "join":
-        ejemplo = f"join(lista, {quien})"
+def method_message(obj, method, args):
+    who = obj["name"] if obj["t"] == "name" else "datum"
+    func = METHOD_HINTS.get(method, method)
+    inner = f"{who}, {args}" if args else who
+    if method in CHANGE_THE_DATA:
+        example = f"{who} = {func}({inner})"
+    elif method == "join":
+        example = f"join(list, {who})"
     else:
-        ejemplo = f"{funcion}({dentro})" if funcion.isidentifier() else funcion
-    return f"Cupcake no tiene métodos: «.{metodo}(…)» no existe. Escribe:  {ejemplo}"
+        example = f"{func}({inner})" if func.isidentifier() else func
+    return f"Cupcake has no methods: '.{method}(…)' doesn't exist. Write:  {example}"
 
 
-def primario(P):
-    tok = tomar(P)
-    tipo, v, L = tok
-    if tipo == "num":
-        return nodo("lit", L, valor=v)
-    if tipo == "str":
-        return texto_nodo(v, L)
-    if tipo == "kw" and v in ("true", "false", "none"):
-        return nodo("lit", L, valor={"true": True, "false": False, "none": None}[v])
-    if tipo == "kw" and v == "fx":
-        return fx_anonima(P, L)
-    if tipo == "kw" and v in ("if", "when"):
-        raise error(f"«{v}» no da un valor. Guarda el valor dentro de cada caso:\n"
-                    f"    mensaje = \"\"\n    {v} …:\n        mensaje = \"…\"", L)
-    if tipo == "name":
-        if v in PALABRAS_DE_PYTHON and PALABRAS_DE_PYTHON[v] and (v[0].isupper() or v in ("lam", "lambda")):
-            raise error(f"«{v}» no es una palabra de Cupcake. Se escribe «{PALABRAS_DE_PYTHON[v]}».", L)
-        return nodo("name", L, nombre=v)
-    if tipo == "op" and v == "=>":
-        raise error("Cupcake ya no usa «=>». Una función sin nombre se escribe:  fx(p): p.vida > 0", L)
-    if tipo == "op" and v == "(":
-        if es(P, ")"):
-            raise error("un registro necesita al menos un campo:  (nombre: \"Pikachu\")", L)
-        if ver(P)[0] in ("name", "str") and es(P, ":", 1):      # (campo: valor, …) es un registro
-            return registro(P, L)
-        e = expresion(P)
-        espera(P, ")", "falta cerrar el paréntesis «)»")
+def primary(P):
+    tok = take(P)
+    type_, v, L = tok
+    if type_ == "num":
+        return node("lit", L, value=v)
+    if type_ == "str":
+        return text_node(v, L)
+    if type_ == "kw" and v in ("true", "false", "none"):
+        return node("lit", L, value={"true": True, "false": False, "none": None}[v])
+    if type_ == "kw" and v == "fx":
+        return anonymous_fx(P, L)
+    if type_ == "kw" and v in ("if", "when"):
+        raise error(f"'{v}' doesn't give a value. Store the value inside each case:\n"
+                    f"    message = \"\"\n    {v} …:\n        message = \"…\"", L)
+    if type_ == "name":
+        if v in OTHER_WORDS and OTHER_WORDS[v] and (v[0].isupper() or v in ("lam", "lambda")):
+            raise error(f"'{v}' is not a Cupcake word. Write '{OTHER_WORDS[v]}'.", L)
+        return node("name", L, name=v)
+    if type_ == "op" and v == "=>":
+        raise error("Cupcake no longer uses '=>'. A function without a name is written:  fx(p): p.hp > 0", L)
+    if type_ == "op" and v == "(":
+        if is_op(P, ")"):
+            raise error("a record needs at least one field:  (name: \"Pikachu\")", L)
+        if peek(P)[0] in ("name", "str") and is_op(P, ":", 1):      # (field: value, …) is a record
+            return record(P, L)
+        e = expression(P)
+        expect(P, ")", "the closing ')' is missing")
         return e
-    if tipo == "op" and v == "[":
-        return lista_o_diccionario(P, L)
-    if tipo == "op" and v == "{":
-        raise error("Cupcake no usa llaves. Un registro se escribe con paréntesis:  "
-                    "(nombre: \"Pikachu\", vida: 35)", L)
-    que = "el final de la línea" if tipo == "nl" else "el final del archivo" if tipo == "eof" else f"«{v}»"
-    raise error(f"no esperaba {que} aquí", L)
+    if type_ == "op" and v == "[":
+        return list_or_dict(P, L)
+    if type_ == "op" and v == "{":
+        raise error("Cupcake doesn't use braces. A record is written with parentheses:  "
+                    "(name: \"Pikachu\", hp: 35)", L)
+    what = "the end of the line" if type_ == "nl" else "the end of the file" if type_ == "eof" else f"'{v}'"
+    raise error(f"I didn't expect {what} here", L)
 
 
-def texto_nodo(partes, L):
-    if all(isinstance(p, str) for p in partes):
-        return nodo("lit", L, valor="".join(partes))
-    piezas = []
-    for p in partes:
+def text_node(parts, L):
+    if all(isinstance(p, str) for p in parts):
+        return node("lit", L, value="".join(parts))
+    pieces = []
+    for p in parts:
         if isinstance(p, str):
-            piezas.append(p)
+            pieces.append(p)
         else:
-            sub = {"t": tokenizar(p[1], p[2]), "i": 0}
-            e = expresion(sub)
-            if ver(sub)[0] not in ("nl", "eof"):
-                raise error(f"no entiendo lo que está entre llaves: «{{{p[1]}}}»", p[2])
-            piezas.append(e)
-    return nodo("texto", L, piezas=piezas)
+            sub = {"t": tokenize(p[1], p[2]), "i": 0}
+            e = expression(sub)
+            if peek(sub)[0] not in ("nl", "eof"):
+                raise error(f"I don't understand what's between the braces: '{{{p[1]}}}'", p[2])
+            pieces.append(e)
+    return node("text", L, pieces=pieces)
 
 
-def lista_o_diccionario(P, L):
-    if es(P, ":") and es(P, "]", 1):
-        tomar(P)
-        tomar(P)
-        return nodo("dic", L, pares=[])
-    if acepta(P, "]"):
-        return nodo("lista", L, items=[])
-    primero = expresion(P)
-    if acepta(P, ":"):                                # diccionario
-        valor = expresion(P)
-        if es(P, "for"):
-            return comprension(P, L, clave=primero, valor=valor)
-        pares = [(primero, valor)]
-        while acepta(P, ","):
-            if es(P, "]"):
+def list_or_dict(P, L):
+    if is_op(P, ":") and is_op(P, "]", 1):
+        take(P)
+        take(P)
+        return node("dict", L, pairs=[])
+    if accept(P, "]"):
+        return node("list", L, items=[])
+    first_ = expression(P)
+    if accept(P, ":"):                                # dictionary
+        value = expression(P)
+        if is_op(P, "for"):
+            return comprehension(P, L, key=first_, value=value)
+        pairs = [(first_, value)]
+        while accept(P, ","):
+            if is_op(P, "]"):
                 break
-            k = expresion(P)
-            espera(P, ":", "en un diccionario cada valor lleva su clave:  [\"a\": 1, \"b\": 2]")
-            pares.append((k, expresion(P)))
-        espera(P, "]", "falta cerrar el corchete «]»")
-        return nodo("dic", L, pares=pares)
-    if es(P, "for"):
-        return comprension(P, L, clave=None, valor=primero)
-    items = [primero]
-    while acepta(P, ","):
-        if es(P, "]"):
+            k = expression(P)
+            expect(P, ":", "in a dictionary each value has its key:  [\"a\": 1, \"b\": 2]")
+            pairs.append((k, expression(P)))
+        expect(P, "]", "the closing bracket ']' is missing")
+        return node("dict", L, pairs=pairs)
+    if is_op(P, "for"):
+        return comprehension(P, L, key=None, value=first_)
+    items = [first_]
+    while accept(P, ","):
+        if is_op(P, "]"):
             break
-        items.append(expresion(P))
-    espera(P, "]", "falta cerrar el corchete «]»")
-    return nodo("lista", L, items=items)
+        items.append(expression(P))
+    expect(P, "]", "the closing bracket ']' is missing")
+    return node("list", L, items=items)
 
 
-def comprension(P, L, clave, valor):
-    espera(P, "for")
-    var, indice, iterable = cabeza_for(P, o_completo=False)
-    cond = o(P) if acepta(P, "if") else None
-    espera(P, "]", "falta cerrar el corchete «]»")
-    return nodo("comp", L, clave=clave, valor=valor, var=var, indice=indice, iterable=iterable, cond=cond)
+def comprehension(P, L, key, value):
+    expect(P, "for")
+    var, position, iterable = for_header(P, full_expression=False)
+    cond = or_(P) if accept(P, "if") else None
+    expect(P, "]", "the closing bracket ']' is missing")
+    return node("comp", L, key=key, value=value, var=var, position=position, iterable=iterable, cond=cond)
 
 
-def registro(P, L):
-    """(campo: valor, campo: valor): el «(» ya se leyó."""
-    campos = []
-    while not es(P, ")"):
-        tok = ver(P)
+def record(P, L):
+    """(field: value, field: value): the '(' was already read."""
+    fields = []
+    while not is_op(P, ")"):
+        tok = peek(P)
         if tok[0] == "str":
-            raise error("en un registro, los campos van sin comillas:  (nombre: \"Pikachu\"). "
-                        "Si quieres claves con comillas, es un diccionario:  [\"nombre\": \"Pikachu\"]", tok[2])
-        n = nombre(P, "el nombre de un campo")
-        espera(P, ":", f"en un registro, cada campo lleva dos puntos:  ({n}: valor)")
-        if any(n == c for c, _ in campos):
-            raise error(f"el campo «{n}» está repetido", tok[2])
-        campos.append((n, expresion(P)))
-        if not acepta(P, ","):
+            raise error("in a record, fields go without quotes:  (name: \"Pikachu\"). "
+                        "If you want keys with quotes, that's a dictionary:  [\"name\": \"Pikachu\"]", tok[2])
+        n = name(P, "a field name")
+        expect(P, ":", f"in a record, each field has a colon:  ({n}: value)")
+        if any(n == c for c, _ in fields):
+            raise error(f"the field '{n}' is repeated", tok[2])
+        fields.append((n, expression(P)))
+        if not accept(P, ","):
             break
-    espera(P, ")", "falta cerrar el registro con «)»")
-    return nodo("registro", L, campos=campos)
+    expect(P, ")", "the record is missing its closing ')'")
+    return node("record", L, fields=fields)
 
 
-# ================================================================ 3. ejecución
-# Los valores de Cupcake en Python:
-#   números, textos, True/False, None  → igual
-#   lista                              → list
-#   diccionario                        → dict
-#   registro                           → ("registro", dict)     ← la forma no cambia
-#   función                            → ("funcion", dict)
-#   función integrada                  → una función de Python
+# ================================================================ 3. execution
+# How Cupcake values are stored:
+#   numbers, texts, True/False, None  → the same
+#   list                               → list
+#   dictionary                         → dict
+#   record                            → ("record", dict)     ← its shape doesn't change
+#   function                          → ("function", dict)
+#   builtin function                  → a host function
 
-def es_registro(v):
-    return isinstance(v, tuple) and len(v) == 2 and v[0] == "registro"
-
-
-def es_funcion(v):
-    return (isinstance(v, tuple) and len(v) == 2 and v[0] == "funcion") or callable(v)
+def is_record(v):
+    return isinstance(v, tuple) and len(v) == 2 and v[0] == "record"
 
 
-def copiar(v):
-    """Los datos se copian: cada nombre tiene su propio dato."""
+def is_function(v):
+    return (isinstance(v, tuple) and len(v) == 2 and v[0] == "function") or callable(v)
+
+
+def copy(v):
+    """Data is copied: each name has its own data."""
     if isinstance(v, list):
-        return [copiar(x) for x in v]
+        return [copy(x) for x in v]
     if isinstance(v, dict):
-        return {k: copiar(x) for k, x in v.items()}
-    if es_registro(v):
-        return ("registro", {k: copiar(x) for k, x in v[1].items()})
+        return {k: copy(x) for k, x in v.items()}
+    if is_record(v):
+        return ("record", {k: copy(x) for k, x in v[1].items()})
     return v
 
 
-def tipo_de(v):
+def type_of(v):
     if v is None:
         return "none"
     if isinstance(v, bool):
-        return "un sí/no (true o false)"
+        return "a yes/no (true or false)"
     if isinstance(v, (int, float)):
-        return "un número"
+        return "a number"
     if isinstance(v, str):
-        return "un texto"
+        return "a text"
     if isinstance(v, list):
-        return "una lista"
+        return "a list"
     if isinstance(v, dict):
-        return "un diccionario"
-    if es_registro(v):
-        return "un registro"
-    return "una función"
+        return "a dictionary"
+    if is_record(v):
+        return "a record"
+    return "a function"
 
 
-def mostrar(v, dentro=False):
+def display(v, inner=False):
     if v is None:
         return "none"
     if v is True:
@@ -1046,523 +1046,523 @@ def mostrar(v, dentro=False):
     if v is False:
         return "false"
     if isinstance(v, str):
-        if not dentro:
+        if not inner:
             return v
         return '"' + v.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n") + '"'
     if isinstance(v, float):
         return repr(v)
     if isinstance(v, list):
-        return "[" + ", ".join(mostrar(x, True) for x in v) + "]"
+        return "[" + ", ".join(display(x, True) for x in v) + "]"
     if isinstance(v, dict):
         if not v:
             return "[:]"
-        return "[" + ", ".join(f"{mostrar(k, True)}: {mostrar(x, True)}" for k, x in v.items()) + "]"
-    if es_registro(v):
-        return "(" + ", ".join(f"{k}: {mostrar(x, True)}" for k, x in v[1].items()) + ")"
-    if isinstance(v, tuple) and v[0] == "funcion":
-        return f"<función {v[1]['nombre']}>"
+        return "[" + ", ".join(f"{display(k, True)}: {display(x, True)}" for k, x in v.items()) + "]"
+    if is_record(v):
+        return "(" + ", ".join(f"{k}: {display(x, True)}" for k, x in v[1].items()) + ")"
+    if isinstance(v, tuple) and v[0] == "function":
+        return f"<function {v[1]['name']}>"
     if callable(v):
-        return f"<función {v.__name__.rstrip('_')}>"
+        return f"<function {v.__name__.rstrip('_')}>"
     return str(v)
 
 
-# -- entornos: {"vars": {...}, "padre": entorno o None, "carpeta": ruta}
+# -- environments: {"vars": {...}, "parent": environment or None, "folder": path}
 
-def entorno(padre=None, carpeta=None):
-    return {"vars": {}, "padre": padre, "carpeta": carpeta if carpeta is not None else (padre or {}).get("carpeta", ".")}
+def environment(parent=None, folder=None):
+    return {"vars": {}, "parent": parent, "folder": folder if folder is not None else (parent or {}).get("folder", ".")}
 
 
-def buscar(env, n, L):
+def lookup(env, n, L):
     e = env
     while e is not None:
         if n in e["vars"]:
             return e["vars"][n]
-        e = e["padre"]
-    visibles = set()
+        e = e["parent"]
+    visible = set()
     e = env
     while e is not None:
-        visibles |= set(e["vars"])
-        e = e["padre"]
-    if n in PALABRAS_DE_PYTHON and PALABRAS_DE_PYTHON[n]:
-        raise error(f"«{n}» no es una palabra de Cupcake. Se escribe «{PALABRAS_DE_PYTHON[n]}».", L)
-    raise error(f"«{n}» no existe.{parecido(n, visibles)}", L)
+        visible |= set(e["vars"])
+        e = e["parent"]
+    if n in OTHER_WORDS and OTHER_WORDS[n]:
+        raise error(f"'{n}' is not a Cupcake word. Write '{OTHER_WORDS[n]}'.", L)
+    raise error(f"'{n}' doesn't exist.{did_you_mean(n, visible)}", L)
 
 
-def ejecutar_programa(sentencias, env):
-    # Las funciones del archivo se registran primero: el orden en que se escriben no importa.
-    for s in sentencias:
+def execute_program(statements, env):
+    # The file's functions are registered first: the order they are written in doesn't matter.
+    for s in statements:
         if s["t"] == "def":
-            env["vars"][s["nombre"]] = ("funcion", {"nombre": s["nombre"], "params": s["params"],
-                                                    "cuerpo": s["cuerpo"], "env": env, "lam": False})
-    señal = ejecutar_bloque(sentencias, env)
-    if señal is not None:
-        palabra = {"return": "return", "break": "break", "continue": "continue"}[señal[0]]
-        raise error(f"«{palabra}» solo tiene sentido dentro de "
-                    f"{'una función' if palabra == 'return' else 'un ciclo'}", señal[2])
+            env["vars"][s["name"]] = ("function", {"name": s["name"], "params": s["params"],
+                                                    "body": s["body"], "env": env, "lam": False})
+    signal = execute_block(statements, env)
+    if signal is not None:
+        word = {"return": "return", "break": "break", "continue": "continue"}[signal[0]]
+        raise error(f"'{word}' only makes sense inside "
+                    f"{'a function' if word == 'return' else 'a loop'}", signal[2])
 
 
-def ejecutar_bloque(sentencias, env):
-    """Devuelve None, o una señal: ("return", valor, línea), ("break", None, línea), ("continue", None, línea)."""
-    for s in sentencias:
-        señal = ejecutar(s, env)
-        if señal is not None:
-            return señal
+def execute_block(statements, env):
+    """Returns None, or a signal: ("return", value, line), ("break", None, line), ("continue", None, line)."""
+    for s in statements:
+        signal = execute(s, env)
+        if signal is not None:
+            return signal
     return None
 
 
-def ejecutar(s, env):
+def execute(s, env):
     t = s["t"]
     if t == "expr":
-        evaluar(s["expr"], env)
+        evaluate(s["expr"], env)
         return None
-    if t == "asignar":
-        asignar(s["destino"], evaluar(s["valor"], env), env, s["l"])
+    if t == "assign":
+        assign(s["target"], evaluate(s["value"], env), env, s["l"])
         return None
     if t == "def":
-        env["vars"][s["nombre"]] = ("funcion", {"nombre": s["nombre"], "params": s["params"],
-                                                "cuerpo": s["cuerpo"], "env": env, "lam": False})
+        env["vars"][s["name"]] = ("function", {"name": s["name"], "params": s["params"],
+                                                "body": s["body"], "env": env, "lam": False})
         return None
     if t == "if":
-        for cond, cuerpo in s["ramas"]:
-            if verdad(evaluar(cond, env)):
-                return ejecutar_bloque(cuerpo, env)
-        if s["otro"] is not None:
-            return ejecutar_bloque(s["otro"], env)
+        for cond, body in s["branches"]:
+            if truthy(evaluate(cond, env)):
+                return execute_block(body, env)
+        if s["otherwise"] is not None:
+            return execute_block(s["otherwise"], env)
         return None
     if t == "while":
-        vueltas = 0
-        while verdad(evaluar(s["cond"], env)):
-            vueltas += 1
-            if vueltas > 10_000_000:
-                raise error("el ciclo dio más de diez millones de vueltas; ¿olvidaste cambiar la condición?", s["l"])
-            señal = ejecutar_bloque(s["cuerpo"], env)
-            if señal is not None:
-                if señal[0] == "break":
+        loops = 0
+        while truthy(evaluate(s["cond"], env)):
+            loops += 1
+            if loops > 10_000_000:
+                raise error("the loop ran more than ten million times; did you forget to change the condition?", s["l"])
+            signal = execute_block(s["body"], env)
+            if signal is not None:
+                if signal[0] == "break":
                     break
-                if señal[0] == "return":
-                    return señal
+                if signal[0] == "return":
+                    return signal
         return None
     if t == "repeat":
-        veces = evaluar(s["veces"], env)
-        if not isinstance(veces, int) or isinstance(veces, bool) or veces < 0:
-            raise error(f"repeat necesita un número entero (cuántas veces), y recibió {mostrar(veces, True)}", s["l"])
-        for _ in range(veces):
-            señal = ejecutar_bloque(s["cuerpo"], env)
-            if señal is not None:
-                if señal[0] == "break":
+        times = evaluate(s["times"], env)
+        if not isinstance(times, int) or isinstance(times, bool) or times < 0:
+            raise error(f"repeat needs a whole number (how many times), and got {display(times, True)}", s["l"])
+        for _ in range(times):
+            signal = execute_block(s["body"], env)
+            if signal is not None:
+                if signal[0] == "break":
                     break
-                if señal[0] == "return":
-                    return señal
+                if signal[0] == "return":
+                    return signal
         return None
     if t == "when":
-        cuerpo = elegir_caso(s, env)
-        return None if cuerpo is None else ejecutar_bloque(cuerpo, env)
+        body = choose_case(s, env)
+        return None if body is None else execute_block(body, env)
     if t == "stop":
         raise Exception("cupcake-stop")
     if t == "for":
-        for posicion, elemento in enumerate(recorrible(evaluar(s["iterable"], env), s["l"], s.get("indice"))):
+        for position, element in enumerate(iterable_of(evaluate(s["iterable"], env), s["l"], s.get("position"))):
             if s["var"]:
-                env["vars"][s["var"]] = copiar(elemento)
-            if s.get("indice"):
-                env["vars"][s["indice"]] = posicion
-            señal = ejecutar_bloque(s["cuerpo"], env)
-            if señal is not None:
-                if señal[0] == "break":
+                env["vars"][s["var"]] = copy(element)
+            if s.get("position"):
+                env["vars"][s["position"]] = position
+            signal = execute_block(s["body"], env)
+            if signal is not None:
+                if signal[0] == "break":
                     break
-                if señal[0] == "return":
-                    return señal
+                if signal[0] == "return":
+                    return signal
         return None
     if t == "return":
-        return ("return", None if s["valor"] is None else evaluar(s["valor"], env), s["l"])
+        return ("return", None if s["value"] is None else evaluate(s["value"], env), s["l"])
     if t in ("break", "continue"):
         return (t, None, s["l"])
     if t == "raise":
-        v = evaluar(s["valor"], env)
-        raise error(mostrar(v), s["l"])
+        v = evaluate(s["value"], env)
+        raise error(display(v), s["l"])
     if t == "assert":
-        if not verdad(evaluar(s["cond"], env)):
-            if s["mensaje"] is not None:
-                mensaje = mostrar(evaluar(s["mensaje"], env))
+        if not truthy(evaluate(s["cond"], env)):
+            if s["message"] is not None:
+                message = display(evaluate(s["message"], env))
             else:
-                mensaje = f"assert falló: {s['texto']}"
-            detalles = valores_de(s["cond"], env)
-            if detalles:
-                mensaje += "\n" + "\n".join(f"  {k} vale {v}" for k, v in detalles)
-            raise error(mensaje, s["l"])
+                message = f"assert failed: {s['text']}"
+            details = values_of(s["cond"], env)
+            if details:
+                message += "\n" + "\n".join(f"  {k} is {v}" for k, v in details)
+            raise error(message, s["l"])
         return None
     if t == "try":
         try:
-            señal = ejecutar_bloque(s["cuerpo"], env)
+            signal = execute_block(s["body"], env)
         except Exception as ex:
-            if not es_error_cupcake(ex) or s["manejo"] is None:
-                if s["final"] is not None:
-                    ejecutar_bloque(s["final"], env)
+            if not is_cupcake_error(ex) or s["handler"] is None:
+                if s["finally_"] is not None:
+                    execute_block(s["finally_"], env)
                 raise
             if s["var"]:
                 env["vars"][s["var"]] = ex.args[1]
             try:
-                señal = ejecutar_bloque(s["manejo"], env)
+                signal = execute_block(s["handler"], env)
             finally:
-                if s["final"] is not None:
-                    ejecutar_bloque(s["final"], env)
-            return señal
-        if s["final"] is not None:
-            otra = ejecutar_bloque(s["final"], env)
-            if otra is not None:
-                return otra
-        return señal
+                if s["finally_"] is not None:
+                    execute_block(s["finally_"], env)
+            return signal
+        if s["finally_"] is not None:
+            other = execute_block(s["finally_"], env)
+            if other is not None:
+                return other
+        return signal
     if t == "use":
-        usar(s, env)
+        use_module(s, env)
         return None
-    raise error(f"instrucción desconocida: {t}", s["l"])
+    raise error(f"unknown instruction: {t}", s["l"])
 
 
-def valor_de_bloque(cuerpo, env, L):
-    """Un bloque de una sola línea vale lo que esa línea vale (para if, when y fx que dan un valor)."""
-    if not cuerpo:
+def block_value(body, env, L):
+    """A one-line block is worth what that line is worth."""
+    if not body:
         return None
-    if es_de_un_valor(cuerpo):
-        return valor_de_linea(cuerpo[0], env)
-    raise error("cuando un if o un when da un valor, cada bloque tiene una sola cosa:  if x: 1 other: 2", L)
+    if is_single_value(body):
+        return line_value(body[0], env)
+    raise error("each block must have a single value", L)
 
 
-def es_de_un_valor(cuerpo):
-    """¿El bloque tiene una sola línea que da un valor (una expresión, o un if / when completo)?"""
-    return len(cuerpo) == 1 and cuerpo[0]["t"] in ("expr", "if", "when")
+def is_single_value(body):
+    """Does the block have a single line that gives a value (an expression, or a whole if / when)?"""
+    return len(body) == 1 and body[0]["t"] in ("expr", "if", "when")
 
 
-def bloques_de_un_valor(s):
-    """Un if o when cuyos bloques tienen todos una sola línea que da un valor (si no, se ejecuta como siempre)."""
+def single_value_blocks(s):
+    """An if or when whose blocks all have a single line that gives a value."""
     if s["t"] == "if":
-        bloques = [c for _, c in s["ramas"]] + ([s["otro"]] if s["otro"] is not None else [])
+        blocks = [c for _, c in s["branches"]] + ([s["otherwise"]] if s["otherwise"] is not None else [])
     else:
-        bloques = [c for _, _, c, _ in s["casos"]] + ([s["otro"]] if s["otro"] is not None else [])
-    return all(not b or (es_de_un_valor(b) and (b[0]["t"] == "expr" or bloques_de_un_valor(b[0]))) for b in bloques)
+        blocks = [c for _, _, c, _ in s["cases"]] + ([s["otherwise"]] if s["otherwise"] is not None else [])
+    return all(not b or (is_single_value(b) and (b[0]["t"] == "expr" or single_value_blocks(b[0]))) for b in blocks)
 
 
-def valor_de_linea(s, env):
+def line_value(s, env):
     if s["t"] == "expr":
-        return evaluar(s["expr"], env)
+        return evaluate(s["expr"], env)
     if s["t"] == "if":
-        for cond, cuerpo in s["ramas"]:
-            if verdad(evaluar(cond, env)):
-                return valor_de_bloque(cuerpo, env, s["l"])
-        return valor_de_bloque(s["otro"], env, s["l"]) if s["otro"] is not None else None
-    cuerpo = elegir_caso(s, env)
-    return None if cuerpo is None else valor_de_bloque(cuerpo, env, s["l"])
+        for cond, body in s["branches"]:
+            if truthy(evaluate(cond, env)):
+                return block_value(body, env, s["l"])
+        return block_value(s["otherwise"], env, s["l"]) if s["otherwise"] is not None else None
+    body = choose_case(s, env)
+    return None if body is None else block_value(body, env, s["l"])
 
 
-def es_del_tipo(v, tipo):
-    if tipo == "number":
+def is_of_type(v, type_):
+    if type_ == "number":
         return isinstance(v, (int, float)) and not isinstance(v, bool)
-    if tipo == "text":
+    if type_ == "text":
         return isinstance(v, str)
-    if tipo == "list":
+    if type_ == "list":
         return isinstance(v, list)
-    if tipo == "dict":
+    if type_ == "dict":
         return isinstance(v, dict)
-    if tipo == "record":
-        return es_registro(v)
-    if tipo == "function":
-        return es_funcion(v)
-    if tipo == "bool":
+    if type_ == "record":
+        return is_record(v)
+    if type_ == "function":
+        return is_function(v)
+    if type_ == "bool":
         return isinstance(v, bool)
-    if tipo == "none":
+    if type_ == "none":
         return v is None
-    if tipo == "empty":
+    if type_ == "empty":
         return isinstance(v, (list, dict, str)) and len(v) == 0
     return False
 
 
-def elegir_caso(s, env):
-    """El bloque del primer caso de un when que se cumple (o el de other, o ninguno)."""
-    if s.get("sujetos"):
-        vs = [evaluar(x, env) for x in s["sujetos"]]
+def choose_case(s, env):
+    """The block of the first matching case of a when (or the else, or none)."""
+    if s.get("subjects"):
+        vs = [evaluate(x, env) for x in s["subjects"]]
 
-        def encaja(v, patron, L):
-            clase, dato = patron
-            if clase == "tipo":
-                return es_del_tipo(v, dato)
-            if clase == "valor":
-                return v == evaluar(dato, env)
-            return esta_en(v, dato, env, L)
+        def fits(v, pattern, L):
+            kind, datum = pattern
+            if kind == "type_":
+                return is_of_type(v, datum)
+            if kind == "value":
+                return v == evaluate(datum, env)
+            return is_in(v, datum, env, L)
 
-        for (_, alternativas), negado, cuerpo, L in s["casos"]:
-            cumple = any(all(encaja(v, pt, L) for v, pt in zip(vs, alt)) for alt in alternativas)
-            if cumple != negado:
-                return cuerpo
-        return s["otro"]
-    v = evaluar(s["valor"], env)
-    for (clase, dato), negado, cuerpo, L in s["casos"]:
-        if clase == "tipo":
-            cumple = es_del_tipo(v, dato)
-        elif clase == "valores":
-            cumple = any(v == evaluar(x, env) for x in dato)
+        for (_, alternatives), negated, body, L in s["cases"]:
+            matches = any(all(fits(v, pt, L) for v, pt in zip(vs, alt)) for alt in alternatives)
+            if matches != negated:
+                return body
+        return s["otherwise"]
+    v = evaluate(s["value"], env)
+    for (kind, datum), negated, body, L in s["cases"]:
+        if kind == "type_":
+            matches = is_of_type(v, datum)
+        elif kind == "values":
+            matches = any(v == evaluate(x, env) for x in datum)
         else:
-            cumple = esta_en(v, dato, env, L)
-        if cumple != negado:
-            return cuerpo
-    return s["otro"]
+            matches = is_in(v, datum, env, L)
+        if matches != negated:
+            return body
+    return s["otherwise"]
 
 
-def valores_de(e, env):
-    """Los nombres y campos que aparecen en una condición, con su valor (para los mensajes de assert)."""
-    vistos, salida = set(), []
+def values_of(e, env):
+    """The names and fields in a condition, with their values (for assert messages)."""
+    seen, output = set(), []
 
-    def recorrer(x):
+    def walk(x):
         if not isinstance(x, dict):
             return
-        if x.get("t") in ("name", "campo", "index"):
-            texto = nombre_de(x)
-            if texto and texto not in vistos:
-                vistos.add(texto)
+        if x.get("t") in ("name", "field", "index"):
+            text = name_of(x)
+            if text and text not in seen:
+                seen.add(text)
                 try:
-                    salida.append((texto, mostrar(evaluar(x, env), True)))
+                    output.append((text, display(evaluate(x, env), True)))
                 except Exception:
                     pass
             if x["t"] != "name":
                 return
         for v in x.values():
             if isinstance(v, dict):
-                recorrer(v)
+                walk(v)
             elif isinstance(v, list):
-                for y in v:
-                    recorrer(y)
+                for and_ in v:
+                    walk(and_)
 
-    recorrer(e)
-    return salida
+    walk(e)
+    return output
 
 
-def nombre_de(x):
+def name_of(x):
     if x["t"] == "name":
-        return x["nombre"]
-    if x["t"] == "campo":
-        base = nombre_de(x["obj"])
-        return base and f"{base}.{x['campo']}"
+        return x["name"]
+    if x["t"] == "field":
+        base = name_of(x["obj"])
+        return base and f"{base}.{x['field']}"
     if x["t"] == "index" and x["idx"]["t"] == "lit":
-        base = nombre_de(x["obj"])
-        return base and f"{base}[{mostrar(x['idx']['valor'], True)}]"
+        base = name_of(x["obj"])
+        return base and f"{base}[{display(x['idx']['value'], True)}]"
     return None
 
 
-def verdad(v):
-    if es_registro(v):
+def truthy(v):
+    if is_record(v):
         return True
     return bool(v)
 
 
-def recorrible(v, L, con_posicion=None):
-    if con_posicion and not isinstance(v, (list, str)):
-        raise error(f"«at» da las posiciones de una lista o un texto, y esto es {tipo_de(v)}", L)
+def iterable_of(v, L, with_position=None):
+    if with_position and not isinstance(v, (list, str)):
+        raise error(f"'at' gives the positions of a list or a text, and this is {type_of(v)}", L)
     if isinstance(v, (list, str)):
         return list(v)
     if isinstance(v, dict):
         return list(v.keys())
-    if es_registro(v):
-        raise error("un registro no se recorre con for; para ver sus campos, muéstralo con show(…)", L)
-    raise error(f"for necesita una lista, un texto o un diccionario, y recibió {tipo_de(v)}", L)
+    if is_record(v):
+        raise error("a record can't be looped over with for; to see its fields, show it with show(…)", L)
+    raise error(f"for needs a list, a text or a dictionary, and got {type_of(v)}", L)
 
 
-def asignar(destino, valor, env, L):
-    valor = copiar(valor)
-    t = destino["t"]
+def assign(target, value, env, L):
+    value = copy(value)
+    t = target["t"]
     if t == "name":
-        if destino["nombre"] in PALABRAS_DE_PYTHON and PALABRAS_DE_PYTHON[destino["nombre"]] and destino["nombre"][0].isupper():
-            raise error(f"«{destino['nombre']}» es de Python.", L)
-        env["vars"][destino["nombre"]] = valor
+        if target["name"] in OTHER_WORDS and OTHER_WORDS[target["name"]] and target["name"][0].isupper():
+            raise error(f"'{target['name']}' is not a Cupcake word. Write '{OTHER_WORDS[target['name']]}'.", L)
+        env["vars"][target["name"]] = value
         return
-    contenedor = evaluar(destino["obj"], env)          # sin copiar: se cambia el dato de esa variable
-    if t == "campo":
-        if not es_registro(contenedor):
-            raise error(f"solo los registros tienen campos, y esto es {tipo_de(contenedor)}", L)
-        campos = contenedor[1]
-        if destino["campo"] not in campos:
-            raise error(f"el registro no tiene el campo «{destino['campo']}».{parecido(destino['campo'], campos)} "
-                        f"Un registro nace con sus campos y no gana campos nuevos.", L)
-        campos[destino["campo"]] = valor
+    container = evaluate(target["obj"], env)          # not copied: the variable's own data is changed
+    if t == "field":
+        if not is_record(container):
+            raise error(f"only records have fields, and this is {type_of(container)}", L)
+        fields = container[1]
+        if target["field"] not in fields:
+            raise error(f"the record has no field '{target['field']}'.{did_you_mean(target['field'], fields)} "
+                        f"A record is born with its fields and doesn't get new ones.", L)
+        fields[target["field"]] = value
         return
-    indice = evaluar(destino["idx"], env)
-    if isinstance(contenedor, list):
-        if not isinstance(indice, int) or isinstance(indice, bool):
-            raise error("la posición de una lista es un número entero", L)
-        if not -len(contenedor) <= indice < len(contenedor):
-            raise error(f"la lista tiene {len(contenedor)} elementos; la posición {indice} no existe", L)
-        contenedor[indice] = valor
-    elif isinstance(contenedor, dict):
-        contenedor[indice] = valor
-    elif es_registro(contenedor):
-        raise error(f"un registro se cambia con punto:  registro.{indice if isinstance(indice, str) else 'campo'} = …", L)
+    position = evaluate(target["idx"], env)
+    if isinstance(container, list):
+        if not isinstance(position, int) or isinstance(position, bool):
+            raise error("a list position is a whole number", L)
+        if not -len(container) <= position < len(container):
+            raise error(f"the list has {len(container)} elements; position {position} doesn't exist", L)
+        container[position] = value
+    elif isinstance(container, dict):
+        container[position] = value
+    elif is_record(container):
+        raise error(f"a record is changed with a dot:  record.{position if isinstance(position, str) else 'field'} = …", L)
     else:
-        raise error(f"no se puede cambiar un elemento de {tipo_de(contenedor)}", L)
+        raise error(f"can't change an element of {type_of(container)}", L)
 
 
-OPERACIONES = {
+OPERATIONS = {
     "+": lambda a, b: a + b, "-": lambda a, b: a - b, "*": lambda a, b: a * b,
     "/": lambda a, b: a / b, "//": lambda a, b: a // b, "%": lambda a, b: a % b,
     "**": lambda a, b: a ** b,
     "==": lambda a, b: a == b, "!=": lambda a, b: a != b,
     "<": lambda a, b: a < b, ">": lambda a, b: a > b, "<=": lambda a, b: a <= b, ">=": lambda a, b: a >= b,
 }
-NOMBRES_OPERACION = {"+": "sumar", "-": "restar", "*": "multiplicar", "/": "dividir", "//": "dividir",
-                     "%": "sacar el resto de", "**": "elevar", "<": "comparar", ">": "comparar",
-                     "<=": "comparar", ">=": "comparar"}
+OPERATION_NAMES = {"+": "add", "-": "subtract", "*": "multiply", "/": "divide", "//": "divide",
+                     "%": "take the remainder of", "**": "raise", "<": "compare", ">": "compare",
+                     "<=": "compare", ">=": "compare"}
 
 
-def operar(op, a, b, L):
+def operate(op, a, b, L):
     if op == "in":
         if isinstance(b, (list, dict)):
             return a in b
         if isinstance(b, str):
             if not isinstance(a, str):
-                raise error(f"para buscar dentro de un texto hace falta otro texto, y llegó {tipo_de(a)}", L)
+                raise error(f"to search inside a text you need another text, and got {type_of(a)}", L)
             return a in b
-        if es_registro(b):
+        if is_record(b):
             if not isinstance(a, str):
-                raise error("para preguntar si un registro tiene un campo, se usa su nombre en texto:  \"vida\" in pika", L)
+                raise error("to ask whether a record has a field, use its name as text:  \"hp\" in pika", L)
             return a in b[1]
-        raise error(f"«in» busca dentro de una lista, un texto o un diccionario, no en {tipo_de(b)}", L)
+        raise error(f"'in' looks inside a list, a text or a dictionary, not in {type_of(b)}", L)
     if op in ("==", "!="):
-        return OPERACIONES[op](a, b)
-    numero = lambda x: isinstance(x, (int, float)) and not isinstance(x, bool)
+        return OPERATIONS[op](a, b)
+    number = lambda x: isinstance(x, (int, float)) and not isinstance(x, bool)
     if op == "+" and isinstance(a, str) != isinstance(b, str):
-        raise error(f"no se puede sumar un texto y {tipo_de(b if isinstance(a, str) else a)}. "
-                    f"Para juntarlos, ponlos en un texto:  \"…{{valor}}…\"", L)
+        raise error(f"can't add a text and {type_of(b if isinstance(a, str) else a)}. "
+                    f"To join them, put them in a text:  \"…{{value}}…\"", L)
     if op in ("+", "*") and (isinstance(a, list) or isinstance(b, list)):
         if op == "+" and isinstance(a, list) and isinstance(b, list):
-            return copiar(a) + copiar(b)
+            return copy(a) + copy(b)
         if op == "*" and isinstance(a, list) and isinstance(b, int):
-            return copiar(a) * b
-        raise error(f"no se puede {NOMBRES_OPERACION[op]} una lista y {tipo_de(b)}. "
-                    f"Para agregar algo a una lista:  add(lista, x)", L)
-    permitido = (numero(a) and numero(b)) or (isinstance(a, str) and isinstance(b, str) and op in ("+", "<", ">", "<=", ">=")) \
+            return copy(a) * b
+        raise error(f"can't {OPERATION_NAMES[op]} a list and {type_of(b)}. "
+                    f"To add something to a list:  add(list, x)", L)
+    allowed = (number(a) and number(b)) or (isinstance(a, str) and isinstance(b, str) and op in ("+", "<", ">", "<=", ">=")) \
         or (isinstance(a, str) and isinstance(b, int) and op == "*")
-    if not permitido:
-        raise error(f"no se puede {NOMBRES_OPERACION.get(op, 'operar')} {tipo_de(a)} y {tipo_de(b)}", L)
+    if not allowed:
+        raise error(f"can't {OPERATION_NAMES.get(op, 'operate on')} {type_of(a)} and {type_of(b)}", L)
     try:
-        return OPERACIONES[op](a, b)
+        return OPERATIONS[op](a, b)
     except ZeroDivisionError:
-        raise error("no se puede dividir entre cero", L) from None
+        raise error("can't divide by zero", L) from None
     except OverflowError:
-        raise error("el número es demasiado grande", L) from None
+        raise error("the number is too big", L) from None
 
 
-def evaluar(e, env):
+def evaluate(e, env):
     t = e["t"]
     L = e["l"]
     if t == "lit":
-        return e["valor"]
+        return e["value"]
     if t == "name":
-        return buscar(env, e["nombre"], L)
-    if t == "texto":
-        return "".join(p if isinstance(p, str) else mostrar(evaluar(p, env)) for p in e["piezas"])
+        return lookup(env, e["name"], L)
+    if t == "text":
+        return "".join(p if isinstance(p, str) else display(evaluate(p, env)) for p in e["pieces"])
     if t == "bin":
-        return operar(e["op"], evaluar(e["a"], env), evaluar(e["b"], env), L)
-    if t == "y":
-        a = evaluar(e["a"], env)
-        return evaluar(e["b"], env) if verdad(a) else a
-    if t == "o":
-        a = evaluar(e["a"], env)
-        return a if verdad(a) else evaluar(e["b"], env)
-    if t == "no":
-        return not verdad(evaluar(e["a"], env))
+        return operate(e["op"], evaluate(e["a"], env), evaluate(e["b"], env), L)
+    if t == "and":
+        a = evaluate(e["a"], env)
+        return evaluate(e["b"], env) if truthy(a) else a
+    if t == "or":
+        a = evaluate(e["a"], env)
+        return a if truthy(a) else evaluate(e["b"], env)
+    if t == "not":
+        return not truthy(evaluate(e["a"], env))
     if t in ("neg", "pos"):
-        a = evaluar(e["a"], env)
+        a = evaluate(e["a"], env)
         if not isinstance(a, (int, float)) or isinstance(a, bool):
-            raise error(f"el signo {'-' if t == 'neg' else '+'} va con números, no con {tipo_de(a)}", L)
+            raise error(f"the {'-' if t == 'neg' else '+'} sign goes with numbers, not with {type_of(a)}", L)
         return -a if t == "neg" else a
-    if t == "lista":
-        return [copiar(evaluar(x, env)) for x in e["items"]]
-    if t == "dic":
-        return {clave_valida(evaluar(k, env), L): copiar(evaluar(v, env)) for k, v in e["pares"]}
-    if t == "registro":
-        return ("registro", {n: copiar(evaluar(v, env)) for n, v in e["campos"]})
-    if t == "rango":
+    if t == "list":
+        return [copy(evaluate(x, env)) for x in e["items"]]
+    if t == "dict":
+        return {valid_key(evaluate(k, env), L): copy(evaluate(v, env)) for k, v in e["pairs"]}
+    if t == "record":
+        return ("record", {n: copy(evaluate(v, env)) for n, v in e["fields"]})
+    if t == "range":
         if e["a"] is None or e["b"] is None:
-            raise error("un rango abierto (como 2.. o ..3) solo sirve dentro de [ ], para cortar una lista", L)
-        a, b = evaluar(e["a"], env), evaluar(e["b"], env)
-        paso = 1 if e.get("paso") is None else evaluar(e["paso"], env)
-        if not all(isinstance(x, int) and not isinstance(x, bool) for x in (a, b, paso)):
-            raise error("un rango va de un número entero a otro:  1..10  (y el salto también es entero:  by 2)", L)
-        if paso == 0:
-            raise error("el salto de un rango no puede ser 0", L)
-        return list(range(a, b + 1, paso)) if paso > 0 else list(range(a, b - 1, paso))
+            raise error("an open range (like 2.. or ..3) only works inside [ ], to slice a list", L)
+        a, b = evaluate(e["a"], env), evaluate(e["b"], env)
+        step = 1 if e.get("step") is None else evaluate(e["step"], env)
+        if not all(isinstance(x, int) and not isinstance(x, bool) for x in (a, b, step)):
+            raise error("a range goes from one whole number to another:  1..10  (and the step is whole too:  by 2)", L)
+        if step == 0:
+            raise error("the step of a range can't be 0", L)
+        return list(range(a, b + 1, step)) if step > 0 else list(range(a, b - 1, step))
     if t == "comp":
-        local = entorno(env)
-        if e["clave"] is None:
-            salida = []
+        local = environment(env)
+        if e["key"] is None:
+            output = []
         else:
-            salida = {}
-        for posicion, x in enumerate(recorrible(evaluar(e["iterable"], env), L, e.get("indice"))):
+            output = {}
+        for position, x in enumerate(iterable_of(evaluate(e["iterable"], env), L, e.get("position"))):
             if e["var"]:
-                local["vars"][e["var"]] = copiar(x)
-            if e.get("indice"):
-                local["vars"][e["indice"]] = posicion
-            if e["cond"] is not None and not verdad(evaluar(e["cond"], local)):
+                local["vars"][e["var"]] = copy(x)
+            if e.get("position"):
+                local["vars"][e["position"]] = position
+            if e["cond"] is not None and not truthy(evaluate(e["cond"], local)):
                 continue
-            if e["clave"] is None:
-                salida.append(copiar(evaluar(e["valor"], local)))
+            if e["key"] is None:
+                output.append(copy(evaluate(e["value"], local)))
             else:
-                salida[clave_valida(evaluar(e["clave"], local), L)] = copiar(evaluar(e["valor"], local))
-        return salida
-    if t == "campo":
-        obj = evaluar(e["obj"], env)
-        if es_registro(obj):
-            if e["campo"] not in obj[1]:
-                raise error(f"el registro no tiene el campo «{e['campo']}».{parecido(e['campo'], obj[1])}", L)
-            return obj[1][e["campo"]]
+                output[valid_key(evaluate(e["key"], local), L)] = copy(evaluate(e["value"], local))
+        return output
+    if t == "field":
+        obj = evaluate(e["obj"], env)
+        if is_record(obj):
+            if e["field"] not in obj[1]:
+                raise error(f"the record has no field '{e['field']}'.{did_you_mean(e['field'], obj[1])}", L)
+            return obj[1][e["field"]]
         if isinstance(obj, dict):
-            raise error(f"un diccionario se lee con corchetes:  dic[\"{e['campo']}\"]", L)
-        raise error(f"solo los registros tienen campos, y esto es {tipo_de(obj)}", L)
+            raise error(f"a dictionary is read with brackets:  dict[\"{e['field']}\"]", L)
+        raise error(f"only records have fields, and this is {type_of(obj)}", L)
     if t == "index":
-        return indexar(evaluar(e["obj"], env), e["idx"], env, L)
-    if t == "llamar":
-        f = evaluar(e["f"], env)
-        args = [evaluar(a, env) for a in e["args"]]
-        nombrados = [(n, evaluar(v, env)) for n, v in e["nombrados"]]
-        return llamar(f, args, nombrados, L)
+        return index_into(evaluate(e["obj"], env), e["idx"], env, L)
+    if t == "call":
+        f = evaluate(e["f"], env)
+        args = [evaluate(a, env) for a in e["args"]]
+        named = [(n, evaluate(v, env)) for n, v in e["named"]]
+        return call(f, args, named, L)
     if t == "anon":
-        return ("funcion", {"nombre": "fx", "params": e["params"], "cuerpo": e["cuerpo"], "env": env, "lam": e.get("lam", False)})
-    if t == "en":
-        return esta_en(evaluar(e["a"], env), e["b"], env, L)
-    if t == "tiene":
-        return tiene(evaluar(e["obj"], env), e["campos"], L)
-    if t == "ifvalor":
-        for cond, cuerpo in e["ramas"]:
-            if verdad(evaluar(cond, env)):
-                return valor_de_bloque(cuerpo, env, L)
-        return valor_de_bloque(e["otro"], env, L) if e["otro"] is not None else None
-    if t == "whenvalor":
-        cuerpo = elegir_caso(e, env)
-        return None if cuerpo is None else valor_de_bloque(cuerpo, env, L)
-    if t == "reserva":
+        return ("function", {"name": "fx", "params": e["params"], "body": e["body"], "env": env, "lam": e.get("lam", False)})
+    if t == "in":
+        return is_in(evaluate(e["a"], env), e["b"], env, L)
+    if t == "has":
+        return has_value(evaluate(e["obj"], env), e["fields"], L)
+    if t == "ifvalue":
+        for cond, body in e["branches"]:
+            if truthy(evaluate(cond, env)):
+                return block_value(body, env, L)
+        return block_value(e["otherwise"], env, L) if e["otherwise"] is not None else None
+    if t == "whenvalue":
+        body = choose_case(e, env)
+        return None if body is None else block_value(body, env, L)
+    if t == "fallback":
         try:
-            return evaluar(e["a"], env)
+            return evaluate(e["a"], env)
         except Exception as ex:
-            if not es_error_cupcake(ex):
+            if not is_cupcake_error(ex):
                 raise
-            return evaluar(e["b"], env)
-    if t == "es_tipo":
-        return es_del_tipo(evaluar(e["a"], env), e["tipo"])
-    if t == "entre":
-        v = evaluar(e["a"], env)
-        return operar("<=", evaluar(e["bajo"], env), v, L) and operar("<=", v, evaluar(e["alto"], env), L)
-    raise error(f"expresión desconocida: {t}", L)
+            return evaluate(e["b"], env)
+    if t == "is_type":
+        return is_of_type(evaluate(e["a"], env), e["type_"])
+    if t == "between":
+        v = evaluate(e["a"], env)
+        return operate("<=", evaluate(e["low"], env), v, L) and operate("<=", v, evaluate(e["high"], env), L)
+    raise error(f"unknown expression: {t}", L)
 
 
-def esta_en(v, nodo_b, env, L):
-    """x in grupo. Con un rango sin «by» (0..10) es «entre los dos, contando los dos», también con decimales."""
-    if nodo_b["t"] == "rango" and nodo_b.get("paso") is None and nodo_b["a"] is not None and nodo_b["b"] is not None:
-        a, b = evaluar(nodo_b["a"], env), evaluar(nodo_b["b"], env)
+def is_in(v, node_b, env, L):
+    """x in group. With a range without 'by' (0..10) it means 'between the two, both included', decimals too."""
+    if node_b["t"] == "range" and node_b.get("step") is None and node_b["a"] is not None and node_b["b"] is not None:
+        a, b = evaluate(node_b["a"], env), evaluate(node_b["b"], env)
         if not all(isinstance(x, (int, float)) and not isinstance(x, bool) for x in (a, b)):
-            raise error("un rango va de un número a otro:  0..10", L)
+            raise error("a range goes from one number to another:  0..10", L)
         if not isinstance(v, (int, float)) or isinstance(v, bool):
             return False
         return min(a, b) <= v <= max(a, b)
-    return operar("in", v, evaluar(nodo_b, env), L)
+    return operate("in", v, evaluate(node_b, env), L)
 
 
-def tiene_algo(v):
-    """Lo que «has» considera tener: un número mayor que 0, un texto o lista con algo, true."""
+def has_something(v):
+    """What 'has' counts as having something: a number greater than 0, a non-empty text or list, true."""
     if isinstance(v, bool):
         return v
     if isinstance(v, (int, float)):
@@ -1572,335 +1572,335 @@ def tiene_algo(v):
     return v is not None
 
 
-def tiene(obj, campos, L):
-    """pika has vida · eevee has piedra and amistad · equipo has vida (¿alguno?)."""
-    def campos_de(x):
-        return x[1] if es_registro(x) else x
+def has_value(obj, fields, L):
+    """pika has hp · eevee has stone and friendship · team has hp (does anyone?)."""
+    def fields_of(x):
+        return x[1] if is_record(x) else x
 
-    def cumple(x, arbol):
-        if arbol[0] == "campo":
-            datos = campos_de(x)
-            if arbol[1] not in datos:
+    def matches(x, tree):
+        if tree[0] == "field":
+            data = fields_of(x)
+            if tree[1] not in data:
                 return False
-            return tiene_algo(datos[arbol[1]])
-        a = cumple(x, arbol[1])
-        if arbol[0] == "y":
-            return a and cumple(x, arbol[2])
-        return a or cumple(x, arbol[2])
+            return has_something(data[tree[1]])
+        a = matches(x, tree[1])
+        if tree[0] == "and":
+            return a and matches(x, tree[2])
+        return a or matches(x, tree[2])
 
-    def revisar_nombres(conocidos, arbol):
-        if arbol[0] == "campo":
-            if arbol[1] not in conocidos:
-                cerca = difflib.get_close_matches(arbol[1], list(conocidos), 1, 0.7)   # solo errores de escritura
-                if cerca:
-                    raise error(f"no hay ningún campo «{arbol[1]}». ¿Quisiste decir «{cerca[0]}»?", L)
+    def check_names(known, tree):
+        if tree[0] == "field":
+            if tree[1] not in known:
+                close = difflib.get_close_matches(tree[1], list(known), 1, 0.7)   # only typos
+                if close:
+                    raise error(f"there's no field '{tree[1]}'. Did you mean '{close[0]}'?", L)
         else:
-            revisar_nombres(conocidos, arbol[1])
-            revisar_nombres(conocidos, arbol[2])
+            check_names(known, tree[1])
+            check_names(known, tree[2])
 
-    if es_registro(obj) or isinstance(obj, dict):
-        revisar_nombres(set(campos_de(obj)), campos)
-        return cumple(obj, campos)
+    if is_record(obj) or isinstance(obj, dict):
+        check_names(set(fields_of(obj)), fields)
+        return matches(obj, fields)
     if isinstance(obj, list):
-        if any(not (es_registro(x) or isinstance(x, dict)) for x in obj):
-            raise error("«has» pregunta por campos, y esta lista tiene cosas sin campos. "
-                        "Para saber si algo está en la lista se usa in:  x in lista", L)
-        conocidos = set()
+        if any(not (is_record(x) or isinstance(x, dict)) for x in obj):
+            raise error("'has' asks about fields, and this list has things without fields. "
+                        "To know whether something is in the list, use in:  x in list", L)
+        known = set()
         for x in obj:
-            conocidos |= set(campos_de(x))
-        revisar_nombres(conocidos, campos)
-        return any(cumple(x, campos) for x in obj)
-    raise error(f"«has» pregunta por los campos de un registro (pika has vida), y esto es {tipo_de(obj)}. "
-                f"Para buscar dentro de un texto se usa in:  \"chu\" in nombre", L)
+            known |= set(fields_of(x))
+        check_names(known, fields)
+        return any(matches(x, fields) for x in obj)
+    raise error(f"'has' asks about the fields of a record (pika has hp), and this is {type_of(obj)}. "
+                f"To search inside a text, use in:  \"chu\" in name", L)
 
 
-def no_tapar(n, L):
-    if n in INTEGRADAS:
-        raise error(f"«{n}» ya es una función de Cupcake. Usa otro nombre, para no taparla", L)
+def dont_shadow(n, L):
+    if n in BUILTINS:
+        raise error(f"'{n}' is already a Cupcake function. Use another name, so you don't hide it", L)
 
 
-def revisar_return(cuerpo):
-    """En una función, una línea que solo calcula un valor no hace nada: seguramente le falta return."""
-    for s in cuerpo:
+def check_return(body):
+    """In a function, a line that only computes a value does nothing: it's probably missing return."""
+    for s in body:
         t = s["t"]
-        if t == "expr" and s["expr"]["t"] != "llamar" and not (s["expr"]["t"] == "lit" and s["expr"]["valor"] is None):
-            raise error("esta línea calcula un valor, pero no hace nada con él. "
-                        "Para que la función lo devuelva, escribe return:  return …", s["l"])
-        for clave in ("cuerpo", "otro", "manejo", "final"):
-            if isinstance(s.get(clave), list) and s["t"] != "def":
-                revisar_return(s[clave])
-        for _, b in s.get("ramas", []):
-            revisar_return(b)
-        for caso in s.get("casos", []):
-            revisar_return(caso[2])
+        if t == "expr" and s["expr"]["t"] != "call" and not (s["expr"]["t"] == "lit" and s["expr"]["value"] is None):
+            raise error("this line computes a value but does nothing with it. "
+                        "For the function to give it back, write return:  return …", s["l"])
+        for key in ("body", "otherwise", "handler", "finally_"):
+            if isinstance(s.get(key), list) and s["t"] != "def":
+                check_return(s[key])
+        for _, b in s.get("branches", []):
+            check_return(b)
+        for case in s.get("cases", []):
+            check_return(case[2])
 
 
-def clave_valida(k, L):
-    if isinstance(k, (list, dict)) or es_registro(k):
-        raise error("la clave de un diccionario es un texto o un número", L)
+def valid_key(k, L):
+    if isinstance(k, (list, dict)) or is_record(k):
+        raise error("a dictionary key is a text or a number", L)
     return k
 
 
-def indexar(obj, idx_nodo, env, L):
-    if idx_nodo["t"] == "rango":                         # cortar: lista[1..3]
+def index_into(obj, idx_node, env, L):
+    if idx_node["t"] == "range":                         # slicing: list[1..3]
         if not isinstance(obj, (list, str)):
-            raise error(f"solo se pueden cortar listas y textos, no {tipo_de(obj)}", L)
-        a = 0 if idx_nodo["a"] is None else evaluar(idx_nodo["a"], env)
-        b = None if idx_nodo["b"] is None else evaluar(idx_nodo["b"], env)
+            raise error(f"only lists and texts can be sliced, not {type_of(obj)}", L)
+        a = 0 if idx_node["a"] is None else evaluate(idx_node["a"], env)
+        b = None if idx_node["b"] is None else evaluate(idx_node["b"], env)
         if not isinstance(a, int) or (b is not None and not isinstance(b, int)):
-            raise error("para cortar se usan números enteros:  lista[1..3]", L)
-        fin = None if b is None or b == -1 else b + 1     # el último se incluye
-        return copiar(obj[a:fin])
-    i = evaluar(idx_nodo, env)
+            raise error("slicing uses whole numbers:  list[1..3]", L)
+        end = None if b is None or b == -1 else b + 1     # the last one is included
+        return copy(obj[a:end])
+    i = evaluate(idx_node, env)
     if isinstance(obj, (list, str)):
         if not isinstance(i, int) or isinstance(i, bool):
-            raise error(f"la posición es un número entero, y llegó {tipo_de(i)}", L)
+            raise error(f"the position is a whole number, and got {type_of(i)}", L)
         if not -len(obj) <= i < len(obj):
-            que = "la lista" if isinstance(obj, list) else "el texto"
-            raise error(f"{que} tiene {len(obj)} elementos (de 0 a {len(obj) - 1}); la posición {i} no existe", L)
+            what = "the list" if isinstance(obj, list) else "the text"
+            raise error(f"{what} has {len(obj)} elements (0 to {len(obj) - 1}); position {i} doesn't exist", L)
         return obj[i]
     if isinstance(obj, dict):
         if i not in obj:
-            raise error(f"el diccionario no tiene la clave {mostrar(i, True)}."
-                        f"{parecido(str(i), [str(k) for k in obj]) if isinstance(i, str) else ''}", L)
+            raise error(f"the dictionary has no key {display(i, True)}."
+                        f"{did_you_mean(str(i), [str(k) for k in obj]) if isinstance(i, str) else ''}", L)
         return obj[i]
-    if es_registro(obj):
-        raise error(f"un registro se lee con punto:  registro.{i if isinstance(i, str) else 'campo'}", L)
-    raise error(f"no se puede buscar una posición en {tipo_de(obj)}", L)
+    if is_record(obj):
+        raise error(f"a record is read with a dot:  record.{i if isinstance(i, str) else 'field'}", L)
+    raise error(f"can't look up a position in {type_of(obj)}", L)
 
 
-def llamar(f, args, nombrados, L):
+def call(f, args, named, L):
     if callable(f):
         try:
-            return f(*args, **dict(nombrados))
+            return f(*args, **dict(named))
         except TypeError as ex:
-            if es_error_cupcake(ex):
+            if is_cupcake_error(ex):
                 raise
-            raise error(f"{f.__name__.rstrip('_')}() recibió datos que no esperaba ({ex})", L) from None
+            raise error(f"{f.__name__.rstrip('_')}() got values it didn't expect ({ex})", L) from None
         except Exception as ex:
-            if es_error_cupcake(ex):
+            if is_cupcake_error(ex):
                 if ex.args[2] is None:
                     raise error(ex.args[1], L) from None
                 raise
             raise error(f"{f.__name__.rstrip('_')}(): {ex}", L) from None
-    if not (isinstance(f, tuple) and f[0] == "funcion"):
-        raise error(f"esto no es una función, es {tipo_de(f)}: no se puede llamar con ( )", L)
-    datos = f[1]
-    params = datos["params"]
-    local = entorno(datos["env"])
+    if not (isinstance(f, tuple) and f[0] == "function"):
+        raise error(f"this is not a function, it's {type_of(f)}: it can't be called with ( )", L)
+    data = f[1]
+    params = data["params"]
+    local = environment(data["env"])
     if len(args) > len(params):
-        raise error(f"{datos['nombre']}() recibe {len(params)} dato(s) y le diste {len(args)}", L)
+        raise error(f"{data['name']}() takes {len(params)} value(s) and you gave it {len(args)}", L)
     for (n, _), v in zip(params, args):
-        local["vars"][n] = copiar(v)
-    nombres_params = [n for n, _ in params]
-    for n, v in nombrados:
-        if n not in nombres_params:
-            raise error(f"{datos['nombre']}() no tiene un dato llamado «{n}».{parecido(n, nombres_params)}", L)
+        local["vars"][n] = copy(v)
+    param_names = [n for n, _ in params]
+    for n, v in named:
+        if n not in param_names:
+            raise error(f"{data['name']}() has no value called '{n}'.{did_you_mean(n, param_names)}", L)
         if n in local["vars"]:
-            raise error(f"{datos['nombre']}(): el dato «{n}» llegó dos veces", L)
-        local["vars"][n] = copiar(v)
-    for n, defecto in params:
+            raise error(f"{data['name']}(): the value '{n}' arrived twice", L)
+        local["vars"][n] = copy(v)
+    for n, default in params:
         if n not in local["vars"]:
-            if defecto is None:
-                raise error(f"{datos['nombre']}() necesita el dato «{n}»", L)
-            local["vars"][n] = copiar(evaluar(defecto, datos["env"]))
-    if datos["lam"]:
-        return evaluar(datos["cuerpo"], local)
-    for s in datos["cuerpo"]:
+            if default is None:
+                raise error(f"{data['name']}() needs the value '{n}'", L)
+            local["vars"][n] = copy(evaluate(default, data["env"]))
+    if data["lam"]:
+        return evaluate(data["body"], local)
+    for s in data["body"]:
         if s["t"] == "def":
-            local["vars"][s["nombre"]] = ("funcion", {"nombre": s["nombre"], "params": s["params"],
-                                                      "cuerpo": s["cuerpo"], "env": local, "lam": False})
-    señal = ejecutar_bloque(datos["cuerpo"], local)
-    if señal is None:
+            local["vars"][s["name"]] = ("function", {"name": s["name"], "params": s["params"],
+                                                      "body": s["body"], "env": local, "lam": False})
+    signal = execute_block(data["body"], local)
+    if signal is None:
         return None
-    if señal[0] == "return":
-        return señal[1]
-    raise error(f"«{señal[0]}» solo tiene sentido dentro de un ciclo", señal[2])
+    if signal[0] == "return":
+        return signal[1]
+    raise error(f"'{signal[0]}' only makes sense inside a loop", signal[2])
 
 
-# -- otros archivos: use
+# -- other files: use
 
-MODULOS = {}            # ruta → variables del archivo ya ejecutado
-CARGANDO = set()
+MODULES = {}            # path → variables of the already executed file
+LOADING = set()
 
 
-def usar(s, env):
-    ruta = os.path.join(env["carpeta"], s["modulo"] + ".cup")
-    if not os.path.exists(ruta):
-        raise error(f"no encuentro el archivo «{s['modulo']}.cup» en la carpeta del programa", s["l"])
-    ruta = os.path.abspath(ruta)
-    if ruta in CARGANDO:
-        raise error(f"«{s['modulo']}.cup» se usa a sí mismo en un círculo", s["l"])
-    if ruta not in MODULOS:
-        CARGANDO.add(ruta)
+def use_module(s, env):
+    path_ = os.path.join(env["folder"], s["module"] + ".cup")
+    if not os.path.exists(path_):
+        raise error(f"I can't find the file '{s['module']}.cup' in the program's folder", s["l"])
+    path_ = os.path.abspath(path_)
+    if path_ in LOADING:
+        raise error(f"'{s['module']}.cup' uses itself in a circle", s["l"])
+    if path_ not in MODULES:
+        LOADING.add(path_)
         try:
-            fuente = open(ruta, encoding="utf-8").read()
-            mod_env = entorno(GLOBAL, os.path.dirname(ruta))
+            source = open(path_, encoding="utf-8").read()
+            mod_env = environment(GLOBAL, os.path.dirname(path_))
             try:
-                ejecutar_programa(programa(fuente), mod_env)
+                execute_program(parse_program(source), mod_env)
             except Exception as ex:
-                if es_error_cupcake(ex):
-                    raise error(f"en {s['modulo']}.cup, línea {ex.args[2]}: {ex.args[1]}", s["l"]) from None
+                if is_cupcake_error(ex):
+                    raise error(f"in {s['module']}.cup, line {ex.args[2]}: {ex.args[1]}", s["l"]) from None
                 raise
-            MODULOS[ruta] = mod_env["vars"]
+            MODULES[path_] = mod_env["vars"]
         finally:
-            CARGANDO.discard(ruta)
-    variables = MODULOS[ruta]
-    if s["nombres"] is None:
+            LOADING.discard(path_)
+    variables = MODULES[path_]
+    if s["names"] is None:
         for n, v in variables.items():
             env["vars"][n] = v
         return
-    for n, alias in s["nombres"]:
+    for n, alias in s["names"]:
         if n not in variables:
-            raise error(f"«{s['modulo']}.cup» no tiene «{n}».{parecido(n, variables)}", s["l"])
+            raise error(f"'{s['module']}.cup' has no '{n}'.{did_you_mean(n, variables)}", s["l"])
         env["vars"][alias] = variables[n]
 
 
-# ================================================================ 4. funciones integradas
-# Todas con el dato principal primero. Las que «cambian» algo devuelven una copia nueva.
+# ================================================================ 4. builtin functions
+# All take the main value first. The ones that "change" something return a new copy.
 
-def pedir_lista(v, quien):
+def need_list(v, who):
     if not isinstance(v, list):
-        raise error(f"{quien}() necesita una lista, y recibió {tipo_de(v)}")
+        raise error(f"{who}() needs a list, and got {type_of(v)}")
     return v
 
 
-def pedir_texto(v, quien):
+def need_text(v, who):
     if not isinstance(v, str):
-        raise error(f"{quien}() necesita un texto, y recibió {tipo_de(v)}")
+        raise error(f"{who}() needs a text, and got {type_of(v)}")
     return v
 
 
-def pedir_funcion(v, quien):
-    if not es_funcion(v):
-        raise error(f"{quien}() necesita una función, como  lam x => x > 0")
+def need_function(v, who):
+    if not is_function(v):
+        raise error(f"{who}() needs a function, like  fx: it > 0")
     return v
 
 
-def show(*valores):
-    print(" ".join(mostrar(v) for v in valores))
+def show(*values_):
+    print(" ".join(display(v) for v in values_))
 
 
-def read(aviso=""):
-    """Muestra un aviso y devuelve lo que la persona escribe (siempre un texto)."""
+def read(prompt=""):
+    """Shows a prompt and returns what the person types (always a text)."""
     try:
-        respuesta = input(mostrar(aviso))
+        answer = input(display(prompt))
     except EOFError:
-        raise error("read() esperaba que alguien escribiera algo, y no llegó nada") from None
-    if not sys.stdin.isatty():          # sin una persona escribiendo, se muestra la respuesta
-        print(respuesta)
-    return respuesta
+        raise error("read() was waiting for someone to type something, and nothing came") from None
+    if not sys.stdin.isatty():          # with no person typing, the answer is shown
+        print(answer)
+    return answer
 
 
 def len_(v):
-    if es_registro(v):
-        raise error("len() no cuenta los campos de un registro")
+    if is_record(v):
+        raise error("len() doesn't count a record's fields")
     if not isinstance(v, (list, str, dict)):
-        raise error(f"len() cuenta los elementos de una lista, un texto o un diccionario, no de {tipo_de(v)}")
+        raise error(f"len() counts the elements of a list, a text or a dictionary, not of {type_of(v)}")
     return len(v)
 
 
-def add(lista, x):
-    return copiar(pedir_lista(lista, "add")) + [copiar(x)]
+def add(list_, x):
+    return copy(need_list(list_, "add")) + [copy(x)]
 
 
-def drop(coleccion, x):
-    if isinstance(coleccion, dict):
-        if x not in coleccion:
-            raise error(f"drop(): el diccionario no tiene la clave {mostrar(x, True)}")
-        return {k: copiar(v) for k, v in coleccion.items() if k != x}
-    lista = copiar(pedir_lista(coleccion, "drop"))
-    if x not in lista:
-        raise error(f"drop(): {mostrar(x, True)} no está en la lista")
-    lista.remove(x)
-    return lista
+def drop(collection, x):
+    if isinstance(collection, dict):
+        if x not in collection:
+            raise error(f"drop(): the dictionary has no key {display(x, True)}")
+        return {k: copy(v) for k, v in collection.items() if k != x}
+    list_ = copy(need_list(collection, "drop"))
+    if x not in list_:
+        raise error(f"drop(): {display(x, True)} is not in the list")
+    list_.remove(x)
+    return list_
 
 
-def sorted_(lista, clave=None):
-    lista = pedir_lista(lista, "sorted")
+def sorted_(list_, key=None):
+    list_ = need_list(list_, "sorted")
     try:
-        if clave is None:
-            return copiar(sorted(lista))
-        pedir_funcion(clave, "sorted")
-        return copiar(sorted(lista, key=lambda x: llamar(clave, [x], [], None)))
+        if key is None:
+            return copy(sorted(list_))
+        need_function(key, "sorted")
+        return copy(sorted(list_, key=lambda x: call(key, [x], [], None)))
     except TypeError:
-        raise error("sorted() no puede ordenar cosas de distinto tipo (por ejemplo, textos y números juntos)") from None
+        raise error("sorted() can't sort things of different kinds (for example, texts and numbers together)") from None
 
 
 def reversed_(v):
     if isinstance(v, str):
         return v[::-1]
-    return copiar(pedir_lista(v, "reversed"))[::-1]
+    return copy(need_list(v, "reversed"))[::-1]
 
 
-def filter_(lista, f):
-    pedir_funcion(f, "filter")
-    return [copiar(x) for x in pedir_lista(lista, "filter") if verdad(llamar(f, [x], [], None))]
+def filter_(list_, f):
+    need_function(f, "filter")
+    return [copy(x) for x in need_list(list_, "filter") if truthy(call(f, [x], [], None))]
 
 
-def map_(lista, f):
-    pedir_funcion(f, "map")
-    return [copiar(llamar(f, [x], [], None)) for x in pedir_lista(lista, "map")]
+def map_(list_, f):
+    need_function(f, "map")
+    return [copy(call(f, [x], [], None)) for x in need_list(list_, "map")]
 
 
-def reduce(lista, f, inicio):
-    pedir_funcion(f, "reduce")
-    acumulado = copiar(inicio)
-    for x in pedir_lista(lista, "reduce"):
-        acumulado = llamar(f, [acumulado, x], [], None)
-    return acumulado
+def reduce(list_, f, begin):
+    need_function(f, "reduce")
+    acc = copy(begin)
+    for x in need_list(list_, "reduce"):
+        acc = call(f, [acc, x], [], None)
+    return acc
 
 
-def first(lista):
-    if not pedir_lista(lista, "first"):
-        raise error("first(): la lista está vacía")
-    return copiar(lista[0])
+def first(list_):
+    if not need_list(list_, "first"):
+        raise error("first(): the list is empty")
+    return copy(list_[0])
 
 
-def last(lista):
-    if not pedir_lista(lista, "last"):
-        raise error("last(): la lista está vacía")
-    return copiar(lista[-1])
+def last(list_):
+    if not need_list(list_, "last"):
+        raise error("last(): the list is empty")
+    return copy(list_[-1])
 
 
-def numeros(valores, quien):
-    if len(valores) == 1 and isinstance(valores[0], list):
-        valores = valores[0]
-    if not valores:
-        raise error(f"{quien}() necesita al menos un número")
-    for v in valores:
+def numbers(values_, who):
+    if len(values_) == 1 and isinstance(values_[0], list):
+        values_ = values_[0]
+    if not values_:
+        raise error(f"{who}() needs at least one number")
+    for v in values_:
         if not isinstance(v, (int, float, str)) or isinstance(v, bool):
-            raise error(f"{quien}() compara números (o textos), y recibió {tipo_de(v)}")
-    return valores
+            raise error(f"{who}() compares numbers (or texts), and got {type_of(v)}")
+    return values_
 
 
-def min_(*valores):
-    return min(numeros(valores, "min"))
+def min_(*values_):
+    return min(numbers(values_, "min"))
 
 
-def max_(*valores):
-    return max(numeros(valores, "max"))
+def max_(*values_):
+    return max(numbers(values_, "max"))
 
 
-def sum_(lista):
+def sum_(list_):
     total = 0
-    for v in pedir_lista(lista, "sum"):
+    for v in need_list(list_, "sum"):
         if not isinstance(v, (int, float)) or isinstance(v, bool):
-            raise error(f"sum() suma números, y la lista tiene {tipo_de(v)}")
+            raise error(f"sum() adds numbers, and the list has {type_of(v)}")
         total += v
     return total
 
 
 def abs_(x):
     if not isinstance(x, (int, float)) or isinstance(x, bool):
-        raise error(f"abs() necesita un número, y recibió {tipo_de(x)}")
+        raise error(f"abs() needs a number, and got {type_of(x)}")
     return abs(x)
 
 
-def round_(x, decimales=0):
+def round_(x, decimals=0):
     if not isinstance(x, (int, float)) or isinstance(x, bool):
-        raise error(f"round() necesita un número, y recibió {tipo_de(x)}")
-    return round(x) if decimales == 0 else round(x, decimales)
+        raise error(f"round() needs a number, and got {type_of(x)}")
+    return round(x) if decimals == 0 else round(x, decimals)
 
 
 def int_(x):
@@ -1912,8 +1912,8 @@ def int_(x):
         try:
             return int(x.strip())
         except ValueError:
-            raise error(f"«{x}» no es un número entero") from None
-    raise error(f"int() convierte textos o números, no {tipo_de(x)}")
+            raise error(f"'{x}' is not a whole number") from None
+    raise error(f"int() converts texts or numbers, not {type_of(x)}")
 
 
 def float_(x):
@@ -1923,113 +1923,113 @@ def float_(x):
         try:
             return float(x.strip())
         except ValueError:
-            raise error(f"«{x}» no es un número") from None
-    raise error(f"float() convierte textos o números, no {tipo_de(x)}")
+            raise error(f"'{x}' is not a number") from None
+    raise error(f"float() converts texts or numbers, not {type_of(x)}")
 
 
 def str_(x):
-    return mostrar(x)
+    return display(x)
 
 
 def bool_(x):
-    return verdad(x)
+    return truthy(x)
 
 
 def upper(t):
-    return pedir_texto(t, "upper").upper()
+    return need_text(t, "upper").upper()
 
 
 def lower(t):
-    return pedir_texto(t, "lower").lower()
+    return need_text(t, "lower").lower()
 
 
 def strip(t):
-    return pedir_texto(t, "strip").strip()
+    return need_text(t, "strip").strip()
 
 
-def split(t, separador=None):
-    return pedir_texto(t, "split").split(separador)
+def split(t, separator=None):
+    return need_text(t, "split").split(separator)
 
 
-def join(lista, separador=""):
-    return pedir_texto(separador, "join").join(mostrar(x) for x in pedir_lista(lista, "join"))
+def join(list_, separator=""):
+    return need_text(separator, "join").join(display(x) for x in need_list(list_, "join"))
 
 
-def replace(t, viejo, nuevo):
-    return pedir_texto(t, "replace").replace(pedir_texto(viejo, "replace"), pedir_texto(nuevo, "replace"))
+def replace(t, old, new):
+    return need_text(t, "replace").replace(need_text(old, "replace"), need_text(new, "replace"))
 
 
-def pedir_dic(d, quien):
+def need_dict(d, who):
     if not isinstance(d, dict):
-        extra = " (un registro no tiene claves: sus campos se leen con punto)" if es_registro(d) else ""
-        raise error(f"{quien}() necesita un diccionario, y recibió {tipo_de(d)}{extra}")
+        extra = " (a record has no keys: its fields are read with a dot)" if is_record(d) else ""
+        raise error(f"{who}() needs a dictionary, and got {type_of(d)}{extra}")
     return d
 
 
 def keys(d):
-    return copiar(list(pedir_dic(d, "keys").keys()))
+    return copy(list(need_dict(d, "keys").keys()))
 
 
 def values(d):
-    return copiar(list(pedir_dic(d, "values").values()))
+    return copy(list(need_dict(d, "values").values()))
 
 
-def count(lista, que):
-    lista = pedir_lista(lista, "count")
-    if es_funcion(que):
-        return sum(1 for x in lista if verdad(llamar(que, [x], [], None)))
-    return sum(1 for x in lista if x == que)
+def count(list_, what):
+    list_ = need_list(list_, "count")
+    if is_function(what):
+        return sum(1 for x in list_ if truthy(call(what, [x], [], None)))
+    return sum(1 for x in list_ if x == what)
 
 
-def roll(desde, hasta):
-    if not all(isinstance(x, int) and not isinstance(x, bool) for x in (desde, hasta)):
-        raise error("roll() necesita dos números enteros:  roll(1, 6)")
-    if desde > hasta:
-        raise error(f"roll({desde}, {hasta}): el primero tiene que ser menor o igual que el segundo")
-    return random.randint(desde, hasta)
+def roll(start, stop_at):
+    if not all(isinstance(x, int) and not isinstance(x, bool) for x in (start, stop_at)):
+        raise error("roll() needs two whole numbers:  roll(1, 6)")
+    if start > stop_at:
+        raise error(f"roll({start}, {stop_at}): the first must be less than or equal to the second")
+    return random.randint(start, stop_at)
 
 
-def pick(lista):
-    if not pedir_lista(lista, "pick"):
-        raise error("pick(): la lista está vacía")
-    return copiar(random.choice(lista))
+def pick(list_):
+    if not need_list(list_, "pick"):
+        raise error("pick(): the list is empty")
+    return copy(random.choice(list_))
 
 
-def read_num(aviso=""):
-    """Como read, pero insiste hasta recibir un número."""
+def read_num(prompt=""):
+    """Like read, but keeps asking until it gets a number."""
     while True:
-        respuesta = read(aviso).strip()
+        answer = read(prompt).strip()
         try:
-            return int(respuesta)
+            return int(answer)
         except ValueError:
             try:
-                return float(respuesta)
+                return float(answer)
             except ValueError:
-                print(f"«{respuesta}» no es un número. Prueba otra vez.")
+                print(f"'{answer}' is not a number. Try again.")
 
 
-CARPETA_DEL_PROGRAMA = ["."]
+PROGRAM_FOLDER = ["."]
 
 
-def load(ruta):
-    """Carga un archivo de texto."""
+def load(path_):
+    """Loads a text file."""
     try:
-        with open(os.path.join(CARPETA_DEL_PROGRAMA[0], pedir_texto(ruta, "load")), encoding="utf-8") as f:
+        with open(os.path.join(PROGRAM_FOLDER[0], need_text(path_, "load")), encoding="utf-8") as f:
             return f.read()
     except OSError:
-        raise error(f"load(): no se pudo cargar «{ruta}»") from None
+        raise error(f"load(): couldn't load '{path_}'") from None
 
 
-def save(ruta, texto):
-    """Guarda un texto en un archivo."""
+def save(path_, text):
+    """Saves a text to a file."""
     try:
-        with open(os.path.join(CARPETA_DEL_PROGRAMA[0], pedir_texto(ruta, "save")), "w", encoding="utf-8") as f:
-            f.write(mostrar(texto))
+        with open(os.path.join(PROGRAM_FOLDER[0], need_text(path_, "save")), "w", encoding="utf-8") as f:
+            f.write(display(text))
     except OSError:
-        raise error(f"save(): no se pudo guardar «{ruta}»") from None
+        raise error(f"save(): couldn't save '{path_}'") from None
 
 
-INTEGRADAS = {
+BUILTINS = {
     "show": show, "read": read, "len": len_, "add": add, "drop": drop, "sorted": sorted_, "reversed": reversed_,
     "filter": filter_, "map": map_, "reduce": reduce, "first": first, "last": last,
     "min": min_, "max": max_, "sum": sum_, "abs": abs_, "round": round_,
@@ -2039,93 +2039,93 @@ INTEGRADAS = {
     "count": count, "roll": roll, "pick": pick, "read_num": read_num,
 }
 
-GLOBAL = entorno(None, ".")
-GLOBAL["vars"].update(INTEGRADAS)
+GLOBAL = environment(None, ".")
+GLOBAL["vars"].update(BUILTINS)
 
 
-# ================================================================ 5. programa
+# ================================================================ 5. program
 
-def ejecutar_texto(fuente, carpeta="."):
-    """Ejecuta un programa. Devuelve None si salió bien, o (mensaje, línea) si hubo un error."""
-    CARPETA_DEL_PROGRAMA[0] = carpeta
-    MODULOS.clear()
-    env = entorno(GLOBAL, carpeta)
+def run_text(source, folder="."):
+    """Runs a program. Returns None if all went well, or (message, line) if there was an error."""
+    PROGRAM_FOLDER[0] = folder
+    MODULES.clear()
+    env = environment(GLOBAL, folder)
     try:
-        ejecutar_programa(programa(fuente), env)
-        principal = env["vars"].get("main")
-        if es_funcion(principal):                     # main corre al ejecutar el archivo (no al usarlo con use)
-            if principal[1]["params"]:
-                raise error("main no recibe datos:  fx main():")
-            llamar(principal, [], [], None)
+        execute_program(parse_program(source), env)
+        main_fx = env["vars"].get("main")
+        if is_function(main_fx):                     # main runs when the file is executed (not when it's loaded with use)
+            if main_fx[1]["params"]:
+                raise error("main takes no values:  fx main():")
+            call(main_fx, [], [], None)
     except Exception as ex:
         if ex.args == ("cupcake-stop",):
             return None
-        if es_error_cupcake(ex):
+        if is_cupcake_error(ex):
             return ex.args[1], ex.args[2]
         if isinstance(ex, RecursionError):
-            return "una función se llamó a sí misma demasiadas veces (¿falta una condición para parar?)", None
+            return "a function called itself too many times (is a stop condition missing?)", None
         raise
     except KeyboardInterrupt:
-        return "detenido con Ctrl+C", None
+        return "stopped with Ctrl+C", None
     return None
 
 
-def informar(nombre_archivo, fuente, resultado):
-    mensaje, linea = resultado
-    lineas = fuente.split("\n")
-    print(f"\nError en {nombre_archivo}" + (f", línea {linea}:" if linea else ":"), file=sys.stderr)
-    if linea and 1 <= linea <= len(lineas):
-        print(f"    {lineas[linea - 1].strip()}", file=sys.stderr)
-    print(f"  {mensaje}", file=sys.stderr)
+def report(file_name, source, result):
+    message, line = result
+    lines = source.split("\n")
+    print(f"\nError in {file_name}" + (f", line {line}:" if line else ":"), file=sys.stderr)
+    if line and 1 <= line <= len(lines):
+        print(f"    {lines[line - 1].strip()}", file=sys.stderr)
+    print(f"  {message}", file=sys.stderr)
 
 
-def consola():
-    print("Cupcake: escribe código y pulsa Enter. Para salir: Ctrl+D")
-    env = entorno(GLOBAL, ".")
-    pendiente = ""
+def repl():
+    print("Cupcake: type code and press Enter. To exit: Ctrl+D")
+    env = environment(GLOBAL, ".")
+    pending = ""
     while True:
         try:
-            linea = input("... " if pendiente else ">>> ")
+            line = input("... " if pending else ">>> ")
         except EOFError:
             print()
             return
-        pendiente += linea + "\n"
-        abierto = pendiente.count("[") > pendiente.count("]") or pendiente.count("(") > pendiente.count(")")
-        con_bloque = any(l.split("#")[0].rstrip().endswith(":") for l in pendiente.split("\n"))
-        if abierto or (con_bloque and linea.strip()):       # un bloque termina con una línea vacía
+        pending += line + "\n"
+        open_ = pending.count("[") > pending.count("]") or pending.count("(") > pending.count(")")
+        with_block = any(l.split("#")[0].rstrip().endswith(":") for l in pending.split("\n"))
+        if open_ or (with_block and line.strip()):       # a block ends with an empty line
             continue
-        fuente, pendiente = pendiente, ""
+        source, pending = pending, ""
         try:
-            sentencias = programa(fuente)
-            if len(sentencias) == 1 and sentencias[0]["t"] == "expr":
-                v = evaluar(sentencias[0]["expr"], env)
+            statements = parse_program(source)
+            if len(statements) == 1 and statements[0]["t"] == "expr":
+                v = evaluate(statements[0]["expr"], env)
                 if v is not None:
-                    print(mostrar(v, True))
+                    print(display(v, True))
             else:
-                ejecutar_programa(sentencias, env)
+                execute_program(statements, env)
         except Exception as ex:
             if ex.args == ("cupcake-stop",):
                 return
-            if not es_error_cupcake(ex):
+            if not is_cupcake_error(ex):
                 raise
             print(f"Error: {ex.args[1]}")
 
 
 def main(argv):
     if len(argv) < 2:
-        consola()
+        repl()
         return 0
-    ruta = argv[1]
-    if not ruta.endswith(".cup") and not os.path.exists(ruta) and os.path.exists(ruta + ".cup"):
-        ruta += ".cup"
+    path_ = argv[1]
+    if not path_.endswith(".cup") and not os.path.exists(path_) and os.path.exists(path_ + ".cup"):
+        path_ += ".cup"
     try:
-        fuente = open(ruta, encoding="utf-8").read()
+        source = open(path_, encoding="utf-8").read()
     except OSError:
-        print(f"No encuentro el archivo «{ruta}».", file=sys.stderr)
+        print(f"I can't find the file '{path_}'.", file=sys.stderr)
         return 1
-    resultado = ejecutar_texto(fuente, os.path.dirname(os.path.abspath(ruta)))
-    if resultado is not None:
-        informar(os.path.basename(ruta), fuente, resultado)
+    result = run_text(source, os.path.dirname(os.path.abspath(path_)))
+    if result is not None:
+        report(os.path.basename(path_), source, result)
         return 1
     return 0
 

@@ -1,13 +1,13 @@
-"""Empaqueta la extensión como .vsix sin necesitar Node. Uso: python3 empaquetar.py"""
+"""Packs the extension as a .vsix without needing Node. Usage: python3 pack.py"""
 import json
 import pathlib
 import zipfile
 
-AQUI = pathlib.Path(__file__).parent
-pkg = json.loads((AQUI / "package.json").read_text(encoding="utf-8"))
-salida = AQUI / f"{pkg['name']}-{pkg['version']}.vsix"
+HERE = pathlib.Path(__file__).parent
+pkg = json.loads((HERE / "package.json").read_text(encoding="utf-8"))
+output = HERE / f"{pkg['name']}-{pkg['version']}.vsix"
 
-MANIFIESTO = f"""<?xml version="1.0" encoding="utf-8"?>
+MANIFEST = f"""<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
   <Metadata>
     <Identity Language="en-US" Id="{pkg['name']}" Version="{pkg['version']}" Publisher="{pkg['publisher']}" />
@@ -24,12 +24,12 @@ MANIFIESTO = f"""<?xml version="1.0" encoding="utf-8"?>
   <Dependencies />
   <Assets>
     <Asset Type="Microsoft.VisualStudio.Code.Manifest" Path="extension/package.json" Addressable="true" />
-    <Asset Type="Microsoft.VisualStudio.Services.Icons.Default" Path="extension/icono.png" Addressable="true" />
+    <Asset Type="Microsoft.VisualStudio.Services.Icons.Default" Path="extension/icon.png" Addressable="true" />
   </Assets>
 </PackageManifest>
 """
 
-TIPOS = """<?xml version="1.0" encoding="utf-8"?>
+CONTENT_TYPES = """<?xml version="1.0" encoding="utf-8"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension=".json" ContentType="application/json" />
   <Default Extension=".vsixmanifest" ContentType="text/xml" />
@@ -39,12 +39,12 @@ TIPOS = """<?xml version="1.0" encoding="utf-8"?>
 </Types>
 """
 
-ARCHIVOS = ["package.json", "language-configuration.json", "README.md", "syntaxes/cupcake.tmLanguage.json", "snippets/cupcake.json", "icono.png", "icono-archivo.svg"]
+FILES = ["package.json", "language-configuration.json", "README.md", "syntaxes/cupcake.tmLanguage.json", "snippets/cupcake.json", "icon.png", "file-icon.svg"]
 
-with zipfile.ZipFile(salida, "w", zipfile.ZIP_DEFLATED) as z:
-    z.writestr("extension.vsixmanifest", MANIFIESTO)
-    z.writestr("[Content_Types].xml", TIPOS)
-    for nombre in ARCHIVOS:
-        z.write(AQUI / nombre, f"extension/{nombre}")
+with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as z:
+    z.writestr("extension.vsixmanifest", MANIFEST)
+    z.writestr("[Content_Types].xml", CONTENT_TYPES)
+    for name in FILES:
+        z.write(HERE / name, f"extension/{name}")
 
-print(f"Creado {salida.name}")
+print(f"Created {output.name}")

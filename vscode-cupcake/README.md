@@ -1,6 +1,6 @@
-# Cupcake para VS Code
+# Cupcake for VS Code
 
-Colores, sangría automática y atajos para los archivos `.cup` del lenguaje [Cupcake](https://github.com/cupcake-lang/cupcake) 1.0 «Frambuesa».
+Colors, automatic indentation and snippets for `.cup` files of the [Cupcake](https://github.com/cupcake-lang/cupcake) language, version 1.0 "Frambuesa".
 
-- Después de `:`, Enter agrega la sangría solo.
-- Atajos: `fx`, `main`, `if`, `ife`, `when`, `for`, `forat`, `while`, `repeat`, `try`, y `lam` + Tab para escribir `λ`.
+- After `:`, pressing Enter indents for you.
+- Snippets: `fx`, `main`, `if`, `ife`, `when`, `for`, `forat`, `while`, `repeat`, `try`, and `lam` + Tab to write `λ`.
