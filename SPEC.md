@@ -1,6 +1,6 @@
 # Cupcake
 
-**Version 1.0 "Frambuesa" (raspberry)**
+**Version 1.0 "Frambuesa"**
 
 A small, comfortable scripting language with **no classes, no objects and no methods**. There are only **data** and **functions**.
 
